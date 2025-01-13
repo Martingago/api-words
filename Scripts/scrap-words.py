@@ -18,13 +18,20 @@ all_words = []
 def process_page(url):
     print(f"Procesando página: {url}")
     response = requests.get(url)
+    # Configuramos explícitamente la codificación a UTF-8
+    response.encoding = 'utf-8'
+    
     if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "html.parser")
+        # Especificamos el parser y la codificación
+        soup = BeautifulSoup(response.text, "html.parser", from_encoding='utf-8')
         # Buscamos el <span> con la clase 'mt'
         span = soup.find("span", class_="mt")
         if span:
             # Obtenemos el texto y lo separamos en palabras
-            return span.text.split()
+            words = span.text.split()
+            # Limpiamos posibles caracteres problemáticos
+            words = [word.strip() for word in words]
+            return words
         else:
             print(f"No se encontró el span en la página {url}.")
             return []
