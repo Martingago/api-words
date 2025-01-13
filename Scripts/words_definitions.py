@@ -60,6 +60,7 @@ def process_csv(input_file, output_file):
             language = "esp"
 
             writer.writerow(row[:2] + ["true" if status else "false", calificacion if calificacion else "N/A", definition if definition else "N/A", length, language])
+            print("word: '" + word + "' successfully scraped and added to the csv")
 
 if __name__ == "__main__":
     process_csv(input_file, output_file)
