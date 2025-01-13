@@ -2,7 +2,6 @@ package com.martingago.words.controller;
 
 import com.martingago.words.dto.ApiResponse;
 import com.martingago.words.dto.WordResponseDTO;
-import com.martingago.words.model.WordModel;
 import com.martingago.words.service.WordService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +47,11 @@ public class WordController {
     @PostMapping("/add-word")
     public ResponseEntity<ApiResponse<WordResponseDTO>> insertWord(@Valid @RequestBody WordResponseDTO wordResponseDTO){
         WordResponseDTO addedWord =  wordService.addNewWord(wordResponseDTO);
-        return ApiResponse.build(true, "Word '" + addedWord.getWord() + "' added successfully", addedWord,HttpStatus.CREATED);
+        return ApiResponse.build(
+                true,
+                "Word '" + addedWord.getWord() + "' was added successfully",
+                HttpStatus.CREATED.value(),
+                addedWord,
+                HttpStatus.CREATED);
     }
 }

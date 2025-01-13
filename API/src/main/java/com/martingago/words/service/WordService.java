@@ -23,9 +23,14 @@ public class WordService {
         return WordMapper.toDTO(wordModel);
     }
 
+    /**
+     * Adds a new word to the API database
+     * @param wordResponseDTO DTO of the word that gona be added
+     * @return the updated word
+     */
     public WordResponseDTO addNewWord(WordResponseDTO wordResponseDTO){
         if(wordRepository.existsByWord(wordResponseDTO.getWord())){
-            throw new DuplicateKeyException(wordResponseDTO.getWord());
+            throw new DuplicateKeyException("Error, duplicate word on database: '" + wordResponseDTO.getWord() + "'");
         }
         try{
             WordModel wordModel = WordMapper.toModel(wordResponseDTO);

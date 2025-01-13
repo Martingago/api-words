@@ -4,36 +4,37 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import java.time.Instant;
 
 @Getter
 public class ApiResponse<T> {
     private final boolean status;
     private final String message;
+    private final Integer serverCode;
     private final T responseObject;
+    private final Instant timeStamp;
 
     @Builder
-    private ApiResponse(boolean status, String message, T responseObject) {
+    private ApiResponse(boolean status, String message, int serverCode, T responseObject) {
         this.status = status;
         this.message = message;
+        this.serverCode = serverCode;
         this.responseObject = responseObject;
+        this.timeStamp = Instant.now();
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> build(boolean status, String message, T responseObject, HttpStatus httpStatus) {
+    public static <T> ResponseEntity<ApiResponse<T>> build(boolean status, String message, Integer serverCode, T responseObject, HttpStatus httpStatus) {
         ApiResponse<T> response = ApiResponse.<T>builder()
                 .status(status)
                 .message(message)
                 .responseObject(responseObject)
+                .serverCode(serverCode)
                 .build();
 
         return new ResponseEntity<>(response, httpStatus);
     }
 
-    // Métodos de conveniencia para respuestas comunes
-    public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
-        return build(true, "Success", data, HttpStatus.OK);
-    }
-
-    public static <T> ResponseEntity<ApiResponse<T>> error(String message) {
-        return build(false, message, null, HttpStatus.BAD_REQUEST);
+    public static <T> ResponseEntity<ApiResponse<T>> error(String message, Integer errorCode, HttpStatus status) {
+        return build(false, message, errorCode, null, status);
     }
 }

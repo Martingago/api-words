@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WordRepository extends JpaRepository<WordModel, Long> {
 
-    @Query(value = "SELECT * FROM word_model ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM word_model  " +
+            "WHERE language = 'gal' ORDER BY RAND() LIMIT 1", nativeQuery = true)
     WordModel findRandomWord();
 
     Boolean existsByWord(String word);
