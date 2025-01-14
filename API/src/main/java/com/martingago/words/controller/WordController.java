@@ -7,10 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class WordController {
@@ -52,6 +50,20 @@ public class WordController {
                 "Word '" + addedWord.getWord() + "' was added successfully",
                 HttpStatus.CREATED.value(),
                 addedWord,
+                HttpStatus.CREATED);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<ApiResponse<String>> uploadCSV(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty() || !file.getOriginalFilename().endsWith(".csv")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        String processedWords = wordService.uploadWordsCSV(file);
+        return ApiResponse.build(true,
+                processedWords,
+                HttpStatus.CREATED.value(),
+                processedWords,
                 HttpStatus.CREATED);
     }
 }
