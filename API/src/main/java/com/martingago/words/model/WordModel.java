@@ -24,4 +24,6 @@ public class WordModel {
 
     @Column(columnDefinition = "TEXT")
     private String definition;
+
+    private String qualification;
 }

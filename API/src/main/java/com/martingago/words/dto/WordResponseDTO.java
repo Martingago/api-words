@@ -20,4 +20,6 @@ public class WordResponseDTO {
     private int wordLength;
 
     private String definition;
+
+    private String qualification;
 }

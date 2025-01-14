@@ -11,15 +11,16 @@ public class WordMapper {
                 .definition(wordModel.getDefinition())
                 .language(wordModel.getLanguage())
                 .wordLength(wordModel.getWordLength())
+                .qualification(wordModel.getQualification())
                 .build();
     }
     public  static WordModel toModel(WordResponseDTO wordResponseDTO){
-        System.out.println(wordResponseDTO);
         return WordModel.builder()
                 .word(wordResponseDTO.getWord())
                 .definition(wordResponseDTO.getDefinition())
                 .language(wordResponseDTO.getLanguage())
                 .wordLength(wordResponseDTO.getWordLength())
+                .qualification(wordResponseDTO.getQualification())
                 .build();
     }
 }

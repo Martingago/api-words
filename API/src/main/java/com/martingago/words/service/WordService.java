@@ -68,7 +68,7 @@ public class WordService {
             Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
             //Reads the file and all the records on it
             Iterable<CSVRecord> records = CSVFormat.DEFAULT
-                    .withHeader("word", "status", "calification", "definition", "length", "language")
+                    .withHeader("word", "status", "qualification", "definition", "length", "language")
                     .withSkipHeaderRecord()
                     .parse(reader);
             List<WordModel> batchList = new ArrayList<>();
@@ -77,18 +77,20 @@ public class WordService {
             for (CSVRecord record : records) {
                 //If word doesn't exist on db its loaded
                 if (!Boolean.parseBoolean(record.get("status"))) {
-                    System.out.println("Skipping: '" + record.get("word") + "' not valid word");
+                    //System.out.println("Skipping: '" + record.get("word") + "' not valid word");
                     continue;
                 }
                 if (wordRepository.existsByWord(record.get("word"))) {
-                    System.out.println("Skipping: '" + record.get("word") + "' duplicate word");
+                    //System.out.println("Skipping: '" + record.get("word") + "' duplicate word");
                     continue;
                 }
                 try {
-                    WordResponseDTO wordResponseDTO = new WordResponseDTO(record.get("word"),
+                    WordResponseDTO wordResponseDTO = new WordResponseDTO(
+                            record.get("word"),
                             record.get("language"),
                             Integer.parseInt(record.get("length")),
-                            record.get("description"));
+                            record.get("definition"),
+                            record.get("qualification"));
                     WordModel wordModel = WordMapper.toModel(wordResponseDTO);
                     batchList.add(wordModel);
                     count++;
@@ -97,7 +99,7 @@ public class WordService {
                         batchList.clear();
                     }
                 } catch (NumberFormatException e) {
-                    System.err.println("Error with conversion to int of the column 'length', value is not a valid number");
+                    System.err.println(record.get("word") + " has an error with conversion to int of the column 'length', value is not a valid number");
                 }
             }
         } catch (Exception e) {
