@@ -106,8 +106,6 @@ public class WordService {
             System.err.println("Exception reading CSV words: " + e.getMessage());
         }
         return "successfully upload " + count + " words";
-    }
-
-    ;
+    };
 
 }
