@@ -10,4 +10,5 @@ conda activate scrap_web
 ```bash
 conda install anaconda::requests
 conda install anaconda::beautifulsoup4
+conda install conda-forge::fake-useragent
 ```
