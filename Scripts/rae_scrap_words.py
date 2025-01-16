@@ -36,7 +36,6 @@ def obtener_datos(palabra, session):
     }
 
     try:
-        #time.sleep(random.uniform(0.1, 0.3))
         response = session.get(url, headers=headers, timeout=1)
         response.raise_for_status()
 
@@ -44,16 +43,23 @@ def obtener_datos(palabra, session):
 
         ol = soup.find('ol', class_='c-definitions')
         if not ol:
-            print("{palabra} no fue encontrada en RAE")
+            print(f"{palabra} no fue encontrada en RAE")
+            # Si no encuentra la palabra original busca por una palabra relacionada.
+            rel = soup.find('a', attrs={'data-acc': 'LISTA APROX'})
+            if rel:
+                relacionada = rel.get_text(strip=True)
+                print(f"Se ha encontrado palabra relacionada: {relacionada}")
+                # Guardar la palabra relacionada en el archivo de palabras similares
+                guardar_palabra_relacionada(relacionada)
             return "NOT_FOUND", None
 
+        # Rest of the function remains the same...
         li = ol.find('li')
         if not li:
             return None, None
 
         abbr = li.find('abbr')
         calification = abbr['title'] if abbr else None
-
         calification = f'"{calification}"'
 
         definition_div = li.find('div', class_='c-definitions__item', role='definition')
@@ -77,6 +83,51 @@ def obtener_datos(palabra, session):
         print(f"Error al procesar '{palabra}': {e}")
         return None, None
 
+def limpiar_palabra(palabra):
+    # Eliminar números de la palabra
+    palabra_sin_numeros = ''.join(char for char in palabra if not char.isdigit())
+    
+    # Si la palabra contiene una coma, tomar solo la primera parte
+    if ',' in palabra_sin_numeros:
+        palabra_sin_numeros = palabra_sin_numeros.split(',')[0]
+    
+    # Eliminar espacios en blanco al inicio y final
+    palabra_limpia = palabra_sin_numeros.strip()
+    
+    # Convertir a mayúsculas manteniendo acentos
+    return palabra_limpia.upper()
+
+
+def guardar_palabra_relacionada(palabra):
+    output_file = "palabras_relacionadas.csv"
+    fieldnames = ['word', 'status']
+    
+    # Limpiar la palabra antes de procesarla
+    palabra = limpiar_palabra(palabra)
+    
+    # Verificar si el archivo existe
+    file_exists = os.path.exists(output_file)
+    
+    # Verificar si la palabra ya existe en el archivo
+    palabra_existe = False
+    if file_exists:
+        with open(output_file, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            palabra_existe = any(row['word'] == palabra for row in reader)
+    
+    # Si la palabra no existe y no está vacía, añadirla al archivo
+    if not palabra_existe and palabra:
+        modo = 'a' if file_exists else 'w'
+        with open(output_file, modo, encoding='utf-8', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            if modo == 'w':
+                writer.writeheader()
+            writer.writerow({
+                'word': palabra,
+                'status': 'false'
+            })
+            print(f"Palabra relacionada '{palabra}' guardada en {output_file}")
+
 def escribir_a_archivo(rows, fieldnames, output_path):
     modo = 'a' if os.path.exists(output_path) else 'w'
     with open(output_path, modo, encoding='utf-8', newline='') as file:
@@ -85,6 +136,7 @@ def escribir_a_archivo(rows, fieldnames, output_path):
             writer.writeheader()
         writer.writerows(rows)
 
+# Función que actualiza el archivo .CSV original
 def actualizar_csv_original(input_path, rows):
     temp_file_path = input_path + ".tmp"
     with open(input_path, 'r', encoding='utf-8') as infile, open(temp_file_path, 'w', encoding='utf-8', newline='') as outfile:
@@ -168,6 +220,6 @@ def procesar_archivo(input_path, output_path, batch_size=10):
 
 
 if __name__ == "__main__":
-    input_path = "palabras_test.csv"
-    output_path = "palabras_definiciones_output.csv"
+    input_path = "./docs/data/palabras_relacionadas.csv"
+    output_path = "./docs/data/palabras_relacionadas_definiciones.csv"
     procesar_archivo(input_path, output_path, batch_size=10)

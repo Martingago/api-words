@@ -66,4 +66,17 @@ public class WordController {
                 processedWords,
                 HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse<String>> deleteCSV(@RequestParam("file") MultipartFile file){
+        if(file.isEmpty() || !file.getOriginalFilename().endsWith(".csv")){
+            return  ResponseEntity.badRequest().body(null);
+        }
+        String deletedWords = wordService.deleteWordsFromCSV(file);
+        return ApiResponse.build(true,
+                deletedWords,
+                HttpStatus.NO_CONTENT.value(),
+                deletedWords,
+                HttpStatus.NO_CONTENT);
+    }
 }
