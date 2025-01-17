@@ -63,18 +63,43 @@ def obtener_datos(palabra, session):
             if not definition_div:
                 continue
 
-            #Extrae la calificacion:
+            # Extrae la calificación
             first_div = definition_div.find('div')
             calification_word = first_div.find('abbr')['title'] if first_div and first_div.find('abbr') else None
 
-            # Extraer solo la definición o, en su defecto, el enlace <a>
-            definition_text_parts = first_div.find_all('span', attrs={'data-id': True}) if first_div else []
-            if definition_text_parts:
-                definition_word = ' '.join(span.get_text(strip=True) for span in definition_text_parts)
-            else:
-                # Si no hay definición, buscar un enlace <a> y extraer su texto
-                link_element = first_div.find('a', class_='a') if first_div else None
-                definition_word = link_element.get_text(strip=True) if link_element else None
+            # Construir la definición incluyendo texto plano y spans con data-id
+            definition_parts = []
+            definition_word = None  # Inicializar la variable de definición
+            if first_div:
+                for content in first_div.contents:
+                    text = ''
+                    if isinstance(content, str):  # Texto plano (incluye signos de puntuación)
+                        text = content.strip()
+                    elif content.name == 'span' and content.has_attr('data-id'):  # Solo spans con data-id
+                        text = content.get_text(strip=True)
+                    elif content.name == 'a':  # Enlaces <a>
+                        text = formatear_palabra(content.get_text(strip=True))
+                    
+                    if text:
+                        # Si no es el primer elemento y el texto actual no empieza con puntuación cerrada
+                        if definition_parts and not text[0] in ")]}',.:;":
+                            definition_parts.append(' ')
+                        
+                        definition_parts.append(text)
+                        
+                        # Si el texto termina con punto, coma, o punto y coma, no agregar espacio adicional
+                        if text.endswith(('.', ';', ':')):
+                            continue
+                
+                # Si se han encontrado partes de definición, construir la definición
+                if definition_parts:
+                    definition_word = ''.join(definition_parts).strip()
+                else:
+                    # Si no hay definición en spans con data-id, buscar un enlace <a> y extraer su texto
+                    link_element = first_div.find('a', class_='a')
+                    if link_element:
+                        definition_word = formatear_palabra(link_element.get_text(strip=True))
+
 
             # Extraer sinónimos y antónimos del footer
             sinonimos = []
@@ -233,7 +258,8 @@ def procesar_archivo(input_path, output_json, batch_size=10):
         
         for row in reader:
             palabra = row.get('word', '').strip().lower()
-            status = row.get('status', '').strip().lower()
+            status = row.get('status', '')
+            status = status.strip().lower() if status is not None else ''
             
             if not palabra or status in ['true', 'null']:
                 continue

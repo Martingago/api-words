@@ -169,7 +169,8 @@ def procesar_archivo(input_path, output_path, batch_size=10):
         for row in reader:
             try:
                 status = row.get('status', '')
-                # Asegúrate de que `status` no sea None antes de llamar a strip y lower
+                # Obtener el status y asegurarse de que no sea None antes de strip() y lower()
+                status = row.get('status', '')
                 status = status.strip().lower() if status is not None else ''
 
                 if status == 'null':
