@@ -41,8 +41,8 @@ def obtener_datos(palabra, session):
 
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        ol = soup.find('ol', class_='c-definitions')
-        if not ol:
+        section_definitions = soup.find('ol', class_='c-definitions')
+        if not section_definitions:
             print(f"{palabra} no fue encontrada en RAE")
             # Si no encuentra la palabra original busca por una palabra relacionada.
             rel = soup.find('a', attrs={'data-acc': 'LISTA APROX'})
@@ -54,7 +54,7 @@ def obtener_datos(palabra, session):
             return "NOT_FOUND", None
 
         # Rest of the function remains the same...
-        li = ol.find('li')
+        li = section_definitions.find('li')
         if not li:
             return None, None
 
