@@ -69,6 +69,7 @@ def obtener_datos(palabra, session):
 
             # Construir la definición incluyendo texto plano y spans con data-id
             definition_parts = []
+            examples = []
             definition_word = None  # Inicializar la variable de definición
             if first_div:
                 for content in first_div.contents:
@@ -78,8 +79,25 @@ def obtener_datos(palabra, session):
                     elif content.name == 'span' and content.has_attr('data-id'):  # Solo spans con data-id
                         text = content.get_text(strip=True)
                     elif content.name == 'a':  # Enlaces <a>
-                        text = formatear_palabra(content.get_text(strip=True))
-                    
+                        text = formatear_palabra(content.get_text(strip=True)) + " "
+                    elif content.name == 'span' and 'h' in content.get('class', []):  # Ejemplo con clase "h"
+                        # Extraer texto incluyendo signos de puntuación y espacios entre spans
+                        example_text_parts = []
+                        for span_content in content.contents:
+                            if isinstance(span_content, str):  # Texto plano dentro del span "h"
+                                example_text_parts.append(span_content.strip())
+                            elif span_content.name == 'span':  # Subspans dentro del span "h"
+                                example_text_parts.append(span_content.get_text(strip=True))
+
+                        # Construir el texto del ejemplo con espacios
+                        example_text = ''.join(
+                            f" {part}" if part not in ".,;:" else part
+                            for part in example_text_parts
+                        ).strip()  # Eliminar espacio inicial
+
+                        if example_text:
+                            examples.append(example_text)
+                   
                     if text:
                         # Si no es el primer elemento y el texto actual no empieza con puntuación cerrada
                         if definition_parts and not text[0] in ")]}',.:;":
@@ -92,13 +110,13 @@ def obtener_datos(palabra, session):
                             continue
                 
                 # Si se han encontrado partes de definición, construir la definición
-                if definition_parts:
-                    definition_word = ''.join(definition_parts).strip()
-                else:
+            if definition_parts:
+                definition_word = ''.join(definition_parts).strip()
+            else:
                     # Si no hay definición en spans con data-id, buscar un enlace <a> y extraer su texto
-                    link_element = first_div.find('a', class_='a')
-                    if link_element:
-                        definition_word = formatear_palabra(link_element.get_text(strip=True))
+                link_element = first_div.find('a', class_='a')
+                if link_element:
+                    definition_word = formatear_palabra(link_element.get_text(strip=True))
 
 
             # Extraer sinónimos y antónimos del footer
@@ -130,6 +148,7 @@ def obtener_datos(palabra, session):
                 "definition": definition_word,
                 "sinonimos": sinonimos,
                 "antonimos": antonimos,
+                "examples": examples
             })
 
         return {
@@ -276,7 +295,6 @@ def procesar_archivo(input_path, output_json, batch_size=10):
                         'word': palabra,
                         'status': new_status
                     })
-                    actualizar_csv_original(input_path, processed_words)
                     print(f"Estado actualizado para la palabra: {palabra} -> {new_status}")
                 elif word_data is False:
                     # Error en el procesamiento, mantener status 'false'
@@ -291,26 +309,34 @@ def procesar_archivo(input_path, output_json, batch_size=10):
                     })
                     all_words.append(word_data)
                     
-                    if len(all_words) % batch_size == 0:
+                # Sincronizar CSV y JSON cada batch_size acciones
+                if len(processed_words) % batch_size == 0:
+                    # Escribir en JSON
+                    if all_words:
                         escribir_a_json(all_words, output_json)
-                        print(f"Procesadas {len(all_words)} palabras")
+                        print(f"Procesadas {len(all_words)} palabras, JSON actualizado.")
                         all_words.clear()
                     
+                    # Actualizar el CSV
                     actualizar_csv_original(input_path, processed_words)
-                    print(f"Estado actualizado para la palabra: {palabra} -> {new_status}")
+                    print(f"CSV actualizado después de procesar {len(processed_words)} palabras.")
 
             except Exception as e:
                 print(f"Error procesando palabra '{palabra}': {e}")
                 # No modificamos el status en caso de error
                 continue
 
-        # Escribir las palabras restantes al JSON
+        # Escribir las palabras restantes al JSON y CSV al finalizar
         if all_words:
             escribir_a_json(all_words, output_json)
-            print(f"Procesamiento completado. Total de palabras procesadas: {len(all_words)}")
+            print(f"JSON actualizado con las palabras restantes.")
+        if processed_words:
+            actualizar_csv_original(input_path, processed_words)
+            print(f"CSV actualizado con los datos restantes.")
+
 
             
 if __name__ == "__main__":
-    input_path = "./palabras.csv"
-    output_path = "./palabras_definiciones.json"
-    procesar_archivo(input_path, output_path, batch_size=10)
+    input_path = "./palabras_relacionadas.csv"
+    output_path = "./palabras_definiciones_4.json"
+    procesar_archivo(input_path, output_path, batch_size=50)
