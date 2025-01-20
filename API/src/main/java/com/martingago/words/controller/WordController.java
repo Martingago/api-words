@@ -20,38 +20,38 @@ public class WordController {
      * Gets the daily word
      * @return
      */
-    @GetMapping("/daily-word")
-    public WordDTO getDailyWord(){
-        //Generate a random ID every day at 00:00
-
-        //Uses the random ID generated to request that word
-        return wordService.generateRandomWord();
-    }
+//    @GetMapping("/daily-word")
+//    public WordDTO getDailyWord(){
+//        //Generate a random ID every day at 00:00
+//
+//        //Uses the random ID generated to request that word
+//        return wordService.generateRandomWord();
+//    }
 
     /**
      * Gets a random word from database
      * @return
      */
-    @GetMapping("/random-word")
-    public WordDTO getRandomWord(){
-        return wordService.generateRandomWord();
-    }
+//    @GetMapping("/random-word")
+//    public WordDTO getRandomWord(){
+//        return wordService.generateRandomWord();
+//    }
 
     /**
      * Adds a new word to the database
      * @param wordDTO
      * @return
      */
-    @PostMapping("/add-word")
-    public ResponseEntity<ApiResponse<WordDTO>> insertWord(@Valid @RequestBody WordDTO wordDTO){
-        WordDTO addedWord =  wordService.addNewWord(wordDTO);
-        return ApiResponse.build(
-                true,
-                "Word '" + addedWord.getWord() + "' was added successfully",
-                HttpStatus.CREATED.value(),
-                addedWord,
-                HttpStatus.CREATED);
-    }
+//    @PostMapping("/add-word")
+//    public ResponseEntity<ApiResponse<WordDTO>> insertWord(@Valid @RequestBody WordDTO wordDTO){
+//        WordDTO addedWord =  wordService.addNewWord(wordDTO);
+//        return ApiResponse.build(
+//                true,
+//                "Word '" + addedWord.getWord() + "' was added successfully",
+//                HttpStatus.CREATED.value(),
+//                addedWord,
+//                HttpStatus.CREATED);
+//    }
 
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<String>> uploadCSV(@RequestParam("file") MultipartFile file) {

@@ -13,7 +13,7 @@ public class WordDefinitionDTO {
 
     private String definition;
     private List<WordExampleDTO> examples;
-    private List<WordRelationDTO> synonyms;
-    private List<WordRelationDTO> antonyms;
+    private List<String> synonyms;
+    private List<String> antonyms;
     private WordQualificationDTO qualification;
 }

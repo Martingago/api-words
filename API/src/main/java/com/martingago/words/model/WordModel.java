@@ -21,12 +21,12 @@ public class WordModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_language", nullable = false)
-    private LanguageModel languageModel;
+    private LanguageModel languageModel; //Idioma al que está asociada la palabra
 
-    private int wordLength;
+    private int wordLength; //Longitud de la palabra
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_word")
-    private List<WordDefinitionModel> wordDefinitionModelList;
+    private List<WordDefinitionModel> wordDefinitionModelList; //Listado de definiciones que puede tener una palabra
 
 }

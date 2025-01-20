@@ -19,13 +19,13 @@ public class WordRelationModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_definition", nullable = false)
-    private WordDefinitionModel wordDefinitionModel; //FK hacia la definicion de palabra con la que tiene relacion
+    private WordDefinitionModel wordDefinitionModel; //FK hacia la definición de palabra con la que tiene relación
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_word", nullable = false)
-    private WordModel wordRelated; //FK hacia la palabra con la que tiene la relacion
+    private WordModel wordRelated; //FK hacia la palabra con la que tiene la relación
 
     @Enumerated(EnumType.STRING)
     @Column(name = "relation", nullable = false)
-    private RelationEnumType relationEnumType; //Enum tipos relacion: SINONIMA o ANTONIMA
+    private RelationEnumType relationEnumType; //Enum tipos relación: SINÓNIMA o ANTÓNIMA.
 }
