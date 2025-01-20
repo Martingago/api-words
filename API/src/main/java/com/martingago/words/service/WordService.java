@@ -1,7 +1,6 @@
 package com.martingago.words.service;
 
-import com.martingago.words.mapper.word.WordMapper;
-import com.martingago.words.dto.WordResponseDTO;
+import com.martingago.words.dto.WordDTO;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
 import org.apache.commons.csv.CSVFormat;
@@ -31,29 +30,18 @@ public class WordService {
      *
      * @return WordResponseDTO
      */
-    public WordResponseDTO generateRandomWord() {
-        WordModel wordModel = wordRepository.findRandomWord();
-        return WordMapper.toDTO(wordModel);
-    }
+//    public WordDTO generateRandomWord() {
+//        WordModel wordModel = wordRepository.findRandomWord();
+//        return WordMapper.toDTO(wordModel);
+//    }
 
     /**
      * Adds a new single word to the API database
      *
-     * @param wordResponseDTO DTO of the word that gona be added
+     * @param wordDTO DTO of the word that gona be added
      * @return the updated word
      */
-    public WordResponseDTO addNewWord(WordResponseDTO wordResponseDTO) {
-        if (wordRepository.existsByWord(wordResponseDTO.getWord())) {
-            throw new DuplicateKeyException("Error, duplicate word on database: '" + wordResponseDTO.getWord() + "'");
-        }
-        try {
-            WordModel wordModel = WordMapper.toModel(wordResponseDTO);
-            WordModel wordSaved = wordRepository.save(wordModel);
-            return WordMapper.toDTO(wordSaved);
-        } catch (Exception e) {
-            throw new RuntimeException("Error");
-        }
-    }
+
 
     /**
      * Using an upload CSV insert the values on the database with batch processing
@@ -104,14 +92,6 @@ public class WordService {
 
                 CSVRecord record = recordMap.get(word);
                 try {
-                    WordResponseDTO wordResponseDTO = new WordResponseDTO(
-                            word,
-                            record.get("language"),
-                            Integer.parseInt(record.get("length")),
-                            record.get("definition"),
-                            record.get("qualification"));
-                    WordModel wordModel = WordMapper.toModel(wordResponseDTO);
-                    batchList.add(wordModel);
                     updateCount++;
 
                     if (batchList.size() >= 100) {

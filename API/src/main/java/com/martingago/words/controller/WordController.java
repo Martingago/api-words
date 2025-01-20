@@ -1,7 +1,7 @@
 package com.martingago.words.controller;
 
 import com.martingago.words.dto.ApiResponse;
-import com.martingago.words.dto.WordResponseDTO;
+import com.martingago.words.dto.WordDTO;
 import com.martingago.words.service.WordService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class WordController {
      * @return
      */
     @GetMapping("/daily-word")
-    public WordResponseDTO getDailyWord(){
+    public WordDTO getDailyWord(){
         //Generate a random ID every day at 00:00
 
         //Uses the random ID generated to request that word
@@ -33,18 +33,18 @@ public class WordController {
      * @return
      */
     @GetMapping("/random-word")
-    public WordResponseDTO getRandomWord(){
+    public WordDTO getRandomWord(){
         return wordService.generateRandomWord();
     }
 
     /**
      * Adds a new word to the database
-     * @param wordResponseDTO
+     * @param wordDTO
      * @return
      */
     @PostMapping("/add-word")
-    public ResponseEntity<ApiResponse<WordResponseDTO>> insertWord(@Valid @RequestBody WordResponseDTO wordResponseDTO){
-        WordResponseDTO addedWord =  wordService.addNewWord(wordResponseDTO);
+    public ResponseEntity<ApiResponse<WordDTO>> insertWord(@Valid @RequestBody WordDTO wordDTO){
+        WordDTO addedWord =  wordService.addNewWord(wordDTO);
         return ApiResponse.build(
                 true,
                 "Word '" + addedWord.getWord() + "' was added successfully",

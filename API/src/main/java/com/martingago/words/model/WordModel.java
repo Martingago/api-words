@@ -3,13 +3,14 @@ package com.martingago.words.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Table(name = "words")
 public class WordModel {
 
     @Id
@@ -18,12 +19,14 @@ public class WordModel {
 
     private String word;
 
-    private String language;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_language", nullable = false)
+    private LanguageModel languageModel;
 
     private int wordLength;
 
-    @Column(columnDefinition = "TEXT")
-    private String definition;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_word")
+    private List<WordDefinitionModel> wordDefinitionModelList;
 
-    private String qualification;
 }
