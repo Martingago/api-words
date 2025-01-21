@@ -28,7 +28,7 @@ public class WordService {
 
 
     public WordDTO getWordByName(String word){
-        WordModel wordModel = wordRepository.findByWord(word).orElseThrow( () -> new EntityNotFoundException("Word " + word + " was not founded on database"));
+        WordModel wordModel = wordRepository.findByWordWithRelations(word).orElseThrow( () -> new EntityNotFoundException("Word " + word + " was not founded on database"));
         return wordMapper.toDTO(wordModel);
     }
 

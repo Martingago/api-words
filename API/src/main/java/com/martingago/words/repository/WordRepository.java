@@ -15,6 +15,15 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
 
     Optional<WordModel> findByWord(String word);
 
+    @Query("SELECT w FROM WordModel w " +
+            "JOIN FETCH w.languageModel l " +
+            "JOIN FETCH w.wordDefinitionModelList d " +
+            "JOIN FETCH w.wordQualificationModelList q " +
+            "JOIN FETCH w.wordExampleModelList e " +
+            "JOIN FETCH w.wordRelationModelList r " +
+            "WHERE w.word = :word")
+    Optional<WordModel> findByWordWithRelations(String word);
+
     Optional<WordModel> findById(Long id);
 
 
