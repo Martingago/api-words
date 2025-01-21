@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,19 +33,19 @@ public class WordDefinitionMapper {
         return new WordDefinitionDTO(
                 wordDefinitionModel.getWordQualificationModel().getQualification(),
                 wordDefinitionModel.getWordDefinition(),
-                wordExamplesMapper.toStringList(wordDefinitionModel.getWordExampleModelList()),
-                wordRelationMapper.mapSynonyms(wordDefinitionModel.getWordRelationModelList()),
-                wordRelationMapper.mapAntonyms(wordDefinitionModel.getWordRelationModelList())
+                wordExamplesMapper.toStringSet(wordDefinitionModel.getWordExampleModelSet()),
+                wordRelationMapper.mapSynonyms(wordDefinitionModel.getWordRelationModelSet()),
+                wordRelationMapper.mapAntonyms(wordDefinitionModel.getWordRelationModelSet())
         );
     }
 
     /**
      * Convierte una lista de WordDefinitionModel en una lista de WordDefinitionDTOs
-     * @param wordDefinitionModelList
+     * @param wordDefinitionModelSet
      * @return
      */
-    public List<WordDefinitionDTO> toDTOList(List<WordDefinitionModel> wordDefinitionModelList){
-        if(wordDefinitionModelList == null) return List.of();
-        return wordDefinitionModelList.stream().map(this::toDTO).collect(Collectors.toList());
+    public Set<WordDefinitionDTO> toDTOSet(Set<WordDefinitionModel> wordDefinitionModelSet){
+        if(wordDefinitionModelSet == null) return Set.of();
+        return wordDefinitionModelSet.stream().map(this::toDTO).collect(Collectors.toSet());
     }
 }

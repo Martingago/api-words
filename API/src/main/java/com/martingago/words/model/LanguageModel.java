@@ -7,7 +7,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Table(name = "languages")
 public class LanguageModel {
 

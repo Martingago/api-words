@@ -1,16 +1,16 @@
 package com.martingago.words.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Table(name = "words_definitions")
 public class WordDefinitionModel {
 
@@ -26,13 +26,13 @@ public class WordDefinitionModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_definition")
-    private List<WordExampleModel> wordExampleModelList; // Listado de ejemplos que puede tener una palabra
+    private Set<WordExampleModel> wordExampleModelSet = new HashSet<>(); // Listado de ejemplos que puede tener una palabra
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_qualification")
     private WordQualificationModel wordQualificationModel; // Clasificación a la que está asociada una definición de palabra. Ej: "Sustantivo masculino"
 
     @OneToMany(mappedBy = "wordDefinitionModel", fetch = FetchType.LAZY)
-    private List<WordRelationModel> wordRelationModelList; //Listado de relaciones con otras palabras que tiene una definición.
+    private Set<WordRelationModel> wordRelationModelSet = new HashSet<>(); //Listado de relaciones con otras palabras que tiene una definición: SINONIMA/ANTONIMA
 
 }

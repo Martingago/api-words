@@ -32,6 +32,11 @@ public class WordService {
         return wordMapper.toDTO(wordModel);
     }
 
+    public WordDTO getWordByNameTest(String word){
+        WordModel wordModel = wordRepository.findByWord(word).orElseThrow( () -> new EntityNotFoundException("Word " + word + " was not founded on database"));
+        return wordMapper.toDTO(wordModel);
+    }
+
 
     /**
      * Generates a random word to send to users as a secrect word to discover.

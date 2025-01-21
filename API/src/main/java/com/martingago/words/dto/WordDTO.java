@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,5 +14,5 @@ public class WordDTO {
     private String language;
     private String word;
     private int length;
-    private List<WordDefinitionDTO> definitions;
+    private Set<WordDefinitionDTO> definitions;
 }

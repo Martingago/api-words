@@ -33,7 +33,7 @@ INSERT INTO words_examples(example, id_definition) VALUES
 INSERT INTO words_relations(relation, id_definition, id_word) VALUES
 ("SINONIMA", 1, 2),
 ("SINONIMA",2, 2),
-("ANTONIMA", 6, 1);
-
+("ANTONIMA", 6, 1),
+("ANTONIMA", 1, 3);
 
 

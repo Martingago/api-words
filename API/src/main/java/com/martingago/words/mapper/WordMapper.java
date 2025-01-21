@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,7 +28,7 @@ public class WordMapper {
                 wordModel.getLanguageModel().getLang_code(),
                 wordModel.getWord(),
                 wordModel.getWordLength(),
-                wordDefinitionMapper.toDTOList(wordModel.getWordDefinitionModelList())
+                wordDefinitionMapper.toDTOSet(wordModel.getWordDefinitionModelSet())
         );
     }
 
@@ -36,9 +37,11 @@ public class WordMapper {
      * @param wordModelList
      * @return
      */
-    public List<WordDTO> toDTOList(List<WordModel> wordModelList){
-        if(wordModelList == null) return List.of();
-        return wordModelList.stream().map(this::toDTO).collect(Collectors.toList());
+    public Set<WordDTO> toDTOList(Set<WordModel> wordModelList){
+        if(wordModelList == null) return Set.of();
+        return wordModelList.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toSet());
     }
 
 }

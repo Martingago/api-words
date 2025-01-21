@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +14,7 @@ public class WordDefinitionDTO {
 
     private String qualification;
     private String definition;
-    private List<String> examples;
-    private List<String> synonyms;
-    private List<String> antonyms;
+    private Set<String> examples;
+    private Set<String> synonyms;
+    private Set<String> antonyms;
 }

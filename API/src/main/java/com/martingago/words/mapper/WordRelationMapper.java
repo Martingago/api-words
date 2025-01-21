@@ -6,6 +6,7 @@ import com.martingago.words.model.WordRelationModel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,27 +26,27 @@ public class WordRelationMapper {
 
     /**
      * Mappea desde una lista de WordRelationModels y genera una lista de <Strings> que son palabras sinónimas.
-     * @param wordRelationModelList
+     * @param wordRelationModelSet
      * @return
      */
-    public List<String> mapSynonyms(List<WordRelationModel> wordRelationModelList){
-        if(wordRelationModelList == null) return List.of(); //Return lista vacia
-        return wordRelationModelList.stream()
+    public Set<String> mapSynonyms(Set<WordRelationModel> wordRelationModelSet){
+        if(wordRelationModelSet == null) return Set.of(); //Return lista vacia
+        return wordRelationModelSet.stream()
                 .filter(rel -> rel.getRelationEnumType() == RelationEnumType.SINONIMA)
                 .map(rel -> rel.getWordRelated().getWord())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     /**
      * Mapea desde una lista de WordRelationModels y genera una lista de <Strings> que son palabras antónimas.
-     * @param wordRelationModelList
+     * @param wordRelationModelSet
      * @return
      */
-    public List<String> mapAntonyms(List<WordRelationModel> wordRelationModelList){
-        if(wordRelationModelList == null) return List.of();
-        return wordRelationModelList.stream()
+    public Set<String> mapAntonyms(Set<WordRelationModel> wordRelationModelSet){
+        if(wordRelationModelSet == null) return Set.of();
+        return wordRelationModelSet.stream()
                 .filter(rel -> rel.getRelationEnumType() == RelationEnumType.ANTONIMA)
                 .map(rel -> rel.getWordRelated().getWord())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

@@ -26,6 +26,16 @@ public class WordController {
                 HttpStatus.FOUND);
     }
 
+    @GetMapping("/search-test/{word}")
+    public ResponseEntity<ApiResponse<WordDTO>> findWordByNameTest(@PathVariable String word){
+        WordDTO wordDTO = wordService.getWordByNameTest(word);
+        return ApiResponse.build(true,
+                "Word successfully founded",
+                HttpStatus.FOUND.value(),
+                wordDTO,
+                HttpStatus.FOUND);
+    }
+
 
     /**
      * Gets the daily word

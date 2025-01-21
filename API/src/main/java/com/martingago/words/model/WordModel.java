@@ -3,9 +3,11 @@ package com.martingago.words.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor
@@ -27,6 +29,6 @@ public class WordModel {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_word")
-    private List<WordDefinitionModel> wordDefinitionModelList; //Listado de definiciones que puede tener una palabra
+    private Set<WordDefinitionModel> wordDefinitionModelSet = new HashSet<>(); //Listado de definiciones que puede tener una palabra
 
 }
