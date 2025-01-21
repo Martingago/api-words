@@ -32,5 +32,7 @@ public class WordDefinitionModel {
     @JoinColumn(name = "id_qualification")
     private WordQualificationModel wordQualificationModel; // Clasificación a la que está asociada una definición de palabra. Ej: "Sustantivo masculino"
 
+    @OneToMany(mappedBy = "wordDefinitionModel", fetch = FetchType.LAZY)
+    private List<WordRelationModel> wordRelationModelList; //Listado de relaciones con otras palabras que tiene una definición.
 
 }

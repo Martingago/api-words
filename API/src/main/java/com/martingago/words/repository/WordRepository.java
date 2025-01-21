@@ -8,9 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WordRepository extends JpaRepository<WordModel, Long> {
+
+    Optional<WordModel> findByWord(String word);
+
+    Optional<WordModel> findById(Long id);
+
+
 
     //Genera una palabra aleatoria de la base de datos
     @Query(value = "SELECT * FROM word_model  " +

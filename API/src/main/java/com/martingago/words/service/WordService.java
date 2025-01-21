@@ -1,8 +1,10 @@
 package com.martingago.words.service;
 
 import com.martingago.words.dto.WordDTO;
+import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +20,18 @@ import java.util.*;
 @Service
 public class WordService {
 
-    private final WordRepository wordRepository;
+    @Autowired
+    WordRepository wordRepository;
 
     @Autowired
-    public WordService(WordRepository wordRepository) {
-        this.wordRepository = wordRepository;
+    WordMapper wordMapper;
+
+
+    public WordDTO getWordByName(String word){
+        WordModel wordModel = wordRepository.findByWord(word).orElseThrow( () -> new EntityNotFoundException("Word " + word + " was not founded on database"));
+        return wordMapper.toDTO(wordModel);
     }
+
 
     /**
      * Generates a random word to send to users as a secrect word to discover.

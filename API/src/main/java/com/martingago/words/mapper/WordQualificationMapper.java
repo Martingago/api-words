@@ -15,6 +15,7 @@ public class WordQualificationMapper {
      * @return
      */
     public WordQualificationDTO toDTO(WordQualificationModel wordQualificationModel){
+        if(wordQualificationModel == null) return  null;
         return new WordQualificationDTO(wordQualificationModel.getQualification());
     }
 

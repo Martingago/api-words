@@ -11,9 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 public class WordDefinitionDTO {
 
+    private String qualification;
     private String definition;
-    private List<WordExampleDTO> examples;
+    private List<String> examples;
     private List<String> synonyms;
     private List<String> antonyms;
-    private WordQualificationDTO qualification;
 }

@@ -1,5 +1,6 @@
 package com.martingago.words.dto;
 
+import com.martingago.words.model.RelationEnumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WordRelationDTO {
-    private Long relatedWordId;
-    private String relationType;
+    private RelationEnumType relationType; //Tipo de relación con la palabra.
+    private String relatedWord; //String de la palabra con la que tiene relación.
 }

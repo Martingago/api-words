@@ -16,6 +16,17 @@ public class WordController {
     @Autowired
     WordService wordService;
 
+    @GetMapping("/search/{word}")
+    public ResponseEntity<ApiResponse<WordDTO>> findWordByName(@PathVariable String word){
+        WordDTO wordDTO = wordService.getWordByName(word);
+        return ApiResponse.build(true,
+                "Word successfully founded",
+                HttpStatus.FOUND.value(),
+                wordDTO,
+                HttpStatus.FOUND);
+    }
+
+
     /**
      * Gets the daily word
      * @return
