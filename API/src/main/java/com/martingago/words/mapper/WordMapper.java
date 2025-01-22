@@ -5,7 +5,6 @@ import com.martingago.words.model.WordModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,12 +23,36 @@ public class WordMapper {
      */
     public WordDTO toDTO(WordModel wordModel){
         if(wordModel == null) return null;
-        return new WordDTO(
-                wordModel.getLanguageModel().getLang_code(),
-                wordModel.getWord(),
-                wordModel.getWordLength(),
-                wordDefinitionMapper.toDTOSet(wordModel.getWordDefinitionModelSet())
-        );
+        return WordDTO.builder()
+                .language(wordModel.getLanguageModel().getLangCode())
+                .word(wordModel.getWord())
+                .length(wordModel.getWordLength())
+                .definitions(wordDefinitionMapper.toDTOSet(
+                        wordModel.getWordDefinitionModelSet()))
+                .build();
+    }
+
+    public WordDTO toWordDTO(WordModel wordModel){
+        if(wordModel == null) return null;
+        return WordDTO.builder()
+                .languageModel(wordModel.getLanguageModel())
+                .length(wordModel.getWordLength())
+                .word(wordModel.getWord())
+                .build();
+    }
+    
+    /**
+     * Recibe un wordDTO y devuelve un WordModel listo para ser insertado en la BBDD.
+     * @param wordDTO
+     * @return
+     */
+    public WordModel toModel(WordDTO wordDTO){
+        if(wordDTO == null) return  null;
+        return  WordModel.builder()
+                .languageModel(wordDTO.getLanguageModel())
+                .wordLength(wordDTO.getLength())
+                .word(wordDTO.getWord())
+                .build();
     }
 
     /**

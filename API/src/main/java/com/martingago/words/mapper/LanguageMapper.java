@@ -18,7 +18,7 @@ public class LanguageMapper {
         if(languageModel == null) return  null;
         return LanguageDTO.builder()
                 .language(languageModel.getLanguage())
-                .lang(languageModel.getLang_code())
+                .lang(languageModel.getLangCode())
                 .build();
     }
 
@@ -30,7 +30,7 @@ public class LanguageMapper {
     public LanguageModel toEntity(LanguageDTO languageDTO){
         return LanguageModel.builder()
                 .language(languageDTO.getLanguage())
-                .lang_code(languageDTO.getLang())
+                .langCode(languageDTO.getLang())
                 .build();
     }
 }

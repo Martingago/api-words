@@ -16,7 +16,7 @@ public class LanguageModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private  String lang_code;
+    private  String langCode;
 
     private String language;
 }
