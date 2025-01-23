@@ -1,6 +1,7 @@
 package com.martingago.words.mapper;
 
-import com.martingago.words.dto.WordDTO;
+import com.martingago.words.dto.word.WordCreationDTO;
+import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.WordModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,9 +22,9 @@ public class WordMapper {
      * @param wordModel
      * @return
      */
-    public WordDTO toDTO(WordModel wordModel){
+    public WordResponseDTO toResponseDTO(WordModel wordModel){
         if(wordModel == null) return null;
-        return WordDTO.builder()
+        return WordResponseDTO.builder()
                 .language(wordModel.getLanguageModel().getLangCode())
                 .word(wordModel.getWord())
                 .length(wordModel.getWordLength())
@@ -32,26 +33,17 @@ public class WordMapper {
                 .build();
     }
 
-    public WordDTO toWordDTO(WordModel wordModel){
-        if(wordModel == null) return null;
-        return WordDTO.builder()
-                .languageModel(wordModel.getLanguageModel())
-                .length(wordModel.getWordLength())
-                .word(wordModel.getWord())
-                .build();
-    }
-    
     /**
      * Recibe un wordDTO y devuelve un WordModel listo para ser insertado en la BBDD.
-     * @param wordDTO
+     * @param wordCreationDTO
      * @return
      */
-    public WordModel toModel(WordDTO wordDTO){
-        if(wordDTO == null) return  null;
+    public WordModel toModel(WordCreationDTO wordCreationDTO){
+        if(wordCreationDTO == null) return  null;
         return  WordModel.builder()
-                .languageModel(wordDTO.getLanguageModel())
-                .wordLength(wordDTO.getLength())
-                .word(wordDTO.getWord())
+                .languageModel(wordCreationDTO.getLanguageModel())
+                .wordLength(wordCreationDTO.getLength())
+                .word(wordCreationDTO.getWord())
                 .build();
     }
 
@@ -60,10 +52,10 @@ public class WordMapper {
      * @param wordModelList
      * @return
      */
-    public Set<WordDTO> toDTOList(Set<WordModel> wordModelList){
+    public Set<WordResponseDTO> toDTOList(Set<WordModel> wordModelList){
         if(wordModelList == null) return Set.of();
         return wordModelList.stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toSet());
     }
 

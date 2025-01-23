@@ -6,7 +6,9 @@ import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WordQualificationService {
 
     @Autowired
