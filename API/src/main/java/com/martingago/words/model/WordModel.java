@@ -30,4 +30,5 @@ public class WordModel {
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
     private Set<WordDefinitionModel> wordDefinitionModelSet = new HashSet<>(); //Listado de definiciones que puede tener una palabra
 
+    private boolean isPlaceholder;
 }
