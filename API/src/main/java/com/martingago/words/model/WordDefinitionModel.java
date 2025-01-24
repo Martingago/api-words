@@ -25,8 +25,7 @@ public class WordDefinitionModel {
     @JoinColumn(name = "id_word", nullable = false)
     private WordModel word; //Relación bidireccional para obtener información de la palabra a la que está asociada la definición.
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_definition")
+    @OneToMany(mappedBy = "wordDefinitionModel", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WordExampleModel> wordExampleModelSet = new HashSet<>(); // Listado de ejemplos que puede tener una palabra
 
     @ManyToOne(fetch = FetchType.LAZY)

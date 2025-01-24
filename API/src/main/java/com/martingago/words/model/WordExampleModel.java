@@ -17,4 +17,8 @@ public class WordExampleModel {
     private Long id;
 
     private String example;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_definition", nullable = false) // Clave foránea
+    private WordDefinitionModel wordDefinitionModel; // Relación bidireccional
 }
