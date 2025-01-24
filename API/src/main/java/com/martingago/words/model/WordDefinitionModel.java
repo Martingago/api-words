@@ -11,6 +11,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "words_definitions")
 public class WordDefinitionModel {
 

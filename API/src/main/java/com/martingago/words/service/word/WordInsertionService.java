@@ -1,12 +1,14 @@
 package com.martingago.words.service.word;
 
 import com.martingago.words.dto.WordDefinitionDTO;
+import com.martingago.words.dto.WordQualificationDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import com.martingago.words.repository.WordRepository;
+import com.martingago.words.service.definition.WordDefinitionService;
 import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.service.qualification.WordQualificationService;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,10 +29,7 @@ public class WordInsertionService {
     WordRepository wordRepository;
 
     @Autowired
-    WordQualificationRepository wordQualificationRepository;
-
-    @Autowired
-    WordQualificationService wordQualificationService;
+    WordDefinitionService wordDefinitionService;
 
     /**
      *
@@ -47,15 +46,8 @@ public class WordInsertionService {
             throw  e;
         }
 
-        //Extrer las qualifications de la palabra recibida:
-        Set<String> qualifications =  wordResponseDTO.getDefinitions().stream()
-                .map(WordDefinitionDTO::getQualification)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-       //Valida las qualification y devuelve las qualifications que componen las definiciones:
-        Map<String, WordQualificationModel> qualificationModelMap = wordQualificationService.validateAndInsertQualifications(qualifications);
-
+        //Extraer las definiciones de la palabra recibida:
+        Set<WordDefinitionDTO> definitionDTOS = wordResponseDTO.getDefinitions();
 
         WordModel wordModel = WordModel.builder()
                 .word(wordResponseDTO.getWord())
@@ -63,7 +55,12 @@ public class WordInsertionService {
                 .languageModel(languageModel)
                 .build();
         System.out.println("Inserted: " + wordModel.toString());
-        return wordRepository.save(wordModel);
+        WordModel newWord=  wordRepository.save(wordModel);
+
+        //Genera las definiciones de cada palabra
+        wordDefinitionService.validateAndInsertDefinitions(newWord, definitionDTOS);
+
+        return newWord;
     }
 
 
