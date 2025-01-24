@@ -1,7 +1,6 @@
 package com.martingago.words.dto.word;
 
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.model.LanguageModel;
 import lombok.*;
 
 import java.util.Set;

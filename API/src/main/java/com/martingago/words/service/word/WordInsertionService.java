@@ -5,19 +5,15 @@ import com.martingago.words.dto.WordQualificationDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
-import com.martingago.words.model.WordQualificationModel;
-import com.martingago.words.repository.WordQualificationRepository;
 import com.martingago.words.repository.WordRepository;
 import com.martingago.words.service.definition.WordDefinitionService;
 import com.martingago.words.service.language.LanguageService;
-import com.martingago.words.service.qualification.WordQualificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Component
 public class WordInsertionService {
@@ -53,8 +49,8 @@ public class WordInsertionService {
                 .word(wordResponseDTO.getWord())
                 .wordLength(wordResponseDTO.getLength())
                 .languageModel(languageModel)
+                .isPlaceholder(false)
                 .build();
-        System.out.println("Inserted: " + wordModel.toString());
         WordModel newWord=  wordRepository.save(wordModel);
 
         //Genera las definiciones de cada palabra
