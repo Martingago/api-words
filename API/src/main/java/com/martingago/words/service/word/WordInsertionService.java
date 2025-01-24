@@ -1,16 +1,14 @@
 package com.martingago.words.service.word;
 
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.dto.WordQualificationDTO;
-import com.martingago.words.dto.word.WordCreationDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
-import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import com.martingago.words.repository.WordRepository;
 import com.martingago.words.service.language.LanguageService;
+import com.martingago.words.service.qualification.WordQualificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,8 @@ public class WordInsertionService {
     @Autowired
     WordQualificationRepository wordQualificationRepository;
 
+    @Autowired
+    WordQualificationService wordQualificationService;
 
     /**
      *
@@ -53,30 +53,8 @@ public class WordInsertionService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        //Comprobar cuales de esas qualifications ya existen en la BBDD.
-        Set<WordQualificationModel> existingQualifications = new HashSet<>(
-                wordQualificationRepository.findByQualificationIn(qualifications));
-
-        // Prepare new qualifications for batch insert
-        List<WordQualificationModel> newQualifications = qualifications.stream()
-                .filter(q -> existingQualifications.stream()
-                        .noneMatch(existing -> existing.getQualification().equals(q)))
-                .map(qualification -> WordQualificationModel.builder().qualification(qualification).build())
-                .collect(Collectors.toList());
-
-        wordQualificationRepository.saveAll(newQualifications);
-
-        // Determinar las qualifications que faltan en la base de datos
-        Set<String> existingQualificationStrings = existingQualifications.stream()
-                .map(WordQualificationModel::getQualification)
-                .collect(Collectors.toSet());
-
-        Set<String> missingQualifications = new HashSet<>(qualifications);
-        missingQualifications.removeAll(existingQualificationStrings);
-
-
-
-
+       //Valida las qualification y devuelve las qualifications que componen las definiciones:
+        Map<String, WordQualificationModel> qualificationModelMap = wordQualificationService.validateAndInsertQualifications(qualifications);
 
 
         WordModel wordModel = WordModel.builder()
@@ -87,5 +65,7 @@ public class WordInsertionService {
         System.out.println("Inserted: " + wordModel.toString());
         return wordRepository.save(wordModel);
     }
+
+
 
 }
