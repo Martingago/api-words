@@ -2,6 +2,7 @@ package com.martingago.words.service.word;
 
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.mapper.WordMapper;
+import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -47,15 +48,18 @@ public class WordService {
      * @param wordsStringSet Set de Strings de palabras para añadir en la BBDD como placeholders.
      * @return Set de WordModel con las palabras (placeholders) que han sido añadidos a la BBDD.
      */
-    public Set<WordModel> insertPlaceholderWordsFromList(Set<String> wordsStringSet){
+    public Set<WordModel> insertPlaceholderWordsFromList(Set<String> wordsStringSet, LanguageModel languageModel){
         Set<WordModel> placeholdersToInsert = wordsStringSet.stream().map(
                 placeholder -> WordModel.builder()
                         .isPlaceholder(true)
                         .word(placeholder)
                         .wordLength(placeholder.length())
+                        .languageModel(languageModel)
                         .build()
         ).collect(Collectors.toSet());
         return new HashSet<>(wordRepository.saveAll(placeholdersToInsert));
     }
+
+
 
 }

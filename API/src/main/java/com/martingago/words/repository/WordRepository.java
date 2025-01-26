@@ -11,11 +11,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface WordRepository extends JpaRepository<WordModel, Long> {
 
     Optional<WordModel> findByWord(String word);
+
+    Set<WordModel> findByWordIn(Set<String> wordStringSet);
 
     @Query("SELECT DISTINCT w FROM WordModel w " +
             "JOIN FETCH w.languageModel " +

@@ -1,13 +1,11 @@
 package com.martingago.words.service.definition;
 
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.model.WordDefinitionModel;
-import com.martingago.words.model.WordExampleModel;
-import com.martingago.words.model.WordModel;
-import com.martingago.words.model.WordQualificationModel;
+import com.martingago.words.model.*;
 import com.martingago.words.repository.WordDefinitionRepository;
 import com.martingago.words.service.example.WordExampleService;
 import com.martingago.words.service.qualification.WordQualificationService;
+import com.martingago.words.service.relation.WordRelationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +28,11 @@ public class WordDefinitionService {
     @Autowired
     WordExampleService wordExampleService;
 
+    @Autowired
+    WordRelationService wordRelationService;
+
     @Transactional
-    public Set<WordDefinitionModel> validateAndInsertDefinitions(WordModel wordModel, Set<WordDefinitionDTO> wordDefinitionDTOSet) {
+    public Set<WordDefinitionModel> validateAndInsertDefinitions(WordModel wordModel, Set<WordDefinitionDTO> wordDefinitionDTOSet, LanguageModel languageModel) {
         // Extraer las qualifications de las definiciones recibidas
         Set<String> qualifications = wordDefinitionDTOSet.stream()
                 .map(WordDefinitionDTO::getQualification)
@@ -57,7 +58,7 @@ public class WordDefinitionService {
         wordExampleService.insertExamplesForDefinitions(savedDefinitions, wordDefinitionDTOSet);
 
         //Insertar las relaciones con otras palabras.
-
+        wordRelationService.insertRelationsToDefinitions(savedDefinitions, wordDefinitionDTOSet, languageModel);
 
         return  savedDefinitions;
     }

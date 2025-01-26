@@ -54,7 +54,7 @@ public class WordInsertionService {
         WordModel newWord=  wordRepository.save(wordModel);
 
         //Genera las definiciones de cada palabra
-        wordDefinitionService.validateAndInsertDefinitions(newWord, definitionDTOS);
+        wordDefinitionService.validateAndInsertDefinitions(newWord, definitionDTOS, languageModel);
 
         return newWord;
     }
