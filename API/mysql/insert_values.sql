@@ -10,10 +10,10 @@ INSERT INTO words_qualifications(qualification) VALUES
 ('sustantivo femenino'),
 ('adjetivo femenino');
 
-INSERT INTO words(word, word_length, id_language) VALUES
-("roca",4, 1),
-("piedra", 5, 1),
-("blando", 6, 1);
+INSERT INTO words(word, word_length, id_language, is_placeholder) VALUES
+("roca",4, 1, false),
+("piedra", 5, 1, false),
+("blando", 6, 1, false);
 
 INSERT INTO words_definitions(word_definition, id_word, id_qualification) VALUES
 ("Piedra, o vena de ella, muy dura y sólida.", 1, 1),

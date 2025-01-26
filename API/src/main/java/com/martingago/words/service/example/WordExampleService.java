@@ -4,6 +4,7 @@ import com.martingago.words.dto.WordDefinitionDTO;
 import com.martingago.words.model.WordDefinitionModel;
 import com.martingago.words.model.WordExampleModel;
 import com.martingago.words.repository.WordExampleRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,16 @@ public class WordExampleService {
     @Autowired
     WordExampleRepository wordExampleRepository;
 
-    public void insertExamples(Set<WordExampleModel> exampleModels){
-        wordExampleRepository.saveAll(exampleModels);
-    }
+    /**
+     * Inserta ejemplos en la BBDD asociados a un Set<WordDefinitionModel>
+     * @param definitions Set<WordDefinitionModel> sobre los que se quieren insertar los ejemplos
+     * @param wordDefinitionDTOSet Set<WordDefinitionDTO> que contiene la información de las definiciones
+     * @return Set<WordExampleModel> que contiene las entidades que se han introducido en la BBDD.
+     */
+    @Transactional
+    public Set<WordExampleModel> insertExamplesForDefinitions(Set<WordDefinitionModel> definitions, Set<WordDefinitionDTO> wordDefinitionDTOSet) {
 
-    public void insertExamplesForDefinitions(Set<WordDefinitionModel> definitions, Set<WordDefinitionDTO> wordDefinitionDTOSet) {
-        // Set para agrupar todos los ejemplos
+        // Set para agrupar todos los ejemplos que se quieren guardar en la BBDD.
         Set<WordExampleModel> examplesToSave = new HashSet<>();
 
         // Recorrer las definiciones guardadas
@@ -42,8 +47,7 @@ public class WordExampleService {
                 examplesToSave.add(wordExampleModel);
             });
         }
-
         // Guardar todos los ejemplos en una sola operación
-        insertExamples(examplesToSave);
+        return new HashSet<>(wordExampleRepository.saveAll(examplesToSave));
     }
 }

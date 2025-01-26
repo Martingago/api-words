@@ -8,6 +8,10 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 public class WordService {
 
@@ -36,6 +40,22 @@ public class WordService {
         return  wordRepository.findByWord(word)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Word " + word + " was not founded on database"));
+    }
+
+    /**
+     * Función que recibe un listado de Strings de palabras que deben ser insertadas en la BBDD como placeholders
+     * @param wordsStringSet Set de Strings de palabras para añadir en la BBDD como placeholders.
+     * @return Set de WordModel con las palabras (placeholders) que han sido añadidos a la BBDD.
+     */
+    public Set<WordModel> insertPlaceholderWordsFromList(Set<String> wordsStringSet){
+        Set<WordModel> placeholdersToInsert = wordsStringSet.stream().map(
+                placeholder -> WordModel.builder()
+                        .isPlaceholder(true)
+                        .word(placeholder)
+                        .wordLength(placeholder.length())
+                        .build()
+        ).collect(Collectors.toSet());
+        return new HashSet<>(wordRepository.saveAll(placeholdersToInsert));
     }
 
 }

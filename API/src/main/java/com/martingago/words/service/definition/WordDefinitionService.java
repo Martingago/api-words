@@ -56,6 +56,9 @@ public class WordDefinitionService {
         //Crear los ejemplos de las definiciones
         wordExampleService.insertExamplesForDefinitions(savedDefinitions, wordDefinitionDTOSet);
 
+        //Insertar las relaciones con otras palabras.
+
+
         return  savedDefinitions;
     }
 
