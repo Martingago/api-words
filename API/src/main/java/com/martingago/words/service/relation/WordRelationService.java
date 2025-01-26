@@ -25,7 +25,15 @@ public class WordRelationService {
     @Autowired
     WordRelationRepository wordRelationRepository;
 
-    public void insertRelationsToDefinitions(Set<WordDefinitionModel> wordDefinitionModelSet, Set<WordDefinitionDTO> wordDefinitionDTOSet, LanguageModel languageModel){
+    /**
+     * Función que inserta en un Set de DefinitionModels las relaciones (SINÓNIMA/ANTÓNIMA) que recibe de un Set de WordDefinitionDTO
+     * @param wordDefinitionModelSet > Set de definiciones sobre el que se establece el tipo de relación (ANTÓNIMA/SINÓNIMA)
+     * @param wordDefinitionDTOSet > DTO que se recibe y del que se extráe la información de las definiciones para crear las relaciones
+     * @param languageModel > Idioma de preferencia para crear aquellos word placeholders referenciados en las relaciones.
+     */
+    public void insertRelationsToDefinitions(Set<WordDefinitionModel> wordDefinitionModelSet,
+                                             Set<WordDefinitionDTO> wordDefinitionDTOSet,
+                                             LanguageModel languageModel){
         //Map con las palabras y su relación con la definición y tipo de relación:
         Map<String, DefinitionRelation> relatedWordsMap = new HashMap<>();
 

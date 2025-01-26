@@ -31,8 +31,17 @@ public class WordDefinitionService {
     @Autowired
     WordRelationService wordRelationService;
 
+    /**
+     * Función que inserta las definiciones de una palabra WordModel pasada como parámetro.
+     * @param wordModel de la palabra sobre la que se quieren realizar inserciones de definiciones.
+     * @param wordDefinitionDTOSet Set que contiene WordDefinitionDTO con la información a ingresar en la BBDD
+     * @param languageModel idioma de referencia de la palabra para usar en la creación de posibles placeholders
+     * @return Set de WordDefinitionModel que contiene la información de las definiciones de la palabra que han sido añadidos a la BBDD.
+     */
     @Transactional
-    public Set<WordDefinitionModel> validateAndInsertDefinitions(WordModel wordModel, Set<WordDefinitionDTO> wordDefinitionDTOSet, LanguageModel languageModel) {
+    public Set<WordDefinitionModel> validateAndInsertDefinitions(WordModel wordModel,
+                                                                 Set<WordDefinitionDTO> wordDefinitionDTOSet,
+                                                                 LanguageModel languageModel) {
         // Extraer las qualifications de las definiciones recibidas
         Set<String> qualifications = wordDefinitionDTOSet.stream()
                 .map(WordDefinitionDTO::getQualification)

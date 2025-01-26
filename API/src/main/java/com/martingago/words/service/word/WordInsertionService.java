@@ -1,7 +1,6 @@
 package com.martingago.words.service.word;
 
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.dto.WordQualificationDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;

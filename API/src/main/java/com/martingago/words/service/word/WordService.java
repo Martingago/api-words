@@ -46,6 +46,7 @@ public class WordService {
     /**
      * Función que recibe un listado de Strings de palabras que deben ser insertadas en la BBDD como placeholders
      * @param wordsStringSet Set de Strings de palabras para añadir en la BBDD como placeholders.
+     * @param languageModel idioma en el que se tienen que crear los placeholders.
      * @return Set de WordModel con las palabras (placeholders) que han sido añadidos a la BBDD.
      */
     public Set<WordModel> insertPlaceholderWordsFromList(Set<String> wordsStringSet, LanguageModel languageModel){
