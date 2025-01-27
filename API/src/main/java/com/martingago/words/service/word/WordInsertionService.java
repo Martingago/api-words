@@ -3,6 +3,7 @@ package com.martingago.words.service.word;
 import com.martingago.words.dto.WordDefinitionDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
+import com.martingago.words.model.WordDefinitionModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
 import com.martingago.words.service.definition.WordDefinitionService;
@@ -26,6 +27,9 @@ public class WordInsertionService {
     @Autowired
     WordDefinitionService wordDefinitionService;
 
+    @Autowired
+    WordService wordService;
+
     /**
      *
      * @param wordResponseDTO
@@ -35,27 +39,42 @@ public class WordInsertionService {
     public WordModel insertFullWord(WordResponseDTO wordResponseDTO){
         //Compruebo si el idioma de la palabra existe:
         LanguageModel languageModel;
-        try{
-            languageModel= languageService.searchLanguageByLangCode(wordResponseDTO.getLanguage());
-        }catch (EntityNotFoundException e){
-            throw  e;
+        try {
+            languageModel = languageService.searchLanguageByLangCode(wordResponseDTO.getLanguage());
+        } catch (EntityNotFoundException e) {
+            throw e;
+        }
+        //Comprueba que la palabra no exista en la BBDD:
+        WordModel existingWord;
+        try {
+            existingWord = wordService.searchBasicWord(wordResponseDTO.getWord());
+            // 3. Si la palabra existe, verifica si es un placeholder
+            if (existingWord.isPlaceholder()) {
+                // Actualiza el placeholder a false
+                existingWord.setPlaceholder(false);
+                existingWord = wordRepository.save(existingWord); // Guarda la actualización
+            } else {
+                // Si no es un placeholder, lanza una excepción o maneja el caso según tus necesidades
+                throw new IllegalArgumentException("La palabra '" + wordResponseDTO.getWord() + "' ya existe en la base de datos y no es un placeholder.");
+            }
+        } catch (EntityNotFoundException e) {
+            // 4. Si la palabra no existe, créala
+            existingWord = WordModel.builder()
+                    .word(wordResponseDTO.getWord())
+                    .wordLength(wordResponseDTO.getLength())
+                    .languageModel(languageModel)
+                    .isPlaceholder(false) // No es un placeholder
+                    .build();
+            existingWord = wordRepository.save(existingWord); // Guarda la nueva palabra
         }
 
         //Extraer las definiciones de la palabra recibida:
         Set<WordDefinitionDTO> definitionDTOS = wordResponseDTO.getDefinitions();
 
-        WordModel wordModel = WordModel.builder()
-                .word(wordResponseDTO.getWord())
-                .wordLength(wordResponseDTO.getLength())
-                .languageModel(languageModel)
-                .isPlaceholder(false)
-                .build();
-        WordModel newWord=  wordRepository.save(wordModel);
-
         //Genera las definiciones de cada palabra
-        wordDefinitionService.validateAndInsertDefinitions(newWord, definitionDTOS, languageModel);
-
-        return newWord;
+        Set<WordDefinitionModel> addedDefinitions = wordDefinitionService.validateAndInsertDefinitions(existingWord, definitionDTOS, languageModel);
+        existingWord.setWordDefinitionModelSet(addedDefinitions);
+        return existingWord;
     }
 
 

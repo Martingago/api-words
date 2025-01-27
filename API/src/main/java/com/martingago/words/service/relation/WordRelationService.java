@@ -31,7 +31,7 @@ public class WordRelationService {
      * @param wordDefinitionDTOSet > DTO que se recibe y del que se extráe la información de las definiciones para crear las relaciones
      * @param languageModel > Idioma de preferencia para crear aquellos word placeholders referenciados en las relaciones.
      */
-    public void insertRelationsToDefinitions(Set<WordDefinitionModel> wordDefinitionModelSet,
+    public Set<WordRelationModel> insertRelationsToDefinitions(Set<WordDefinitionModel> wordDefinitionModelSet,
                                              Set<WordDefinitionDTO> wordDefinitionDTOSet,
                                              LanguageModel languageModel){
         //Map con las palabras y su relación con la definición y tipo de relación:
@@ -99,7 +99,7 @@ public class WordRelationService {
             relationToSaveSet.add(relation); //Se añade la nueva relación al set de relaciones para guardar
         });
         //Guarda todas las relaciones de las palabras
-        wordRelationRepository.saveAll(relationToSaveSet);
+        return new HashSet<>(wordRelationRepository.saveAll(relationToSaveSet));
     }
 
 

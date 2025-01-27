@@ -19,13 +19,15 @@ public class WordExampleService {
     WordExampleRepository wordExampleRepository;
 
     /**
-     * Inserta ejemplos en la BBDD asociados a un Set<WordDefinitionModel>
+     * Añade ejemplos en la BBDD asociados a un Set<WordDefinitionModel>
      * @param definitions Set<WordDefinitionModel> sobre los que se quieren insertar los ejemplos
      * @param wordDefinitionDTOSet Set<WordDefinitionDTO> que contiene la información de las definiciones
      * @return Set<WordExampleModel> que contiene las entidades que se han introducido en la BBDD.
      */
     @Transactional
-    public Set<WordExampleModel> insertExamplesForDefinitions(Set<WordDefinitionModel> definitions, Set<WordDefinitionDTO> wordDefinitionDTOSet) {
+    public Set<WordExampleModel> insertExamplesForDefinitions(
+            Set<WordDefinitionModel> definitions,
+            Set<WordDefinitionDTO> wordDefinitionDTOSet) {
 
         // Set para agrupar todos los ejemplos que se quieren guardar en la BBDD.
         Set<WordExampleModel> examplesToSave = new HashSet<>();

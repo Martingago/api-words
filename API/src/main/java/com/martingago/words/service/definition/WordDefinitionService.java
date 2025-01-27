@@ -64,10 +64,10 @@ public class WordDefinitionService {
         Set<WordDefinitionModel> savedDefinitions =new HashSet<>(wordDefinitionRepository.saveAll(definitionsToSave));
 
         //Crear los ejemplos de las definiciones
-        wordExampleService.insertExamplesForDefinitions(savedDefinitions, wordDefinitionDTOSet);
+        Set<WordExampleModel> wordExampleModelSet=  wordExampleService.insertExamplesForDefinitions(savedDefinitions, wordDefinitionDTOSet);
 
         //Insertar las relaciones con otras palabras.
-        wordRelationService.insertRelationsToDefinitions(savedDefinitions, wordDefinitionDTOSet, languageModel);
+        Set<WordRelationModel> wordRelationModelSet = wordRelationService.insertRelationsToDefinitions(savedDefinitions, wordDefinitionDTOSet, languageModel);
 
         return  savedDefinitions;
     }
