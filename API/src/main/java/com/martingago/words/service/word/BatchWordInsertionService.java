@@ -5,10 +5,8 @@ import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordDefinitionRepository;
 import com.martingago.words.repository.WordRepository;
-import com.martingago.words.service.example.WordExampleService;
 import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.service.qualification.WordQualificationService;
-import com.martingago.words.service.relation.WordRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,33 +20,39 @@ import java.util.stream.Collectors;
 public class BatchWordInsertionService {
 
     @Autowired
-    private LanguageService languageService;
-
-    @Autowired
     private WordRepository wordRepository;
 
     @Autowired
-    private WordDefinitionRepository wordDefinitionRepository;
-
-    @Autowired
-    private WordQualificationService wordQualificationService;
-
+    WordService wordService;
 
     /**
-     * Recibe un Set de wordResponseDTO para añadir en la BBDD.
-     * @param wordResponseDTOSet
+     * Recibe un Set de wordResponseDTO para añadir en la BBDD bajo un único batch de datos.
+     * @param wordResponseDTOSet Set de wordDTO con la información de las palabras para añadir en la BBDD
+     * @param mappedLanguages map con la información extraída de los idiomas para evitar múltiples consultas en cada batch
      * @return
+     * Esta función únicamente procesará aquellas palabras que no existan en la BBDD o aquellas que sean placeholders.
      */
-    public Set<WordModel> insertBatchWordsSet(Set<WordResponseDTO> wordResponseDTOSet){
-        //Obtener el listado de idiomas existente en la BBDD
-        Map<String, LanguageModel> mappedLanguages = languageService.getAllLanguagesMappedByLangCode();
+    public Set<WordModel> insertBatchWordsSet(
+            Set<WordResponseDTO> wordResponseDTOSet,
+            Map<String, LanguageModel> mappedLanguages){
 
+        //Extrae el listado de palabras que conforman el batch y obtiene las palabras existentes.
+        Set<String> stringWords = wordResponseDTOSet.stream().map(WordResponseDTO::getWord).collect(Collectors.toSet());
+        Map<String, WordModel> existingWords = wordService.searchListOfWords(stringWords);
+
+
+        //Realiza una serie de filtros para comprobar que palabras ya existen en la BBDD, que el ididoma sea correcto.
         List<WordModel> wordToInsertList = wordResponseDTOSet.stream()
                 .filter(wordDto -> {
                     //Filtra por aquellas palabras cuyo idioma no exista en la BBDD.
                     if(!mappedLanguages.containsKey(wordDto.getLanguage())){
                         System.out.println("Skipping word" + wordDto.getWord() +  "because language " + wordDto.getLanguage()  + " does not exist in database");
                         return false;
+                    }
+                    //Filtra aquellas palabras que ya existen en la base de datos y comprueba si son placeholders:
+                    if(existingWords.containsKey(wordDto.getWord())){
+                        WordModel foundedWord = existingWords.get(wordDto.getWord());
+                        return foundedWord.isPlaceholder(); //Filtra únicamente los placeholders
                     }
                     return true;
                 })
@@ -62,6 +66,9 @@ public class BatchWordInsertionService {
                 )
                 .collect(Collectors.toList());
 
-        return new HashSet<>(wordRepository.saveAll(wordToInsertList));
+        //Guarda las nuevas palabras y actualiza los placeholders. Se devuelven únicamente las palabras añadidas/placeholders
+        Set<WordModel> savedWords = new HashSet<>(wordRepository.saveAll(wordToInsertList));
+
+        return savedWords;
     }
 }

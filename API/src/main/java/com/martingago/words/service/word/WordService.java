@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,10 +38,25 @@ public class WordService {
         return  wordMapper.toResponseDTO(wordModel);
     }
 
+    /**
+     * Busca una palabra en la base de datos
+     * @param word
+     * @return
+     */
     public WordModel searchBasicWord(String word){
         return  wordRepository.findByWord(word)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Word " + word + " was not founded on database"));
+    }
+
+    /**
+     * Busca un set de strings de palabras en la BBDD y obtiene un map [word ⇾ WordModel] con los resultados encontrados.
+     * @param wordsStringSet Set de Strings de palabras a buscar en la BBDD
+     * @return Map<String, WordModel> con las palabras encontradas en la BBDD
+     */
+    public Map<String, WordModel> searchListOfWords(Set<String> wordsStringSet){
+        Set<WordModel> wordModelSet = wordRepository.findByWordIn(wordsStringSet);
+        return wordModelSet.stream().collect(Collectors.toMap(WordModel::getWord, word -> word, (existing, duplicate) -> existing));
     }
 
     /**
