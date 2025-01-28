@@ -144,10 +144,10 @@ def obtener_datos(palabra, session):
                         )
 
             definitions.append({
-                "calification": calification_word,
+                "qualification": calification_word,
                 "definition": definition_word,
-                "sinonimos": sinonimos,
-                "antonimos": antonimos,
+                "synonyms": sinonimos,
+                "antonyms": antonimos,
                 "examples": examples
             })
 
