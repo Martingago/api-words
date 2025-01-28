@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 
-public class WordListDefinitions {
+public class WordListDefinitionsPojo {
 
     /**
      * Este POJO se utiliza para manejar los batch de palabras, del wordModel que ha sido insertado en el batch

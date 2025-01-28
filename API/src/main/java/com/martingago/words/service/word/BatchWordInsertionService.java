@@ -1,12 +1,10 @@
 package com.martingago.words.service.word;
 
+import com.martingago.words.POJO.WordListDefinitionsPojo;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
-import com.martingago.words.repository.WordDefinitionRepository;
 import com.martingago.words.repository.WordRepository;
-import com.martingago.words.service.language.LanguageService;
-import com.martingago.words.service.qualification.WordQualificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,7 @@ public class BatchWordInsertionService {
                 .filter(wordDto -> {
                     //Filtra por aquellas palabras cuyo idioma no exista en la BBDD.
                     if(!mappedLanguages.containsKey(wordDto.getLanguage())){
-                        System.out.println("Skipping word" + wordDto.getWord() +  "because language " + wordDto.getLanguage()  + " does not exist in database");
+                        System.out.println("Skipping word " + wordDto.getWord() +  " because language " + wordDto.getLanguage()  + " does not exist in database");
                         return false;
                     }
                     //Filtra aquellas palabras que ya existen en la base de datos y comprueba si son placeholders:
@@ -71,4 +69,13 @@ public class BatchWordInsertionService {
 
         return savedWords;
     }
+
+//    private Set<WordListDefinitionsPojo> getWordDefinitionPojoList(
+//            Set<WordModel> wordsToExtractDefinitions,
+//            Set<WordResponseDTO> wordResponseDTOSet
+//    ){
+//
+//    }
+
+
 }
