@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -92,7 +93,7 @@ public class WordController {
             }
 
             //Llamar a la función de BatchProcessingInsertionService
-            Set<WordResponseDTO> words = jsonValidation.parseJsonFileToWordSet(file);
+            Map<String, WordResponseDTO> words = jsonValidation.parseJsonFileToWordMap(file);
             batchProcessingInsertionService.processJsonFile(words);
 
             return ApiResponse.build(

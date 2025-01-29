@@ -8,9 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,8 +32,17 @@ public class WordQualificationService {
         );
     }
 
+    public Map<String, WordQualificationModel> getAllQualificationsMapped(){
+        List<WordQualificationModel> wordQualificationModelList =  wordQualificationRepository.findAll();
+        if (wordQualificationModelList.isEmpty()) {
+            return new HashMap<>();
+        }
+        return wordQualificationModelList.stream()
+                .collect(Collectors.toMap(WordQualificationModel::getQualification, qualification -> qualification));
+    }
+
     /**
-     * Recibe un listado de qualifications para validar y devuelve un map con las WordQualificationModel que s corresponden
+     * Recibe un listado de qualifications para validar y devuelve un map con las WordQualificationModel que se corresponden
      * @param qualifications set<String> con las qualifications a tratar
      * @return devuelve un map<String, WordQualificationModel> de las qualifications que tiene una palabra
      */
