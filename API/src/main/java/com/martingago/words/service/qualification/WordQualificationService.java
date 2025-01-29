@@ -32,6 +32,11 @@ public class WordQualificationService {
         );
     }
 
+    /**
+     * Función que obtiene la información de todas las Qualification existentes en la Base de datos y lo devuelve
+     * en un Map, cuya clave es la Qualification y su Objeto la entidad correspondiente en la BBDD.
+     * @return Map <String, WordDefinitionModel>
+     */
     public Map<String, WordQualificationModel> getAllQualificationsMapped(){
         List<WordQualificationModel> wordQualificationModelList =  wordQualificationRepository.findAll();
         if (wordQualificationModelList.isEmpty()) {

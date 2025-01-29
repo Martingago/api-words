@@ -1,13 +1,13 @@
 package com.martingago.words.service.batchInsertion;
 
 import com.martingago.words.POJO.WordListDefinitionsPojo;
-import com.martingago.words.model.WordDefinitionModel;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import com.martingago.words.utils.BatchUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,14 +21,21 @@ public class BatchInsertionQualificationService {
     @Autowired
     WordQualificationRepository wordQualificationRepository;
 
-    public Map<String, WordQualificationModel> insertBatchWordDefinitionsMap(
+    /**
+     * Función que recibe un map de Definitions
+     * @param stringWordListDefinitionsPojoMap
+     * @param mappedQualifications
+     * @return
+     */
+    @Transactional
+    public Map<String, WordQualificationModel> insertBatchWordQualificationMap(
             Map<String, WordListDefinitionsPojo> stringWordListDefinitionsPojoMap,
             Map<String, WordQualificationModel> mappedQualifications) {
 
-        // Mapa para almacenar las qualifications que se van a insertar
+        // Mapa para almacenar las qualifications que se han insertado en la BBDD a lo largo de la ejecución del programa
         Map<String, WordQualificationModel> insertedQualificationsMap = new HashMap<>();
 
-        // Procesamos las qualifications en lotes de 50
+        // Procesa las qualifications en lotes de 50
         BatchUtils.processMapInBatches(stringWordListDefinitionsPojoMap, 50, batch -> {
 
             try {

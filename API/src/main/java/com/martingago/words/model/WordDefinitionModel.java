@@ -19,6 +19,7 @@ public class WordDefinitionModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 5000)
     private String wordDefinition; //Definición de la palabra
 
     @ManyToOne(fetch = FetchType.LAZY)
