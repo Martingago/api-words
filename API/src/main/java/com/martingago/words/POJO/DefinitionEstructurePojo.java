@@ -13,5 +13,6 @@ import java.util.List;
 public class DefinitionEstructurePojo {
     private WordDefinitionModel wordDefinitionModel;
     private List<String> listExamples;
+    private List<WordRelationPojo> relationPojoList; //Lista de relaciones con otras palabras.
 
 }

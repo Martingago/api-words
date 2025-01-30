@@ -2,6 +2,8 @@ package com.martingago.words.service.batchInsertion;
 
 import com.martingago.words.POJO.DefinitionEstructurePojo;
 import com.martingago.words.POJO.WordListDefinitionsPojo;
+import com.martingago.words.POJO.WordRelationPojo;
+import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordDefinitionModel;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordDefinitionRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -62,7 +65,7 @@ public class BatchInsertionDefinitionService {
 
                 // Realizamos la inserción en la base de datos
                 if (!definitionModelSet.isEmpty()) {
-                    List<WordDefinitionModel>  insertedDefinitionsIntoDatabase =  wordDefinitionRepository.saveAll(definitionModelSet);
+                    List<WordDefinitionModel> insertedDefinitionsIntoDatabase = wordDefinitionRepository.saveAll(definitionModelSet);
                     Set<DefinitionEstructurePojo> setDefinicionesPOJO = buildDefinitionEstructurePojos(insertedDefinitionsIntoDatabase, stringWordListDefinitionsPojoMap);
 
                     // Llenar el mapa de salida con las definiciones insertadas
@@ -85,6 +88,7 @@ public class BatchInsertionDefinitionService {
 
     /**
      * Devuelve una lista que contiene un POJO con la información de: definicion palabra + Set<String> ejemplos
+     *
      * @param insertedDefinitions
      * @param stringWordListDefinitionsPojoMap
      * @return
@@ -107,16 +111,40 @@ public class BatchInsertionDefinitionService {
                         .map(dto -> new ArrayList<>(dto.getExamples()))
                         .orElse(new ArrayList<>());
 
-                //Genera el builder con el DefinitionStructurePojo
-                DefinitionEstructurePojo pojo = DefinitionEstructurePojo.builder()
-                        .wordDefinitionModel(definitionModel)
-                        .listExamples(examples)
-                        .build();
+                //Inserta las relaciones existentes con otras palabras (SINONIMA/ANTONIMA):
+                List<WordRelationPojo> wordRelation = wordListPojo.getWordDefinitionDTOSet().stream()
+                        .filter(dto -> dto.getDefinition().equals(definitionModel.getWordDefinition()))
+                        .findFirst()
+                        .map(list -> list.getSynonyms().stream()
+                                .map(syn -> WordRelationPojo.builder()
+                                        .word(syn)
+                                        .relationEnumType(RelationEnumType.SINONIMA)
+                                        .build())
+                                .collect(Collectors.toList())
+                        ).orElse(new ArrayList<>());
 
-                definitionEstructurePojos.add(pojo);
+                wordListPojo.getWordDefinitionDTOSet().stream()
+                        .filter(dto -> dto.getDefinition().equals(definitionModel.getWordDefinition()))
+                        .findFirst()
+                        .ifPresent(dto -> wordRelation.addAll(dto.getAntonyms().stream()
+                                .map(ant -> WordRelationPojo.builder()
+                                        .word(ant)
+                                        .relationEnumType(RelationEnumType.ANTONIMA)
+                                        .build())
+                                .collect(Collectors.toList())));
+
+                // Solo agregar si hay datos relevantes
+                if (!examples.isEmpty() || !wordRelation.isEmpty()) {
+                    DefinitionEstructurePojo pojo = DefinitionEstructurePojo.builder()
+                            .wordDefinitionModel(definitionModel)
+                            .listExamples(examples)
+                            .relationPojoList(wordRelation) // Agregar relaciones
+                            .build();
+
+                    definitionEstructurePojos.add(pojo);
+                }
             }
         }
-
         return definitionEstructurePojos;
     }
 
