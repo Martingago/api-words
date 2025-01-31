@@ -3,6 +3,7 @@ package com.martingago.words.service.batchInsertion;
 import com.martingago.words.POJO.DefinitionEstructurePojo;
 import com.martingago.words.POJO.WordListDefinitionsPojo;
 import com.martingago.words.POJO.WordRelationPojo;
+import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordDefinitionModel;
 import com.martingago.words.model.WordQualificationModel;
@@ -26,6 +27,15 @@ public class BatchInsertionDefinitionService {
     @Autowired
     BatchesInsertionExamplesService batchesInsertionExamplesService;
 
+    @Autowired
+    BatchInsertionRelationService batchInsertionRelationService;
+
+    /**
+     *
+     * @param stringWordListDefinitionsPojoMap
+     * @param mappedQualifications
+     * @return
+     */
     @Transactional
     public Map<String, DefinitionEstructurePojo> insertBatchWordDefinitionMap(
             Map<String, WordListDefinitionsPojo> stringWordListDefinitionsPojoMap,
@@ -75,6 +85,9 @@ public class BatchInsertionDefinitionService {
 
                     //Insertar batch de ejemplos de las palabras
                     batchesInsertionExamplesService.insertBatchExamplesList(setDefinicionesPOJO);
+
+                    // Insertar batch de relaciones de las palabras
+                    batchInsertionRelationService.insertBatchRelationSet(setDefinicionesPOJO);
                 }
 
             } catch (Exception e) {
@@ -138,7 +151,7 @@ public class BatchInsertionDefinitionService {
                     DefinitionEstructurePojo pojo = DefinitionEstructurePojo.builder()
                             .wordDefinitionModel(definitionModel)
                             .listExamples(examples)
-                            .relationPojoList(wordRelation) // Agregar relaciones
+                            .relationPojoList(wordRelation)
                             .build();
 
                     definitionEstructurePojos.add(pojo);

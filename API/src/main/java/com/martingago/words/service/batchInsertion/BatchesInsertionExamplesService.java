@@ -24,7 +24,8 @@ public class BatchesInsertionExamplesService {
      * @param setDefinicionesPojo
      * @return
      */
-    public Set<WordExampleModel> insertBatchExamplesList(Set<DefinitionEstructurePojo> setDefinicionesPojo) {
+    public Set<WordExampleModel> insertBatchExamplesList(
+            Set<DefinitionEstructurePojo> setDefinicionesPojo) {
         // Declaración del set a devolver con los ejemplos insertados:
         Set<WordExampleModel> insertedExamples = new HashSet<>();
 

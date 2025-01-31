@@ -183,7 +183,7 @@ def limpiar_palabra(palabra):
 
 # Guarda las palabras relacionadas en un nuevo fichero .csv
 def guardar_palabra_relacionada(palabra):
-    output_file = "palabras_relacionadas.csv"
+    output_file = related_path
     fieldnames = ['word', 'status']
     
     # Limpiar la palabra antes de procesarla
@@ -337,6 +337,7 @@ def procesar_archivo(input_path, output_json, batch_size=10):
 
             
 if __name__ == "__main__":
-    input_path = "./palabras_relacionadas.csv"
-    output_path = "./palabras_definiciones_4.json"
+    input_path = "./words_placeholders.csv"
+    output_path = "./palabras_definiciones_11.json"
+    related_path = "./palabras_relacionadas.csv"
     procesar_archivo(input_path, output_path, batch_size=50)

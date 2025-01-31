@@ -70,11 +70,13 @@ public class BatchProcessingInsertionService {
                 Map<String, WordQualificationModel> insertedQualifications = batchInsertionQualificationService.insertBatchWordQualificationMap(
                         wordListDefinitionsPojoMap, mappedQualifications);
 
+
                 //Actualiza el listado de qualifications con las nuevas qualifications añadidas:
                 mappedQualifications.putAll(insertedQualifications);
-
-                //Insertar por batches las Definitions de las palabras
-                batchInsertionDefinitionService.insertBatchWordDefinitionMap(wordListDefinitionsPojoMap,mappedQualifications);
+                if(!insertedWords.isEmpty()){
+                    //Insertar por batches las Definitions de las palabras
+                    batchInsertionDefinitionService.insertBatchWordDefinitionMap(wordListDefinitionsPojoMap,mappedQualifications);
+                }
 
                 //Insertar por lotes las qualifications
                 processedWords[0] += insertedWords.size();

@@ -1,15 +1,19 @@
 package com.martingago.words.service.word;
 
+import com.martingago.words.POJO.WordPojo;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
+import com.martingago.words.utils.BatchUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class BatchWordInsertionService {
 
@@ -63,4 +67,55 @@ public class BatchWordInsertionService {
         // Convertir la lista guardada a un Map<String, WordModel> y devolverlo
         return savedWords.stream().collect(Collectors.toMap(WordModel::getWord, word -> word));
     }
+
+    /**
+     * Funcion que recibe un listado de palabras, comprueba las que existan y genera los placeholders
+     * @param wordList
+     * @return
+     */
+    public Map<String, WordModel> insertBatchPlaceholderWords(Set<WordPojo> wordList) {
+        Map<String, WordModel> wordModelMap = new HashMap<>();
+
+        // Obtiene el conjunto de palabras únicas junto con su idioma
+        Map<String, LanguageModel> wordLanguageMap = wordList.stream()
+                .collect(Collectors.toMap(WordPojo::getWord, WordPojo::getLanguageModel, (existing, replacement) -> existing));
+
+        // Busca las palabras existentes en la BBDD
+        Set<WordModel> existingWords = wordRepository.findByWordIn(wordLanguageMap.keySet());
+
+        // Mapea las palabras encontradas en la base de datos
+        existingWords.forEach(word -> wordModelMap.put(word.getWord(), word));
+
+        // Filtra las palabras faltantes
+        Set<WordPojo> missingWords = wordList.stream()
+                .filter(wordPojo -> !wordModelMap.containsKey(wordPojo.getWord()))
+                .collect(Collectors.toSet());
+
+        // Inserta las palabras faltantes en batches de 50
+
+        if (!missingWords.isEmpty()) {
+            BatchUtils.processInBatches(missingWords, 50, batch -> {
+                try {
+                    List<WordModel> newWords = batch.stream()
+                            .map(wordPojo -> WordModel.builder()
+                                    .isPlaceholder(true)
+                                    .word(wordPojo.getWord())
+                                    .wordLength(wordPojo.getWord().length())
+                                    .languageModel(wordPojo.getLanguageModel()) // Usa el idioma correcto
+                                    .build())
+                            .toList();
+
+                    List<WordModel> savedWords = wordRepository.saveAll(newWords);
+                    savedWords.forEach(word -> wordModelMap.put(word.getWord(), word));
+                }catch (Exception e){
+                    log.error("Error processing word placeholders batch: {}", e.getMessage(), e);
+                }
+            });
+        }
+
+        return wordModelMap;
+    }
+
+
+
 }
