@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,15 +33,21 @@ public class BatchInsertionRelationService {
 
         BatchUtils.processInBatches(setDefinitionPojoToInsert, 50, batch -> {
             try {
-                // Obtiene un listado de las palabras relacionadas con su respectivo idioma
-                Set<WordPojo> relatedWords = batch.stream()
-                        .flatMap(pojo -> pojo.getRelationPojoList().stream()
-                                .map(relationPojo -> WordPojo.builder()
-                                        .word(relationPojo.getWord())
-                                        .languageModel(pojo.getWordDefinitionModel().getWord().getLanguageModel()) // Usa el idioma de la definición
-                                        .build()))
-                        .collect(Collectors.toSet());
+                // Usamos un Map para evitar palabras duplicadas
+                Map<String, WordPojo> uniqueWordsMap = new HashMap<>();
 
+                batch.forEach(pojo -> pojo.getRelationPojoList().forEach(relationPojo -> {
+                    String word = relationPojo.getWord();
+                    if (!uniqueWordsMap.containsKey(word)) {
+                        uniqueWordsMap.put(word, WordPojo.builder()
+                                .word(word)
+                                .languageModel(pojo.getWordDefinitionModel().getWord().getLanguageModel())
+                                .build());
+                    }
+                }));
+
+                // Convertimos el Map a un Set
+                Set<WordPojo> relatedWords = new HashSet<>(uniqueWordsMap.values());
                 Map<String, WordModel> wordModelMap = batchWordInsertionService.insertBatchPlaceholderWords(relatedWords);
 
                 // Crea las relaciones WordRelationModel
@@ -58,7 +61,7 @@ public class BatchInsertionRelationService {
                         .toList();
 
                 // Inserta las relaciones en batch
-                wordRelationRepository.saveAll(relationsToInsert);
+                //wordRelationRepository.saveAll(relationsToInsert);
             } catch (Exception e) {
                 log.error("Error processing word relations batch: {}", e.getMessage(), e);
             }

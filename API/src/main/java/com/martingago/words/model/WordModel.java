@@ -19,6 +19,7 @@ public class WordModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "word", unique = true, columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin")
     private String word;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -60,7 +60,7 @@ public class BatchProcessingInsertionService {
         // Procesar en lotes utilizando BatchUtils
         BatchUtils.processMapInBatches(allWords, BATCH_SIZE, batch -> {
             try {
-                // Insertar el lote actual de palabras y el mappeo de idiomas para evitar consultas por cada batch
+                // Insertar el lote actual de palabras y el mapeo de idiomas para evitar consultas por cada batch
                 Map<String, WordModel> insertedWords = batchWordInsertionService.insertBatchWordsMap(batch, mappedLanguages);
 
                 //Genera un map que contiene las keys palabras/placeholders que se van a insertar asociados wordModel + definitionDTO
