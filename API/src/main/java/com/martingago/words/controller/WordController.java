@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -111,6 +113,77 @@ public class WordController {
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    @PostMapping("/batch-multiple-files")
+    public ResponseEntity<ApiResponse<List<String>>> insertMultipleJsonFiles(
+            @RequestParam("files") List<MultipartFile> files) {
+        try {
+            if (files.isEmpty()) {
+                throw new BadRequestException("No files were uploaded");
+            }
+
+            List<String> processedFiles = new ArrayList<>();
+            List<String> failedFiles = new ArrayList<>();
+
+            for (MultipartFile file : files) {
+                try {
+                    if (file.isEmpty()) {
+                        failedFiles.add(file.getOriginalFilename() + " (empty file)");
+                        continue;
+                    }
+
+                    if (!jsonValidation.isValidJsonFile(file)) {
+                        failedFiles.add(file.getOriginalFilename() + " (invalid JSON)");
+                        continue;
+                    }
+
+                    Map<String, WordResponseDTO> words = jsonValidation.parseJsonFileToWordMap(file);
+                    batchProcessingInsertionService.processJsonFile(words);
+                    processedFiles.add(file.getOriginalFilename());
+
+                } catch (Exception e) {
+                    log.error("Error processing file {}: ", file.getOriginalFilename(), e);
+                    failedFiles.add(file.getOriginalFilename() + " (" + e.getMessage() + ")");
+                }
+            }
+
+            String message = buildResultMessage(processedFiles, failedFiles);
+
+            return ApiResponse.build(
+                    !processedFiles.isEmpty(),
+                    message,
+                    HttpStatus.CREATED.value(),
+                    processedFiles,
+                    HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            log.error("Error processing multiple files: ", e);
+            return ApiResponse.error(
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    private String buildResultMessage(List<String> processedFiles, List<String> failedFiles) {
+        StringBuilder message = new StringBuilder();
+
+        if (!processedFiles.isEmpty()) {
+            message.append("Successfully processed files: ")
+                    .append(String.join(", ", processedFiles));
+        }
+
+        if (!failedFiles.isEmpty()) {
+            if (message.length() > 0) {
+                message.append(". ");
+            }
+            message.append("Failed to process files: ")
+                    .append(String.join(", ", failedFiles));
+        }
+
+        return message.toString();
     }
 
 

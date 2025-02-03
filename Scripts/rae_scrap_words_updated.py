@@ -337,7 +337,7 @@ def procesar_archivo(input_path, output_json, batch_size=10):
 
             
 if __name__ == "__main__":
-    input_path = "./words_placeholders.csv"
-    output_path = "./palabras_definiciones_11.json"
+    input_path = "./words_placeholders_original_4.csv"
+    output_path = "./palabras_definiciones_16.json"
     related_path = "./palabras_relacionadas.csv"
-    procesar_archivo(input_path, output_path, batch_size=50)
+    procesar_archivo(input_path, output_path, batch_size=100)
