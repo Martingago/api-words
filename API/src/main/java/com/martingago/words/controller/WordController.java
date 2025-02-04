@@ -41,6 +41,7 @@ public class WordController {
     @Autowired
     JsonValidation jsonValidation;
 
+
     @GetMapping("/search/{word}")
     public ResponseEntity<ApiResponse<WordResponseDTO>> findWordByName(@PathVariable String word) {
         WordResponseDTO wordResponseDTO = wordService.getWordByName(word);
