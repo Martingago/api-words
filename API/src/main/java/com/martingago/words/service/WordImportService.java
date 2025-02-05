@@ -10,6 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 @Service
 public class WordImportService {
@@ -20,30 +23,18 @@ public class WordImportService {
     @Autowired
     private Job wordImportJob;
 
-    public void importWords(MultipartFile file) throws IOException {
-        // Convert MultipartFile to File
-        File tempFile = convertMultipartFileToFile(file);
+    public void importWords(MultipartFile file) throws Exception {
+        // Guardar el archivo temporalmente
+        Path tempFile = Files.createTempFile("word-import-", ".json");
+        Files.copy(file.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
 
-        try {
-            // Create job parameters
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("inputFile", tempFile.getAbsolutePath())
-                    .addLong("timestamp", System.currentTimeMillis())
-                    .toJobParameters();
+        // Crear parámetros para el job
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("inputFile", "file://" + tempFile.toAbsolutePath().toString())
+                .addLong("startTime", System.currentTimeMillis())
+                .toJobParameters();
 
-            // Launch the job
-            jobLauncher.run(wordImportJob, jobParameters);
-        } catch (Exception e) {
-            throw new RuntimeException("Error processing batch job", e);
-        } finally {
-            // Clean up temporary file
-            tempFile.delete();
-        }
-    }
-
-    private File convertMultipartFileToFile(MultipartFile file) throws IOException {
-        File tempFile = File.createTempFile("uploaded-", ".json");
-        file.transferTo(tempFile);
-        return tempFile;
+        // Ejecutar el job
+        jobLauncher.run(wordImportJob, jobParameters);
     }
 }

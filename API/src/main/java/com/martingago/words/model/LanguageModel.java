@@ -3,6 +3,8 @@ package com.martingago.words.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -10,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Table(name = "languages")
-public class LanguageModel {
+public class LanguageModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
