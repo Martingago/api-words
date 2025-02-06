@@ -96,7 +96,7 @@ public class WordController {
 
             //Llamar a la función de BatchProcessingInsertionService
             Map<String, WordResponseDTO> words = jsonValidation.parseJsonFileToWordMap(file);
-            batchProcessingInsertionService.processJsonFile(words);
+            batchProcessingInsertionService.processAllJsonData(words);
 
             return ApiResponse.build(
                     true,
@@ -115,6 +115,11 @@ public class WordController {
         }
     }
 
+    /**
+     * Función que procesa la inserción de múltiples ficheros en la BBDD
+     * @param files Lista de ficheros a procesar
+     * @return
+     */
     @PostMapping("/batch-multiple-files")
     public ResponseEntity<ApiResponse<List<String>>> insertMultipleJsonFiles(
             @RequestParam("files") List<MultipartFile> files) {
@@ -139,7 +144,7 @@ public class WordController {
                     }
 
                     Map<String, WordResponseDTO> words = jsonValidation.parseJsonFileToWordMap(file);
-                    batchProcessingInsertionService.processJsonFile(words);
+                    batchProcessingInsertionService.processAllJsonData(words);
                     processedFiles.add(file.getOriginalFilename());
 
                 } catch (Exception e) {
@@ -148,7 +153,7 @@ public class WordController {
                 }
             }
 
-            String message = buildResultMessage(processedFiles, failedFiles);
+            String message = jsonValidation.buildResultMessage(processedFiles, failedFiles);
 
             return ApiResponse.build(
                     !processedFiles.isEmpty(),
@@ -167,24 +172,7 @@ public class WordController {
         }
     }
 
-    private String buildResultMessage(List<String> processedFiles, List<String> failedFiles) {
-        StringBuilder message = new StringBuilder();
 
-        if (!processedFiles.isEmpty()) {
-            message.append("Successfully processed files: ")
-                    .append(String.join(", ", processedFiles));
-        }
-
-        if (!failedFiles.isEmpty()) {
-            if (message.length() > 0) {
-                message.append(". ");
-            }
-            message.append("Failed to process files: ")
-                    .append(String.join(", ", failedFiles));
-        }
-
-        return message.toString();
-    }
 
 
 }

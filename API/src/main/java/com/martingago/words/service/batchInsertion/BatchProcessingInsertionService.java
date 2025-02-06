@@ -7,15 +7,14 @@ import com.martingago.words.model.WordModel;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.service.qualification.WordQualificationService;
-import com.martingago.words.service.word.BatchWordInsertionService;
 import com.martingago.words.utils.BatchUtils;
 import com.martingago.words.utils.WordListDefinitionUtils;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
@@ -42,56 +41,62 @@ public class BatchProcessingInsertionService {
     BatchInsertionDefinitionService batchInsertionDefinitionService;
 
     /**
-     * Procesa un fichero .json que tiene un listado de palabras.
-     * Por cada batch realiza una inserción de 50 palabras
+     * Función que recibe un fichero .json y se encarga de dividirlo en lotes y manejarlos individualmente
      * @param allWords
      */
-    @Transactional
-    public void processJsonFile(Map<String, WordResponseDTO> allWords) {
+    public void processAllJsonData(Map<String, WordResponseDTO> allWords) {
         int totalWords = allWords.size();
         final int[] processedWords = {0};
 
-        //Obtener el listado de idiomas existente en la BBDD y generar un map
+        // Obtener los idiomas existentes
         Map<String, LanguageModel> mappedLanguages = languageService.getAllLanguagesMappedByLangCode();
 
-        //Obtener el listado de qualifications existentes en la BBDD y generar un map
-        Map<String, WordQualificationModel> mappedQualifications = wordQualificationService.getAllQualificationsMapped();
+        // Obtener qualifications iniciales en un mapa mutable
+        Map<String, WordQualificationModel> mappedQualifications = new ConcurrentHashMap<>(wordQualificationService.getAllQualificationsMapped());
 
-        // Procesar en lotes utilizando BatchUtils
         BatchUtils.processMapInBatches(allWords, BATCH_SIZE, batch -> {
             try {
-                // Insertar el lote actual de palabras y el mapeo de idiomas para evitar consultas por cada batch
-                Map<String, WordModel> insertedWords = batchWordInsertionService.insertBatchWordsMap(batch, mappedLanguages);
-
-                //Genera un map que contiene las keys palabras/placeholders que se van a insertar asociados wordModel + definitionDTO
-                Map<String, WordListDefinitionsPojo> wordListDefinitionsPojoMap = wordListDefinitionUtils.getCommonWordsWithDefinitions(insertedWords, batch);
-
-                //Insertar por batches las qualification de las palabras:
-                Map<String, WordQualificationModel> insertedQualifications = batchInsertionQualificationService.insertBatchWordQualificationMap(
-                        wordListDefinitionsPojoMap, mappedQualifications);
-
-
-                //Actualiza el listado de qualifications con las nuevas qualifications añadidas:
-                mappedQualifications.putAll(insertedQualifications);
-                if(!insertedWords.isEmpty()){
-                    //Insertar por batches las Definitions de las palabras
-                    batchInsertionDefinitionService.insertBatchWordDefinitionMap(wordListDefinitionsPojoMap,mappedQualifications);
-                }
-
-                //Insertar por lotes las qualifications
-                processedWords[0] += insertedWords.size();
+                // Llamar a un método transaccional para procesar el batch
+                processBatchWordsTransactional(batch, mappedLanguages, mappedQualifications);
 
                 // Log del progreso
+                processedWords[0] += batch.size();
                 log.info("Processed batch: {} words inserted (Total processed: {}/{})",
-                        insertedWords.size(), processedWords, totalWords);
+                        batch.size(), processedWords[0], totalWords);
             } catch (Exception e) {
                 // Manejo de errores
-                log.error("Error processing batch: {}", e.getMessage());
-                // Aquí podrías implementar lógica de reintento o manejo de errores
+                log.error("Error processing batch. Transaction rolled back for this batch. Reason: {}", e.getMessage(), e);
             }
         });
+        log.info("Finished processing {} words out of {}", processedWords[0], totalWords);
+    }
 
-        // Log final
-        log.info("Finished processing {} words out of {}", processedWords, totalWords);
+    /**
+     * Operación que maneja la creación de palabras y definiciones de un lote de 50 transaccional de palabras
+     * @param batch Map con el WordResponseDTO a insertar en la base de datos batcheado a un tamaño determinado
+     * @param mappedLanguages mapeo de los idiomas existentes en la BBDD para validar la integridad de las palabras
+     * @param mappedQualifications mapeo de las qualificaciones existentes en la BBDD asociadas a las palabras a añadir.
+     */
+    @Transactional
+    public void processBatchWordsTransactional(Map<String, WordResponseDTO> batch,
+                                               Map<String, LanguageModel> mappedLanguages,
+                                               Map<String, WordQualificationModel> mappedQualifications) {
+
+        // Insertar palabras
+        Map<String, WordModel> insertedWords = batchWordInsertionService.insertBatchWordsMap(batch, mappedLanguages);
+
+        // Generar el mapeo de palabras con sus definiciones
+        Map<String, WordListDefinitionsPojo> wordListDefinitionsPojoMap = wordListDefinitionUtils.getCommonWordsWithDefinitions(insertedWords, batch);
+
+        // Insertar qualifications para las palabras del batch y actualizar el mapa compartido
+        Map<String, WordQualificationModel> insertedQualifications = batchInsertionQualificationService.insertBatchWordQualificationMap(
+                wordListDefinitionsPojoMap, mappedQualifications
+        );
+        mappedQualifications.putAll(insertedQualifications);
+
+        // Insertar definiciones del lote
+        if (!insertedWords.isEmpty()) {
+            batchInsertionDefinitionService.insertBatchWordDefinitionMap(wordListDefinitionsPojoMap, mappedQualifications);
+        }
     }
 }

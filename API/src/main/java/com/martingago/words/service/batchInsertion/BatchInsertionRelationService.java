@@ -3,18 +3,15 @@ package com.martingago.words.service.batchInsertion;
 
 import com.martingago.words.POJO.DefinitionEstructurePojo;
 import com.martingago.words.POJO.WordPojo;
-import com.martingago.words.POJO.WordRelationPojo;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.model.WordRelationModel;
 import com.martingago.words.repository.WordRelationRepository;
-import com.martingago.words.service.word.BatchWordInsertionService;
 import com.martingago.words.utils.BatchUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

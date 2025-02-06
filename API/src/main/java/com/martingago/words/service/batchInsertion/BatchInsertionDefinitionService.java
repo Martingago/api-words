@@ -31,18 +31,15 @@ public class BatchInsertionDefinitionService {
     BatchInsertionRelationService batchInsertionRelationService;
 
     /**
-     *
-     * @param stringWordListDefinitionsPojoMap
-     * @param mappedQualifications
-     * @return
+     * Función que recibe un map
+     * @param stringWordListDefinitionsPojoMap mapa que contiene como key la palabra, y como objeto un WordListDefinitionsPojo
+     * @param mappedQualifications mapa que tiene como key una qualification, y como objeto un WordQualificationModel
      */
     @Transactional
-    public Map<String, DefinitionEstructurePojo> insertBatchWordDefinitionMap(
+    public void insertBatchWordDefinitionMap(
             Map<String, WordListDefinitionsPojo> stringWordListDefinitionsPojoMap,
             Map<String, WordQualificationModel> mappedQualifications
     ) {
-        //Map que contiene la información de las definiciones que han sido añadidas en la BBDD.
-        Map<String, DefinitionEstructurePojo> insertedWordDefinitionsMap = new HashMap<>();
 
         BatchUtils.processMapInBatches(stringWordListDefinitionsPojoMap, 50, batch -> {
             try {
@@ -73,15 +70,12 @@ public class BatchInsertionDefinitionService {
                     }
                 }
 
-                // Realizamos la inserción en la base de datos
+                // Guarda los datos de las definiciones en la Base de datos y añade los ejemplos y relaciones
                 if (!definitionModelSet.isEmpty()) {
                     List<WordDefinitionModel> insertedDefinitionsIntoDatabase = wordDefinitionRepository.saveAll(definitionModelSet);
-                    Set<DefinitionEstructurePojo> setDefinicionesPOJO = buildDefinitionEstructurePojos(insertedDefinitionsIntoDatabase, stringWordListDefinitionsPojoMap);
 
-                    // Llenar el mapa de salida con las definiciones insertadas
-                    for (DefinitionEstructurePojo pojo : setDefinicionesPOJO) {
-                        insertedWordDefinitionsMap.put(pojo.getWordDefinitionModel().getWord().getWord(), pojo);
-                    }
+                    //Genera un Set que contiene la información extra relacionada con las definiciones: Ejemplos y relaciones.
+                    Set<DefinitionEstructurePojo> setDefinicionesPOJO = buildDefinitionEstructurePojos(insertedDefinitionsIntoDatabase, stringWordListDefinitionsPojoMap);
 
                     //Insertar batch de ejemplos de las palabras
                     batchesInsertionExamplesService.insertBatchExamplesList(setDefinicionesPOJO);
@@ -95,9 +89,7 @@ public class BatchInsertionDefinitionService {
             }
         });
 
-        return insertedWordDefinitionsMap;
     }
-
 
     /**
      * Devuelve una lista que contiene un POJO con la información de: definicion palabra + Set<String> ejemplos

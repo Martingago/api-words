@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,5 +53,30 @@ public class JsonValidation {
         );
         // Convertir el Set a un Map, usando la propiedad getWord() como clave
         return wordSet.stream().collect(Collectors.toMap(WordResponseDTO::getWord, word -> word));
+    }
+
+    /**
+     * Genera un mensaje de salida de ficheros procesados con éxito/errores
+     * @param processedFiles nombre de los ficheros procesados con éxito
+     * @param failedFiles nombre de los ficheros que han tenido un error
+     * @return
+     */
+    public String buildResultMessage(List<String> processedFiles, List<String> failedFiles) {
+        StringBuilder message = new StringBuilder();
+
+        if (!processedFiles.isEmpty()) {
+            message.append("Successfully processed files: ")
+                    .append(String.join(", ", processedFiles));
+        }
+
+        if (!failedFiles.isEmpty()) {
+            if (message.length() > 0) {
+                message.append(". ");
+            }
+            message.append("Failed to process files: ")
+                    .append(String.join(", ", failedFiles));
+        }
+
+        return message.toString();
     }
 }

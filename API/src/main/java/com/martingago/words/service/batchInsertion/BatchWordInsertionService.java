@@ -1,10 +1,11 @@
-package com.martingago.words.service.word;
+package com.martingago.words.service.batchInsertion;
 
 import com.martingago.words.POJO.WordPojo;
 import com.martingago.words.dto.word.WordResponseDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
+import com.martingago.words.service.word.WordService;
 import com.martingago.words.utils.BatchUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
