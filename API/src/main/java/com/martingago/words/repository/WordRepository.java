@@ -30,6 +30,7 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "WHERE w.word = :word")
     Optional<WordModel> findByWordWithRelations(@Param("word") String word);
 
+
     @EntityGraph(attributePaths = {
             "languageModel",
             "wordDefinitionModelSet.wordQualificationModel",
@@ -38,8 +39,8 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
     })
     @Query("SELECT w FROM WordModel w " +
             "JOIN w.languageModel l " +
-            "WHERE l.langCode = 'esp' " +
+            "WHERE l.langCode = :langCode " +
             "ORDER BY FUNCTION('RAND') LIMIT 1")
-    Optional<WordModel> findRandomWord();
+    Optional<WordModel> findRandomWord(@Param("langCode") String langCode);
 
 }

@@ -31,8 +31,12 @@ public class WordService {
         return wordMapper.toResponseDTO(wordModel);
     }
 
-    public WordResponseDTO getRandomWord(){
-        WordModel wordModel = wordRepository.findRandomWord()
+    /**
+     * Obtiene una palabra aleatoria de la base de datos bajo un código de idioma establecido.
+     * @return
+     */
+    public WordResponseDTO getRandomWord(String langCode){
+        WordModel wordModel = wordRepository.findRandomWord(langCode)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Word with language: " + " was not founded"));
         return  wordMapper.toResponseDTO(wordModel);
