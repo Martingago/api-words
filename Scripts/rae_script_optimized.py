@@ -305,7 +305,7 @@ def procesar_archivo(input_path, output_jsonl, batch_size=100):
                 print(f"CSV actualizado con los datos restantes.")
 
 if __name__ == "__main__":
-    input_path = "./words_7_letters_optimized_2.csv"
-    output_jsonl = "./palabras_definiciones_7_letras_2.jsonl" 
+    input_path = "./words_7_letters_optimized.csv"
+    output_jsonl = "./palabras_definiciones_7_letras.jsonl" 
     related_path = "./palabras_relacionadas_2_optimized.csv"
     procesar_archivo(input_path, output_jsonl, batch_size=100)
