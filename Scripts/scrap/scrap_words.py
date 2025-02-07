@@ -3,13 +3,13 @@ from bs4 import BeautifulSoup
 import csv
 
 # Base URL para las páginas 2 a 22
-base_url = "https://www.listasdepalabras.es/palabras5letraspagina{}.htm"
+base_url = "https://www.listasdepalabras.es/palabras8letraspagina{}.htm"
 
 # URL para la página 1
-page1_url = "https://www.listasdepalabras.es/palabras5letras.htm"
+page1_url = "https://www.listasdepalabras.es/palabras8letras.htm"
 
 # Archivo CSV donde guardar las palabras
-output_file = "palabras_5_letras.csv"
+output_file = "palabras_8_letras.csv"
 
 # Lista para almacenar las palabras
 all_words = []
@@ -23,7 +23,7 @@ def process_page(url):
     
     if response.status_code == 200:
         # Especificamos el parser y la codificación
-        soup = BeautifulSoup(response.text, "html.parser", from_encoding='utf-8')
+        soup = BeautifulSoup(response.text, "html.parser")
         # Buscamos el <span> con la clase 'mt'
         span = soup.find("span", class_="mt")
         if span:
@@ -43,7 +43,7 @@ def process_page(url):
 all_words.extend(process_page(page1_url))
 
 # Procesamos las páginas 2 a 22
-for page in range(2, 23):  # Desde la página 2 hasta la 22
+for page in range(2, 227):  # Desde la página 2 hasta la 22
     all_words.extend(process_page(base_url.format(page)))
 
 # Escribimos las palabras en un archivo CSV
