@@ -5,7 +5,9 @@ import com.martingago.words.dto.word.WordResponseDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,4 +81,31 @@ public class JsonValidation {
 
         return message.toString();
     }
+
+
+    /**
+     * Función que recibe un fichero jsonl y lo mapea a un map de WordResponseDTO
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public Map<String, WordResponseDTO> parseJsonlFileToWordMap(MultipartFile file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, WordResponseDTO> wordMap;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            wordMap = reader.lines()
+                    .map(line -> {
+                        try {
+                            return objectMapper.readValue(line, WordResponseDTO.class);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error parsing JSON line: " + line, e);
+                        }
+                    })
+                    .collect(Collectors.toMap(WordResponseDTO::getWord, word -> word));
+        }
+
+        return wordMap;
+    }
+
 }
