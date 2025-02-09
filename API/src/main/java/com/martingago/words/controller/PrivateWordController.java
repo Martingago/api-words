@@ -74,17 +74,7 @@ public class PrivateWordController {
 
             for (MultipartFile file : files) {
                 try {
-                    if (file.isEmpty()) {
-                        failedFiles.add(file.getOriginalFilename() + " (empty file)");
-                        continue;
-                    }
-
-                    if (!jsonValidation.isValidJsonFile(file)) {
-                        failedFiles.add(file.getOriginalFilename() + " (invalid JSON)");
-                        continue;
-                    }
-
-                    Map<String, WordResponseDTO> words = jsonValidation.parseJsonFileToWordMap(file);
+                    Map<String, WordResponseDTO> words = jsonValidation.parseFileToWordMap(file);
                     batchProcessingInsertionService.processAllJsonData(words);
                     processedFiles.add(file.getOriginalFilename());
 
