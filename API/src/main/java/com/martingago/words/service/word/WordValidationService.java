@@ -16,7 +16,11 @@ public class WordValidationService {
     @Autowired
     WordRepository wordRepository;
 
-    // Procesar las palabras en lotes y verificar su existencia en la base de datos
+    /**
+     * Procesa un listado de palabras y comprueba si existe o no en la Base de datos.
+     * @param words
+     * @return
+     */
     public Set<String[]> processWordsInBatches(Set<String> words) {
         Set<String[]> results = new HashSet<>();
         int batchSize = 50; // Tamaño del lote

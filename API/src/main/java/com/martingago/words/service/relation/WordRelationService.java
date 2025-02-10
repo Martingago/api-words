@@ -26,6 +26,16 @@ public class WordRelationService {
     WordRelationRepository wordRelationRepository;
 
     /**
+     * Obtiene un list de las palabras que tienen relación de sinónimo con una palabra recibida como parámetro
+     * @param word palabra de la que se quieren buscar relaciones
+     * @param relationType tipo de relación de la palabra
+     * @return
+     */
+    public List<String> getRelationTypeByWord(String word, RelationEnumType relationType, String langCode){
+        return wordRelationRepository.findSynonymsByWord(word, relationType, langCode);
+    }
+
+    /**
      * Función que inserta en un Set de DefinitionModels las relaciones (SINÓNIMA/ANTÓNIMA) que recibe de un Set de WordDefinitionDTO
      * @param wordDefinitionModelSet > Set de definiciones sobre el que se establece el tipo de relación (ANTÓNIMA/SINÓNIMA)
      * @param wordDefinitionDTOSet > DTO que se recibe y del que se extráe la información de las definiciones para crear las relaciones

@@ -58,7 +58,7 @@ public class BatchInsertionRelationService {
                         .toList();
 
                 // Inserta las relaciones en batch
-                //wordRelationRepository.saveAll(relationsToInsert);
+                wordRelationRepository.saveAll(relationsToInsert);
             } catch (Exception e) {
                 log.error("Error processing word relations batch: {}", e.getMessage(), e);
             }
