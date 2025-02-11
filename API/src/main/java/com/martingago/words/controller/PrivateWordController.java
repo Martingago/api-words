@@ -24,7 +24,6 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/private")
-@PreAuthorize("denyAll()")
 public class PrivateWordController {
 
     @Autowired
@@ -47,7 +46,6 @@ public class PrivateWordController {
      * @return
      */
     @PostMapping("/add-word")
-    @PreAuthorize("")
     public ResponseEntity<ApiResponse<WordResponseDTO>> insertWord(@RequestBody @Valid WordResponseDTO wordResponseDTO){
         WordModel updatedWord= wordInsertionService.insertFullWord(wordResponseDTO);
         WordResponseDTO updatedWordResponseDTO = wordMapper.toResponseDTO(updatedWord);
