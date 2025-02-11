@@ -1,3 +1,4 @@
+-- AÑADE LOS IDIOMAS EN LA BASE DE DATOS
 INSERT INTO languages (lang_code, language) VALUES
 ('esp', 'Español'),
 ('eng', 'English'),
@@ -5,35 +6,45 @@ INSERT INTO languages (lang_code, language) VALUES
 ('deu', 'Deutsch'),
 ('ita', 'Italiano');
 
-INSERT INTO words_qualifications(qualification) VALUES
-('sustantivo masculino'),
-('sustantivo femenino'),
-('adjetivo femenino');
+-- AÑADE LOS PERMISOS EXISTENTES EN LA BASE DE DATOS
+INSERT INTO permission(name) VALUES
+("CREATE"),
+("DELETE"),
+("UPDATE"),
+("READ");
 
-INSERT INTO words(word, word_length, id_language, is_placeholder) VALUES
-("roca",4, 1, false),
-("piedra", 5, 1, false),
-("blando", 6, 1, false);
+-- AÑADE LOS ROLES EXISTENTES EN LA BASE DE DATOS
+INSERT INTO roles(role_name) VALUES
+("GUESS"),
+("USER"),
+("MODERATOR"),
+("ADMIN");
 
-INSERT INTO words_definitions(word_definition, id_word, id_qualification) VALUES
-("Piedra, o vena de ella, muy dura y sólida.", 1, 1),
-("Peñasco que se levanta en la tierra o en el mar.", 1, 1),
-("Cosa muy dura, firme y constante.", 1, 1),
-("Sustancia mineral, más o menos dura y compacta.", 2, 2),
-("Trozo de piedra que se usa en la construcción.", 2, 2),
-("Que cede fácilmente a la presión del tacto.", 3, 1);
+-- CREA RELACIONES ENTRE ROLES Y PERMISOS
+INSERT INTO roles_permissions(role_id, permission_id) VALUES
+(1,4), -- guess
+(2,4), -- user
+(3,1), -- moderator
+(3,2),
+(3,3),
+(4,1), -- admin
+(4,2),
+(4,3),
+(4,4);
 
-INSERT INTO words_examples(example, id_definition) VALUES
-("Le cayó una roca en el cráneo", 1),
-("Estaba duro como una roca", 1),
-("La roca pesaba 5 toneladas", 1),
-("Me gustan mucho las películas de la roca", 3),
-("Se puso tan fuerte como la roca", 3);
 
-INSERT INTO words_relations(relation, id_definition, id_word) VALUES
-("SINONIMA", 1, 2),
-("SINONIMA",2, 2),
-("ANTONIMA", 6, 1),
-("ANTONIMA", 1, 3);
+-- CREA USUARIOS EN LA BASE DE DATOS
+INSERT INTO users(credential_no_locked, account_no_expired, account_no_locked, username, is_enabled, password) VALUES
+(true, true, true, 'gagochorenmartin@gmail.com', true,'12345'), -- admin
+(true, true, true, 'chgnitram@gmail.com', true,'12345'), -- moderator
+(true, true, true, 'test@test.com', true, '12345'); -- user
+
+-- ASIGNA ROLES A LOS USUARIOS
+INSERT INTO users_roles(user_id, role_id) VALUES
+(1,4),
+(2,3),
+(3,2)
+
+
 
 

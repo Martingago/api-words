@@ -13,6 +13,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,9 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/private")
-@Slf4j
+@PreAuthorize("denyAll()")
 public class PrivateWordController {
 
     @Autowired
@@ -45,6 +47,7 @@ public class PrivateWordController {
      * @return
      */
     @PostMapping("/add-word")
+    @PreAuthorize("")
     public ResponseEntity<ApiResponse<WordResponseDTO>> insertWord(@RequestBody @Valid WordResponseDTO wordResponseDTO){
         WordModel updatedWord= wordInsertionService.insertFullWord(wordResponseDTO);
         WordResponseDTO updatedWordResponseDTO = wordMapper.toResponseDTO(updatedWord);
