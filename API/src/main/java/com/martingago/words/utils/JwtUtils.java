@@ -39,7 +39,7 @@ public class JwtUtils {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(",")); // READ, WRITE, DELETE
 
-        String jwtToken = JWT.create()
+        return JWT.create()
                 .withIssuer(this.USER_GENERATOR)
                 .withSubject(username)
                 .withClaim("authorities", authorities)
@@ -48,12 +48,10 @@ public class JwtUtils {
                 .withJWTId(UUID.randomUUID().toString())
                 .withNotBefore(new Date(System.currentTimeMillis()))
                 .sign(algorithm);
-
-        return  jwtToken;
     }
 
     /**
-     * Valida si un JWT es válido por el servidor
+     * Comprueba que un JWT enviado por el usuario en los headers de una petición sea valido en el servidor
      * @param token
      * @return
      */
@@ -63,8 +61,7 @@ public class JwtUtils {
             JWTVerifier jwtVerifier = JWT.require(algorithm)
                     .withIssuer(this.USER_GENERATOR)
                     .build();
-            DecodedJWT decodedJWT = jwtVerifier.verify(token);
-            return decodedJWT;
+            return jwtVerifier.verify(token);
         }catch (JWTVerificationException exception){
             throw new JWTVerificationException("Token invalid, not authorized");
         }

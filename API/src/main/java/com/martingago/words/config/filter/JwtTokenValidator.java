@@ -30,6 +30,14 @@ public class JwtTokenValidator extends OncePerRequestFilter {
     }
 
 
+    /**
+     * Filtro que se encarga de verificar que el JWT introducido por el usuario en la validacion es correcto
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,

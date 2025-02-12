@@ -33,6 +33,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Autowired
     JwtUtils jwtUtils;
 
+    /**
+     * Funcion que busca en la base de datos un usuario por su username y devuelve un objeto UserDetails
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserModel userModel = userRepository.findUserByUsername(username)
@@ -52,6 +58,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 authorityList);
     }
 
+    /**
+     * Función que recibe un AuthLoginRequestDTO y comienza el proceso de inicio de sesión del usuario.
+     * @param authLoginRequestDTO
+     * @return
+     */
     public AuthResponseDTO loginUser(AuthLoginRequestDTO authLoginRequestDTO){
         String username = authLoginRequestDTO.email();
         String password = authLoginRequestDTO.password();
@@ -59,8 +70,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtils.createToken(authentication);
-        AuthResponseDTO authResponseDTO = new AuthResponseDTO(username, "user logged successfully", accessToken, true);
-        return authResponseDTO;
+        return new AuthResponseDTO(username, "user logged successfully", accessToken, true);
     }
 
     /**

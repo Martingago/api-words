@@ -9,9 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +39,7 @@ public class WordService {
                         new EntityNotFoundException("Word with language: " + " was not founded"));
         return  wordMapper.toResponseDTO(wordModel);
     }
+
 
     /**
      * Busca una palabra en la base de datos
