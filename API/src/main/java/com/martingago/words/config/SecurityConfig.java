@@ -1,5 +1,7 @@
 package com.martingago.words.config;
 
+import com.martingago.words.config.filter.JwtTokenValidator;
+import com.martingago.words.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,23 +20,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return  httpSecurity
-                .csrf( scrf -> scrf.disable())
+                .csrf( csrf -> csrf.disable())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement( session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests( http -> {
                     http.requestMatchers(HttpMethod.GET, "api/v1/").permitAll();
-                    http.requestMatchers(HttpMethod.GET, "api/v1/private").authenticated();
+                    http.requestMatchers(HttpMethod.GET, "api/v1/private/").authenticated();
                     http.anyRequest().denyAll();
                 })
+                .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
                 .build();
     }
 
