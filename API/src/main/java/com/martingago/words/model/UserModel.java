@@ -27,14 +27,14 @@ public class UserModel {
     @Column(name="is_enabled")
     private Boolean isEnabled;
 
-    @Column(name="account_no_expired")
-    private Boolean accountNoExpired;
+    @Column(name="account_non_expired")
+    private Boolean accountNonExpired;
 
-    @Column(name="account_no_locked")
-    private Boolean accountNoLocked;
+    @Column(name="account_non_locked")
+    private Boolean accountNonLocked;
 
-    @Column(name="credential_no_locked")
-    private Boolean CredentialNoLocked;
+    @Column(name="credential_non_expired")
+    private Boolean CredentialNonExpired;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name="users_roles",

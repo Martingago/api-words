@@ -34,10 +34,10 @@ INSERT INTO roles_permissions(role_id, permission_id) VALUES
 
 
 -- CREA USUARIOS EN LA BASE DE DATOS
-INSERT INTO users(credential_no_locked, account_no_expired, account_no_locked, username, is_enabled, password) VALUES
-(true, true, true, 'gagochorenmartin@gmail.com', true,'12345'), -- admin
-(true, true, true, 'chgnitram@gmail.com', true,'12345'), -- moderator
-(true, true, true, 'test@test.com', true, '12345'); -- user
+INSERT INTO users(credential_non_expired, account_non_expired, account_non_locked, username, is_enabled, password) VALUES
+(true, true, true, 'gagochorenmartin@gmail.com', true,'$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'), -- admin 12345
+(true, true, true, 'chgnitram@gmail.com', true,'$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'), -- moderator 12345
+(true, true, true, 'test@test.com', true, '$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'); -- user 12345
 
 -- ASIGNA ROLES A LOS USUARIOS
 INSERT INTO users_roles(user_id, role_id) VALUES
