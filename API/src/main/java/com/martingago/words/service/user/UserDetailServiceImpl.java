@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,13 +36,20 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserModel userModel = userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username: " + username + " not founded"));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Username: " + username + " not founded"));
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         userModel.getRoleModelSet().forEach(
                 role -> authorityList.add(new SimpleGrantedAuthority("ROLE_".concat(role.getRole().name())))
         );
 
-        return null;
+        return new User(userModel.getUsername(),
+                userModel.getPassword(),
+                userModel.getIsEnabled(),
+                userModel.getAccountNonExpired(),
+                userModel.getCredentialNonExpired(),
+                userModel.getAccountNonLocked(),
+                authorityList);
     }
 
     public AuthResponseDTO loginUser(AuthLoginRequestDTO authLoginRequestDTO){

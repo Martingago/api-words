@@ -22,6 +22,7 @@ public class UserModel {
 
     @Column(unique = true)
     private String username;
+
     private String password;
 
     @Column(name="is_enabled")

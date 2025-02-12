@@ -23,8 +23,12 @@ import java.util.Collection;
 public class JwtTokenValidator extends OncePerRequestFilter {
 
 
-    @Autowired
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
+
+    public JwtTokenValidator(JwtUtils jwtUtils){
+        this.jwtUtils = jwtUtils;
+    }
+
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
