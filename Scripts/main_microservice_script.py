@@ -3,9 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import json
-from fake_useragent import UserAgent
+from fake_useragent import UserAgent # type: ignore
 import urllib3
-import shutil
+import sys
 
 class RetrySession(requests.Session):
     def __init__(self, retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
@@ -43,18 +43,12 @@ def obtener_datos(palabra, session):
 
         section_definitions = soup.find('ol', class_='c-definitions')
         if not section_definitions:
-            print(f"{palabra} no fue encontrada en RAE")
-
             # Si la palabra no fue encontrada, entonces busca una palabra relacionada:
             palabra_relacionada = soup.find('a', attrs={'data-acc': 'LISTA APROX'})
             if palabra_relacionada:
-                relacionada = palabra_relacionada.get_text(strip=True)
+                relacionada = limpiar_palabra(palabra_relacionada.get_text(strip=True))
                 print(f"Se ha encontrado palabra relacionada: {relacionada}")
-                # Guardar la palabra relacionada en el archivo de palabras similares
-                guardar_palabra_relacionada(relacionada)
-
-            # Devolver un null y no procesar esta palabra en el json
-            return None
+            return {"related_word": relacionada} #devuelve la palabra relacionada
 
         # Comprueba cual es la palabra raiz que conforma la palabra y la devuelve
         base_word = palabra
@@ -181,138 +175,34 @@ def limpiar_palabra(palabra):
     # Eliminar espacios en blanco al inicio y final
     palabra_limpia = palabra_sin_numeros.strip()
 
-    # Convertir a mayúsculas manteniendo acentos
-    return palabra_limpia.upper()
+    return palabra_limpia.lower()
 
-# Guarda las palabras relacionadas en un nuevo fichero .csv
-def guardar_palabra_relacionada(palabra):
-    output_file = related_path
-    fieldnames = ['word', 'status']
-
-    # Limpiar la palabra antes de procesarla
-    palabra = limpiar_palabra(palabra)
-
-    # Verificar si el archivo existe
-    file_exists = os.path.exists(output_file)
-
-    # Verificar si la palabra ya existe en el archivo
-    palabra_existe = False
-    if file_exists:
-        with open(output_file, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            palabra_existe = any(row['word'] == palabra for row in reader)
-
-    # Si la palabra no existe y no está vacía, añadirla al archivo
-    if not palabra_existe and palabra:
-        modo = 'a' if file_exists else 'w'
-        with open(output_file, modo, encoding='utf-8', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            if modo == 'w':
-                writer.writeheader()
-            writer.writerow({
-                'word': palabra,
-                'status': 'false'
-            })
-            print(f"Palabra relacionada '{palabra}' guardada en {output_file}")
-
-def actualizar_csv_original(input_path, processed_words):
-    temp_file_path = input_path + ".tmp"
-
-    # Leer todo el archivo original primero
-    with open(input_path, 'r', encoding='utf-8') as infile:
-        reader = csv.DictReader(infile)
-        rows = list(reader)
-        fieldnames = reader.fieldnames
-
-    # Actualizar los estados
-    for row in rows:
-        palabra = row.get('word', '').strip().lower()
-        # Buscar la palabra en las processed_words
-        status_row = next((r for r in processed_words if r['word'].strip().lower() == palabra), None)
-        if status_row:
-            row['status'] = status_row['status']
-
-    # Escribir el archivo actualizado
-    with open(temp_file_path, 'w', encoding='utf-8', newline='') as outfile:
-        writer = csv.DictWriter(outfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-
-    # Reemplazar el archivo original
-    shutil.move(temp_file_path, input_path)
-
-def escribir_a_jsonl(data, file):
-    """Escribe los datos en formato JSON Lines en un archivo ya abierto."""
-    for item in data:
-        json.dump(item, file, ensure_ascii=False)
-        file.write('\n')  # Añadir un salto de línea después de cada objeto JSON
-
-def procesar_archivo(input_path, output_jsonl, batch_size=100):
+# Función principal que procesa una palabra: Crea un fake_useragent >
+def procesar_palabra(palabra):
     session = RetrySession()
-    all_words = []
-    processed_words = []
+    palabra = palabra.strip().lower()
 
-    # Abrir el archivo JSONL una sola vez en modo de añadir
-    with open(output_jsonl, 'a', encoding='utf-8') as jsonl_file:
-        with open(input_path, 'r', encoding='utf-8') as infile:
-            reader = csv.DictReader(infile)
+    print(f"Procesando palabra: {palabra}")
+    word_data = obtener_datos(palabra, session)
 
-            for row in reader:
-                palabra = row.get('word', '').strip().lower()
-                status = row.get('status', '')
-                status = status.strip().lower() if status is not None else ''
-
-                if not palabra or status in ['true', 'null']:
-                    continue
-
-                try:
-                    print(f"Procesando palabra: {palabra}")
-                    word_data = obtener_datos(palabra, session)
-
-                    if word_data is None:
-                        new_status = 'null'
-                        processed_words.append({
-                            'word': palabra,
-                            'status': new_status
-                        })
-                        print(f"Estado actualizado para la palabra: {palabra} -> {new_status}")
-                    elif word_data is False:
-                        print(f"Error en el procesamiento de la palabra: {palabra}, manteniendo status 'false'")
-                        continue
-                    else:
-                        new_status = 'true'
-                        processed_words.append({
-                            'word': palabra,
-                            'status': new_status
-                        })
-                        all_words.append(word_data)
-
-                    # Escribir en lotes
-                    if len(all_words) >= batch_size:
-                        escribir_a_jsonl(all_words, jsonl_file)
-                        print(f"Procesadas {len(all_words)} palabras, JSONL actualizado.")
-                        all_words.clear()  # Limpiar el lote
-
-                    # Actualizar el CSV en lotes
-                    if len(processed_words) >= batch_size:
-                        actualizar_csv_original(input_path, processed_words)
-                        print(f"CSV actualizado después de procesar {len(processed_words)} palabras.")
-                        processed_words.clear()  # Limpiar el lote
-
-                except Exception as e:
-                    print(f"Error procesando palabra '{palabra}': {e}")
-                    continue
-
-            # Escribir los datos restantes
-            if all_words:
-                escribir_a_jsonl(all_words, jsonl_file)
-                print(f"JSONL actualizado con las palabras restantes.")
-            if processed_words:
-                actualizar_csv_original(input_path, processed_words)
-                print(f"CSV actualizado con los datos restantes.")
+    if word_data is None:
+        print(f"La palabra '{palabra}' no fue encontrada en RAE.")
+        return None
+    elif word_data is False:
+        print(f"Error en el procesamiento de la palabra: {palabra}")
+        return None
+    else:
+        return word_data
 
 if __name__ == "__main__":
-    input_path = "./words_8_letters_2.csv"
-    output_jsonl = "./words_definitions_8_letters_2.jsonl" 
-    related_path = "./words_related_words_8_letters.csv"
-    procesar_archivo(input_path, output_jsonl, batch_size=100)
+    if len(sys.argv) != 2:
+        print("Uso: python script.py <palabra>")
+        sys.exit(1)
+
+    palabra = sys.argv[1]
+    resultado = procesar_palabra(palabra)
+
+    if resultado:
+        print(json.dumps(resultado, indent=4, ensure_ascii=False))
+    else:
+        print(f"No se pudo procesar la palabra '{palabra}'.")

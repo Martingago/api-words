@@ -11,4 +11,5 @@ conda activate scrap_web
 conda install anaconda::requests
 conda install anaconda::beautifulsoup4
 conda install conda-forge::fake-useragent
+pip install cloudscraper
 ```
