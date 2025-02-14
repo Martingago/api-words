@@ -1,10 +1,8 @@
 # Usamos una imagen base de Python
-FROM python:3.12-slim
+FROM python:3.12.9-alpine3.21
 
 # Establecemos el directorio de trabajo dentro del contenedor
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Copiamos los archivos necesarios al contenedor
 COPY . .
