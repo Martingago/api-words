@@ -4,19 +4,21 @@ from pydantic import BaseModel
 from scraper import procesar_palabra
 import py_eureka_client.eureka_client as eureka_client
 import uuid
+import socket
+import uvicorn
 
 # Crear una instancia de FastAPI
 app = FastAPI()
 
 # Configuración del cliente Eureka
 async def register_with_eureka():
-
+    port = get_free_port()
     instance_id = f"scraping-microservice:{uuid.uuid4()}"
 
     await eureka_client.init_async(
         eureka_server="http://localhost:8761/eureka",  # URL del servidor Eureka
         app_name="rae-microservice",               # Nombre único del servicio
-        instance_port=8000,                           # Puerto en el que corre el microservicio
+        instance_port=port,                           # Puerto en el que corre el microservicio
         instance_host="localhost",                    # Host del microservicio
         instance_id = instance_id
     )
@@ -48,7 +50,12 @@ async def root():
 async def startup_event():
     await register_with_eureka()
 
-# Ejecutar el servidor (esto se usa solo para desarrollo)
+def get_free_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('0.0.0.0', 0))  # Asigna un puerto disponible
+        return s.getsockname()[1]  # Devuelve el puerto asignado
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = get_free_port()  # Obtén el puerto dinámico
+    uvicorn.run(app, host="0.0.0.0", port=port)

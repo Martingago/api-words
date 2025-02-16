@@ -8,11 +8,8 @@ conda activate scrap_web
 ```
 
 ```bash
-conda install anaconda::requests
-conda install anaconda::beautifulsoup4
-conda install conda-forge::fake-useragent
-pip install cloudscraper
-pip install py_eureka_client
+conda install anaconda::requests anaconda::beautifulsoup4 conda-forge::fake-useragent conda-forge::fastapi
+pip install cloudscraper py_eureka_clientc
 ```
 
 Docker
