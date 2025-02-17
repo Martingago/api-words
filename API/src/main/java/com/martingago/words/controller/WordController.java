@@ -1,30 +1,19 @@
 package com.martingago.words.controller;
 
+import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.dto.ApiResponse;
+import com.martingago.words.dto.word.ScrapWordDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
-import com.martingago.words.mapper.WordMapper;
-import com.martingago.words.model.WordModel;
-import com.martingago.words.service.batchInsertion.BatchProcessingInsertionService;
-import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.service.word.WordValidationService;
 import com.martingago.words.utils.CsvValidation;
-import com.martingago.words.utils.JsonValidation;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -40,6 +29,9 @@ public class WordController {
 
     @Autowired
     WordValidationService wordValidationService;
+
+    @Autowired
+    MyScrapWordClient myScrapWordClient;
 
     /**
      * Busca en la base de datos una palabra
@@ -95,5 +87,17 @@ public class WordController {
         // Devolver el archivo como un array de bytes
         return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
 
+    }
+
+
+    @PostMapping("/scrap-word")
+    public  ResponseEntity<ApiResponse<WordResponseDTO>> scrapWord(@RequestBody ScrapWordDTO scrapWordDTO){
+        WordResponseDTO wordResponseDTO = myScrapWordClient.procesarPalabra(scrapWordDTO);
+        return  ApiResponse.build(
+                true,
+                "Word successfully validate and added",
+                HttpStatus.FOUND.value(),
+                wordResponseDTO,
+                HttpStatus.FOUND);
     }
 }
