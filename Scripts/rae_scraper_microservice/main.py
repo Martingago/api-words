@@ -3,24 +3,33 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from scraper import procesar_palabra
 import py_eureka_client.eureka_client as eureka_client
+import uvicorn
 import uuid
 import socket
-import uvicorn
+from contextlib import asynccontextmanager
+import os
 
-# Crear una instancia de FastAPI
-app = FastAPI()
+
+EUREKA_SERVER = os.getenv('EUREKA_SERVER', 'http://eureka-server:8761/eureka')
+SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8090))
+INSTANCE_HOST = socket.gethostname()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Código que se ejecuta al inicio
+    await register_with_eureka()
+    yield
+    
+app = FastAPI(lifespan=lifespan)
 
 # Configuración del cliente Eureka
 async def register_with_eureka():
-    port = get_free_port()
-    instance_id = f"scraping-microservice:{uuid.uuid4()}"
-
     await eureka_client.init_async(
-        eureka_server="http://localhost:8761/eureka",  # URL del servidor Eureka
-        app_name="rae-microservice",               # Nombre único del servicio
-        instance_port=port,                           # Puerto en el que corre el microservicio
-        instance_host="localhost",                    # Host del microservicio
-        instance_id = instance_id
+        eureka_server=EUREKA_SERVER,
+        app_name="scraping-microservice",
+        instance_port=SERVICE_PORT, 
+        instance_host=INSTANCE_HOST,
+        instance_id= f"scraping-microservice:{uuid.uuid1()}"
     )
 
 # Modelo de datos para la solicitud (opcional, pero recomendado)
@@ -45,17 +54,6 @@ async def procesar_palabra_endpoint(request: PalabraRequest):
 async def root():
     return {"message": "Microservicio de validación de palabras RAE"}
 
-# Registrar el microservicio en Eureka al iniciar
-@app.on_event("startup")
-async def startup_event():
-    await register_with_eureka()
-
-def get_free_port():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('0.0.0.0', 0))  # Asigna un puerto disponible
-        return s.getsockname()[1]  # Devuelve el puerto asignado
-
 
 if __name__ == "__main__":
-    port = get_free_port()  # Obtén el puerto dinámico
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=SERVICE_PORT)

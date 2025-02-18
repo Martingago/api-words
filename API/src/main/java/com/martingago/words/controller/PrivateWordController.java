@@ -38,8 +38,6 @@ public class PrivateWordController {
     @Autowired
     JsonValidation jsonValidation;
 
-
-
     /**
      * Inserta una palabra en la Base de datos.
      * @param wordResponseDTO

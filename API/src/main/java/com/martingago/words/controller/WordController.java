@@ -4,9 +4,12 @@ import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.dto.ApiResponse;
 import com.martingago.words.dto.word.ScrapWordDTO;
 import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.mapper.WordMapper;
+import com.martingago.words.model.WordModel;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.service.word.WordValidationService;
 import com.martingago.words.utils.CsvValidation;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -32,6 +35,9 @@ public class WordController {
 
     @Autowired
     MyScrapWordClient myScrapWordClient;
+
+    @Autowired
+    WordMapper wordMapper;
 
     /**
      * Busca en la base de datos una palabra
@@ -90,14 +96,35 @@ public class WordController {
     }
 
 
+    /**
+     * Función que recibe una palabra > valida que no exista en la Base de datos > la scrapea > la sube a la BBDD
+     * @param scrapWordDTO String de la palabra que se quiere validar y scrapear
+     * @return
+     */
     @PostMapping("/scrap-word")
     public  ResponseEntity<ApiResponse<WordResponseDTO>> scrapWord(@RequestBody ScrapWordDTO scrapWordDTO){
-        WordResponseDTO wordResponseDTO = myScrapWordClient.procesarPalabra(scrapWordDTO);
-        return  ApiResponse.build(
-                true,
-                "Word successfully validate and added",
-                HttpStatus.FOUND.value(),
-                wordResponseDTO,
-                HttpStatus.FOUND);
-    }
+        String baseWord = scrapWordDTO.getWord();
+        //Antes de iniciar el proceso de scrapping comprueba que la palabra no exista y si existe que sea un placeholder:
+        try {
+            //Duplicate entry:
+            WordModel wordModel = wordService.searchBasicWord(baseWord);
+            return  ApiResponse.build(
+                    true,
+                    "Word already exists on database",
+                    HttpStatus.CONFLICT.value(),
+                    wordMapper.toResponseDTO(wordModel),
+                    HttpStatus.CONFLICT
+                    );
+        }catch (EntityNotFoundException e){
+            //Si no encuentra la palabra usa el micro-servicio > procesa > sube palabra
+            WordResponseDTO wordResponseDTO = myScrapWordClient.procesarPalabra(scrapWordDTO);
+            //Añade la palabra sin realizar validaciones previas
+            return  ApiResponse.build(
+                    true,
+                    "Word successfully validate and added",
+                    HttpStatus.CREATED.value(),
+                    wordResponseDTO,
+                    HttpStatus.CREATED);
+        }
+        }
 }

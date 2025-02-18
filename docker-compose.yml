@@ -1,0 +1,32 @@
+version: '3.8'
+
+networks:
+  api_red:
+
+services:
+  eureka-server:
+    image: eureka-server
+    container_name: eureka-server
+    networks:
+      - api_red
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "eureka-server", "8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  scraper-service:
+    image: rae-scraper-service
+    container_name: rae-scraper-service
+    networks:
+      - api_red
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8761/eureka
+      - SERVICE_PORT=8090
+    ports:
+      - "8090:8090"

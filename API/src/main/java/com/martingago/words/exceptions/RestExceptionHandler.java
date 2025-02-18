@@ -39,4 +39,15 @@ public class RestExceptionHandler {
     public  ResponseEntity<ApiResponse<Object>> handleException(Exception e){
         return  ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    // Excepciones del microservicio de scrapping
+    @ExceptionHandler(ScrapingServiceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleScrapingError(ScrapingServiceException e) {
+        HttpStatus status = HttpStatus.valueOf(e.getStatusCode());
+        return ApiResponse.error(
+                e.getMessage(),
+                status.value(),
+                status
+        );
+    }
 }

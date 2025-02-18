@@ -31,7 +31,7 @@ public class WordInsertionService {
     WordService wordService;
 
     /**
-     *
+     * Función que añade una palabra a la aplicación.
      * @param wordResponseDTO
      * @return
      */
@@ -76,7 +76,6 @@ public class WordInsertionService {
         existingWord.setWordDefinitionModelSet(addedDefinitions);
         return existingWord;
     }
-
 
 
 }

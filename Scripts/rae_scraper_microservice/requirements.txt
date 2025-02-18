@@ -5,3 +5,4 @@ beautifulsoup4
 fake-useragent
 urllib3
 cloudscraper
+py_eureka_client
