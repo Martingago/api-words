@@ -1,7 +1,7 @@
 package com.martingago.words.service.batchInsertion;
 
 import com.martingago.words.POJO.WordPojo;
-import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
@@ -32,7 +32,7 @@ public class BatchWordInsertionService {
      * @return Mapa con las palabras insertadas o actualizadas como placeholders.
      */
     public Map<String, WordModel> insertBatchWordsMap(
-            Map<String, WordResponseDTO> wordResponseDTOMap,
+            Map<String, WordResponseViewDTO> wordResponseDTOMap,
             Map<String, LanguageModel> mappedLanguages) {
 
         // Extraer el conjunto de palabras y obtener las que ya existen en la base de datos

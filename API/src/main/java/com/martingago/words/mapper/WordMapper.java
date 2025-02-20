@@ -1,7 +1,6 @@
 package com.martingago.words.mapper;
 
-import com.martingago.words.dto.word.WordCreationDTO;
-import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.WordModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,9 +21,9 @@ public class WordMapper {
      * @param wordModel
      * @return
      */
-    public WordResponseDTO toResponseDTO(WordModel wordModel){
+    public WordResponseViewDTO toResponseDTO(WordModel wordModel){
         if(wordModel == null) return null;
-        return WordResponseDTO.builder()
+        return WordResponseViewDTO.builder()
                 .language(wordModel.getLanguageModel().getLangCode())
                 .word(wordModel.getWord())
                 .length(wordModel.getWordLength())
@@ -34,25 +33,11 @@ public class WordMapper {
     }
 
     /**
-     * Recibe un wordDTO y devuelve un WordModel listo para ser insertado en la BBDD.
-     * @param wordCreationDTO
-     * @return
-     */
-    public WordModel toModel(WordCreationDTO wordCreationDTO){
-        if(wordCreationDTO == null) return  null;
-        return  WordModel.builder()
-                .languageModel(wordCreationDTO.getLanguageModel())
-                .wordLength(wordCreationDTO.getLength())
-                .word(wordCreationDTO.getWord())
-                .build();
-    }
-
-    /**
      * Devuelve un listado de WordDTO
      * @param wordModelList
      * @return
      */
-    public Set<WordResponseDTO> toDTOList(Set<WordModel> wordModelList){
+    public Set<WordResponseViewDTO> toDTOList(Set<WordModel> wordModelList){
         if(wordModelList == null) return Set.of();
         return wordModelList.stream()
                 .map(this::toResponseDTO)

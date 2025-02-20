@@ -47,7 +47,9 @@ def obtener_datos(palabra, session):
             if palabra_relacionada:
                 relacionada = limpiar_palabra(palabra_relacionada.get_text(strip=True))
                 print(f"Se ha encontrado palabra relacionada: {relacionada}")
-                return {"related_word": relacionada}  # Devuelve la palabra relacionada
+                return {
+                    "type": "related",
+                    "relatedWord": relacionada}  # Devuelve la palabra relacionada
             
             return None
         # Comprueba cuál es la palabra raíz que conforma la palabra y la devuelve
@@ -151,6 +153,7 @@ def obtener_datos(palabra, session):
 
         return {
             "language": "esp",
+            "type": "full",
             "word": palabra,
             "base_word": base_word,
             "length": len(palabra),

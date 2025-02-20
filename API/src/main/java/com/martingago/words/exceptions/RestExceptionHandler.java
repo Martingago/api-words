@@ -1,6 +1,6 @@
 package com.martingago.words.exceptions;
 
-import com.martingago.words.dto.ApiResponse;
+import com.martingago.words.dto.global.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DuplicateKeyException;

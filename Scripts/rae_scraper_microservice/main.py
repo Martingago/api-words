@@ -10,8 +10,8 @@ from contextlib import asynccontextmanager
 import os
 
 
-EUREKA_SERVER = os.getenv('EUREKA_SERVER', 'http://eureka-server:8761/eureka')
-SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8090))
+EUREKA_SERVER = os.getenv('EUREKA_SERVER', 'http://localhost:8761/eureka')
+SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8091))
 INSTANCE_HOST = socket.gethostname()
 
 @asynccontextmanager

@@ -2,7 +2,7 @@ package com.martingago.words.utils;
 
 import com.martingago.words.POJO.WordListDefinitionsPojo;
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.WordModel;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class WordListDefinitionUtils {
      */
     public Map<String, WordListDefinitionsPojo> getCommonWordsWithDefinitions(
             Map<String, WordModel> wordModelMap,
-            Map<String, WordResponseDTO> wordResponseDTOMap) {
+            Map<String, WordResponseViewDTO> wordResponseDTOMap) {
 
         return wordModelMap.entrySet().stream()
                 // Filtrar solo las palabras que existen en ambos mapas

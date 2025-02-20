@@ -1,7 +1,7 @@
 package com.martingago.words.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,14 +42,14 @@ public class JsonValidation {
      * @return
      * @throws IOException
      */
-    public Map<String, WordResponseDTO> parseJsonFileToWordMap(MultipartFile file) throws IOException {
+    public Map<String, WordResponseViewDTO> parseJsonFileToWordMap(MultipartFile file) throws IOException {
         // Leer el JSON y convertirlo a un conjunto de WordResponseDTO
-        Set<WordResponseDTO> wordSet = objectMapper.readValue(
+        Set<WordResponseViewDTO> wordSet = objectMapper.readValue(
                 file.getInputStream(),
-                objectMapper.getTypeFactory().constructCollectionType(Set.class, WordResponseDTO.class)
+                objectMapper.getTypeFactory().constructCollectionType(Set.class, WordResponseViewDTO.class)
         );
         // Convertir el Set a un Map, usando la propiedad getWord() como clave
-        return wordSet.stream().collect(Collectors.toMap(WordResponseDTO::getWord, word -> word));
+        return wordSet.stream().collect(Collectors.toMap(WordResponseViewDTO::getWord, word -> word));
     }
 
     /**
@@ -58,21 +58,21 @@ public class JsonValidation {
      * @return
      * @throws IOException
      */
-    public Map<String, WordResponseDTO> parseJsonlFileToWordMap(MultipartFile file) throws IOException {
+    public Map<String, WordResponseViewDTO> parseJsonlFileToWordMap(MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, WordResponseDTO> wordMap;
+        Map<String, WordResponseViewDTO> wordMap;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             wordMap = reader.lines()
                     .map(line -> {
                         try {
-                            return objectMapper.readValue(line, WordResponseDTO.class);
+                            return objectMapper.readValue(line, WordResponseViewDTO.class);
                         } catch (IOException e) {
                             throw new RuntimeException("Error parsing JSON line: " + line, e);
                         }
                     })
                     .collect(Collectors.toMap(
-                            WordResponseDTO::getWord, // Key
+                            WordResponseViewDTO::getWord, // Key
                             word -> word,            // Value
                             (existing, replacement) -> replacement // Merge function: Sobrescribe el valor existente
                     ));
@@ -87,7 +87,7 @@ public class JsonValidation {
      * @return
      * @throws IOException
      */
-    public Map<String, WordResponseDTO> parseFileToWordMap(MultipartFile file) throws IOException {
+    public Map<String, WordResponseViewDTO> parseFileToWordMap(MultipartFile file) throws IOException {
         // Validar si el archivo es JSON o JSONL
         if (!isValidJsonFile(file)) {
             throw new IllegalArgumentException("The file is not a valid JSON or JSONL file.");

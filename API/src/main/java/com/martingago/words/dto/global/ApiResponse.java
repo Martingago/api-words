@@ -1,4 +1,4 @@
-package com.martingago.words.dto;
+package com.martingago.words.dto.global;
 
 import lombok.Builder;
 import lombok.Getter;

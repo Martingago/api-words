@@ -28,6 +28,16 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "WHERE w.word = :word")
     Optional<WordModel> findByWordWithRelations(@Param("word") String word);
 
+    @Query("SELECT DISTINCT w FROM WordModel w " +
+            "JOIN FETCH w.languageModel " +
+            "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
+            "LEFT JOIN FETCH wd.wordQualificationModel " +
+            "LEFT JOIN FETCH wd.wordExampleModelSet " +
+            "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
+            "LEFT JOIN FETCH wr.wordRelated " +
+            "WHERE w.word = :word and w.languageModel.langCode = :lang")
+    Optional<WordModel> findByWordWithRelationsByLanguage(@Param("word") String word, @Param("lang") String lang);
+
 
     @EntityGraph(attributePaths = {
             "languageModel",

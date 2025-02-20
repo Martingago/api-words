@@ -28,7 +28,7 @@ public class WordModel {
 
     private int wordLength; //Longitud de la palabra
 
-    @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "word", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WordDefinitionModel> wordDefinitionModelSet = new HashSet<>(); //Listado de definiciones que puede tener una palabra
 
     private boolean isPlaceholder;

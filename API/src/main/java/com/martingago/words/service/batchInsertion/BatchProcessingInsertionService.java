@@ -1,7 +1,7 @@
 package com.martingago.words.service.batchInsertion;
 
 import com.martingago.words.POJO.WordListDefinitionsPojo;
-import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.model.WordQualificationModel;
@@ -44,7 +44,7 @@ public class BatchProcessingInsertionService {
      * Función que recibe un fichero .json y se encarga de dividirlo en lotes y manejarlos individualmente
      * @param allWords
      */
-    public void processAllJsonData(Map<String, WordResponseDTO> allWords) {
+    public void processAllJsonData(Map<String, WordResponseViewDTO> allWords) {
         int totalWords = allWords.size();
         final int[] processedWords = {0};
 
@@ -78,7 +78,7 @@ public class BatchProcessingInsertionService {
      * @param mappedQualifications mapeo de las qualificaciones existentes en la BBDD asociadas a las palabras a añadir.
      */
     @Transactional
-    public void processBatchWordsTransactional(Map<String, WordResponseDTO> batch,
+    public void processBatchWordsTransactional(Map<String, WordResponseViewDTO> batch,
                                                Map<String, LanguageModel> mappedLanguages,
                                                Map<String, WordQualificationModel> mappedQualifications) {
 

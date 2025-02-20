@@ -1,4 +1,4 @@
-package com.martingago.words.dto.word;
+package com.martingago.words.dto.word.response;
 
 import com.martingago.words.dto.WordDefinitionDTO;
 import lombok.*;
@@ -11,7 +11,7 @@ import java.util.Set;
 @Builder
 
 /**
- * Clase que contiene los datos de una palabra y que serán enviados al front-end
+ * Clase que contiene los datos de una palabra que se envían al front-end
  */
 public class WordResponseViewDTO {
     private String language;

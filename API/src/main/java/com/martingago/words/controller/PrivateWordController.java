@@ -1,19 +1,24 @@
 package com.martingago.words.controller;
 
-import com.martingago.words.dto.ApiResponse;
-import com.martingago.words.dto.word.WordResponseDTO;
+import com.martingago.words.dto.global.ApiResponse;
+import com.martingago.words.dto.word.request.DeleteWordRequestDTO;
+import com.martingago.words.dto.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.WordModel;
+import com.martingago.words.repository.LanguageRepository;
 import com.martingago.words.service.batchInsertion.BatchProcessingInsertionService;
+import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.service.word.WordInsertionService;
+import com.martingago.words.service.word.WordService;
 import com.martingago.words.utils.JsonValidation;
+import com.netflix.discovery.converters.Auto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,22 +43,28 @@ public class PrivateWordController {
     @Autowired
     JsonValidation jsonValidation;
 
+    @Autowired
+    WordService wordService;
+
+    @Autowired
+    LanguageService languageService;
+
     /**
-     * Inserta una palabra en la Base de datos.
-     * @param wordResponseDTO
+     * Añade una palabra en la Base de datos.
+     * @param fullWordResponseDTO
      * @return
      */
     @PostMapping("/add-word")
-    public ResponseEntity<ApiResponse<WordResponseDTO>> insertWord(@RequestBody @Valid WordResponseDTO wordResponseDTO){
-        WordModel updatedWord= wordInsertionService.insertFullWord(wordResponseDTO);
-        WordResponseDTO updatedWordResponseDTO = wordMapper.toResponseDTO(updatedWord);
+    public ResponseEntity<ApiResponse<WordResponseViewDTO>> insertWord(
+            @RequestBody @Valid FullWordRequestDTO fullWordResponseDTO){
+        WordModel updatedWord= wordInsertionService.insertFullWord(fullWordResponseDTO);
+        WordResponseViewDTO updatedWordResponseViewDTO = wordMapper.toResponseDTO(updatedWord);
         return ApiResponse.build(true,
                 "Word successfully created",
                 HttpStatus.CREATED.value(),
-                updatedWordResponseDTO,
+                updatedWordResponseViewDTO,
                 HttpStatus.CREATED);
     }
-
 
 
     /**
@@ -73,7 +84,7 @@ public class PrivateWordController {
 
             for (MultipartFile file : files) {
                 try {
-                    Map<String, WordResponseDTO> words = jsonValidation.parseFileToWordMap(file);
+                    Map<String, WordResponseViewDTO> words = jsonValidation.parseFileToWordMap(file);
                     batchProcessingInsertionService.processAllJsonData(words);
                     processedFiles.add(file.getOriginalFilename());
 
@@ -100,5 +111,30 @@ public class PrivateWordController {
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    /**
+     * Elimina una palabra bajo un string específico
+     * @param deleteWordRequestDTO
+     * @return
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse<Object>> deleteWordByString(
+            @RequestBody @Valid DeleteWordRequestDTO deleteWordRequestDTO) {
+        // Comprobar que el idioma sea válido
+        languageService.searchLanguageByLangCode(deleteWordRequestDTO.getLangCode());
+
+        //Compobar que la palabra en el idioma indicado exista en la BBDD
+        WordModel wordToDelete = wordService.searchBasicWordWithLanguage(deleteWordRequestDTO.getWord(), deleteWordRequestDTO.getLangCode());
+
+        //Eliminar la palabra de la base de datos
+        wordService.deleteWordByWordModel(wordToDelete);
+
+        //Si no se captura ningún error se crea la salida correspondiente
+        return ApiResponse.build(true,
+                "Word: '" + deleteWordRequestDTO.getWord() + "' successfully deleted",
+                HttpStatus.OK.value(),
+                deleteWordRequestDTO,
+                HttpStatus.OK);
     }
 }

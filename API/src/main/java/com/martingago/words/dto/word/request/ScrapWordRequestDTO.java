@@ -11,6 +11,6 @@ import lombok.*;
 /**
  * Clase que se emplea para scrapear palabras como objeto para enviar al micro-servicio de scrapping
  */
-public class ScrapWordDTO {
+public class ScrapWordRequestDTO {
     private String word;
 }

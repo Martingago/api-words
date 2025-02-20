@@ -1,6 +1,6 @@
 package com.martingago.words.controller.authentication;
 
-import com.martingago.words.dto.ApiResponse;
+import com.martingago.words.dto.global.ApiResponse;
 import com.martingago.words.dto.authentication.AuthLoginRequestDTO;
 import com.martingago.words.dto.authentication.AuthResponseDTO;
 import com.martingago.words.service.user.UserDetailServiceImpl;
