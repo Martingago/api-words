@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-        name = "scraping-microservice",
-        url = "http://localhost:8090",
+        name = "SCRAPING-MICROSERVICE",
         configuration = FeignConfig.class)
 public interface MyScrapWordClient {
 

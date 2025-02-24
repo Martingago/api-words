@@ -10,6 +10,7 @@ import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.dto.word.request.RelatedWordRequestDTO;
 import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.WordModel;
+import com.martingago.words.service.word.DailyWordService;
 import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.service.word.WordValidationService;
@@ -47,6 +48,9 @@ public class WordController {
     @Autowired
     WordInsertionService wordInsertionService;
 
+    @Autowired
+    DailyWordService dailyWordService;
+
     /**
      * Busca en la base de datos una palabra
      *
@@ -67,14 +71,25 @@ public class WordController {
     /**
      * Obtiene una palabra aleatoria de toda la base de datos de palabras
      *
-     * @param langCode idioma sobre el que se quiere obtener la palabra aleatoria
+     * @param wordLength tamaño de la palabra que se quiere obtener aleatoriamente
      * @return Objeto ApiResponse que contiene la información de la palabra aleatoria obtenida.
      */
     @GetMapping("/word")
-    public ResponseEntity<ApiResponse<WordResponseViewDTO>> getRandomWord(@RequestParam("lang") String langCode) {
-        WordResponseViewDTO wordResponseViewDTO = wordService.getRandomWord(langCode);
+    public ResponseEntity<ApiResponse<WordResponseViewDTO>> getRandomWord(@RequestParam(value = "length", required = false) Integer wordLength) {
+        WordResponseViewDTO wordResponseViewDTO = wordService.getRandomWord(wordLength);
         return ApiResponse.build(true,
                 "Word successfully founded",
+                HttpStatus.FOUND.value(),
+                wordResponseViewDTO,
+                HttpStatus.FOUND);
+    }
+
+    @GetMapping("/daily")
+    public ResponseEntity<ApiResponse<WordResponseViewDTO>> getDailyWord() {
+        WordModel wordModel = dailyWordService.getDailyWord();
+        WordResponseViewDTO wordResponseViewDTO = wordMapper.toResponseDTO(wordModel);
+        return ApiResponse.build(true,
+                "Daily word founded",
                 HttpStatus.FOUND.value(),
                 wordResponseViewDTO,
                 HttpStatus.FOUND);
