@@ -38,7 +38,8 @@ public class SecurityConfig {
                     http.requestMatchers("/api/v1/private/**").hasRole("ADMIN");
                     http.requestMatchers("/auth/**").permitAll();
                     http.requestMatchers("/api/v1/**").permitAll();
-                    http.anyRequest().denyAll();
+                    http.requestMatchers("/documentacion/**").permitAll();
+                    http.anyRequest().permitAll();
                 })
                 .addFilterBefore(new JwtTokenValidator(this.jwtUtils), BasicAuthenticationFilter.class)
                 .build();

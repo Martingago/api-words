@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: words-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          jdbc:
+            batch_size: 20
+          order_inserts: true
+          order_updates: true
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 100MB
+
+  cloud:
+    loadbalancer:
+      enabled: true
+
+  doc:
+    api-docs:
+      enabled: true
+      path: /v3/api-docs
+      x-logo: /documentation/lose-icon.png
+
+  security:
+    jwt:
+      key:
+        private: ${JWT_KEY}
+      user:
+        generator: ${JWT_USER}
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE}
+
+server:
+  port: 8080
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full

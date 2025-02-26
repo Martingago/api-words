@@ -13,6 +13,7 @@ import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.utils.JsonValidation;
 import com.netflix.discovery.converters.Auto;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -29,6 +30,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/private")
+@Hidden
 public class PrivateWordController {
 
     @Autowired

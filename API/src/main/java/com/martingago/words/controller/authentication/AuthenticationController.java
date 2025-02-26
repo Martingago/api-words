@@ -4,6 +4,7 @@ import com.martingago.words.dto.global.ApiResponse;
 import com.martingago.words.dto.authentication.AuthLoginRequestDTO;
 import com.martingago.words.dto.authentication.AuthResponseDTO;
 import com.martingago.words.service.user.UserDetailServiceImpl;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Hidden
 public class AuthenticationController {
 
     @Autowired
