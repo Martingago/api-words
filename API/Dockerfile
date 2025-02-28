@@ -1,5 +1,5 @@
 # Etapa de construcción
-FROM maven:3.8.6-openjdk-18-slim AS build
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
 # Copiar solo el pom.xml y descargar dependencias
@@ -10,10 +10,8 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-RUN ls -l target/
-
 # Etapa de ejecución
-FROM eclipse-temurin:21-alpine
+FROM gcr.io/distroless/java21
 WORKDIR /app
 
 # Copiar el JAR generado

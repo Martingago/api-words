@@ -2,7 +2,7 @@ package com.martingago.words.controller.global;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.global.stats.StatsApiResponse;
-import com.martingago.words.dto.global.stats.WordStaticsDTO;
+import com.martingago.words.dto.global.stats.WordStatsDTO;
 import com.martingago.words.service.global.WordsStaticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Estadísticas del API", description = "Operaciones relacionadas con obtener las estadísticas del API.")
-public class WordStaticsController {
+public class WordStatsController {
 
     @Autowired
     WordsStaticsService wordsStaticsService;
@@ -38,8 +38,8 @@ public class WordStaticsController {
                             description = "Internal server error")
             })
     @GetMapping("/stats")
-    public ResponseEntity<ApiResponseDTO<WordStaticsDTO>> getWordsStatics(){
-        WordStaticsDTO statics = wordsStaticsService.getWordsStatics();
+    public ResponseEntity<ApiResponseDTO<WordStatsDTO>> getWordsStatics(){
+        WordStatsDTO statics = wordsStaticsService.getWordsStatics();
         return ApiResponseDTO.build(
                 true,
                 "Stats successfully founded",

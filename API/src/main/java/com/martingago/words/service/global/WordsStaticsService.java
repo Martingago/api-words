@@ -1,7 +1,7 @@
 package com.martingago.words.service.global;
 
-import com.martingago.words.dto.global.WordStaticsDTO;
-import com.martingago.words.repository.StaticsRepository;
+import com.martingago.words.dto.global.stats.WordStatsDTO;
+import com.martingago.words.repository.StatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 public class WordsStaticsService {
 
     @Autowired
-    StaticsRepository staticsRepository;
+    StatsRepository statsRepository;
 
 
     /**
      * Obtiene las estadísticas generales de palabras de la Base de datos.
      * @return
      */
-    public WordStaticsDTO getWordsStatics(){
-        return staticsRepository.getStaticsFromDatabase();
+    public WordStatsDTO getWordsStatics(){
+        return statsRepository.getStaticsFromDatabase();
     }
 }

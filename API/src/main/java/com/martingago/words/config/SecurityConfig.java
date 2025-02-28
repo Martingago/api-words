@@ -38,8 +38,8 @@ public class SecurityConfig {
                     http.requestMatchers("/api/v1/private/**").hasRole("ADMIN");
                     http.requestMatchers("/auth/**").permitAll();
                     http.requestMatchers("/api/v1/**").permitAll();
-                    http.requestMatchers("/documentacion/**").permitAll();
-                    http.anyRequest().permitAll();
+                    http.requestMatchers("/documentation/**", "/swagger-ui/**", "/v3/api-docs").permitAll();
+                    http.anyRequest().denyAll();
                 })
                 .addFilterBefore(new JwtTokenValidator(this.jwtUtils), BasicAuthenticationFilter.class)
                 .build();

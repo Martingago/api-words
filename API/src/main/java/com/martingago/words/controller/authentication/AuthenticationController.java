@@ -1,6 +1,6 @@
 package com.martingago.words.controller.authentication;
 
-import com.martingago.words.dto.global.ApiResponse;
+import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.authentication.AuthLoginRequestDTO;
 import com.martingago.words.dto.authentication.AuthResponseDTO;
 import com.martingago.words.service.user.UserDetailServiceImpl;
@@ -23,9 +23,9 @@ public class AuthenticationController {
     UserDetailServiceImpl userDetailService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponseDTO>> loginUser(@RequestBody @Valid AuthLoginRequestDTO authLoginRequestDTO){
+    public ResponseEntity<ApiResponseDTO<AuthResponseDTO>> loginUser(@RequestBody @Valid AuthLoginRequestDTO authLoginRequestDTO){
         AuthResponseDTO authResponseDTO = userDetailService.loginUser(authLoginRequestDTO);
-        return  ApiResponse.build(
+        return  ApiResponseDTO.build(
                 true,
                 "Successfully login",
                 HttpStatus.OK.value(),

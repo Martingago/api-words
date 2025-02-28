@@ -3,14 +3,14 @@ networks:
 
 services:
   eureka-server:
-    image: eureka-server
-    container_name: eureka-server
+    image: rae-eureka-server
+    container_name: rae-eureka-server
     networks:
       - api_red
     ports:
       - "8761:8761"
     healthcheck:
-      test: ["CMD", "nc", "-z", "eureka-server", "8761"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,14 +24,14 @@ services:
       eureka-server:
         condition: service_healthy
     environment:
-      - EUREKA_SERVER=http://eureka-server:8761/eureka
+      - EUREKA_SERVER=http://rae-eureka-server:8761/
       - SERVICE_PORT=8090
     ports:
       - "8090:8090"
 
   api-words:
-    image: api-words
-    container_name: api-words
+    image: rae-api-words
+    container_name: rae-api-words
     networks:
       - api_red
     depends_on:

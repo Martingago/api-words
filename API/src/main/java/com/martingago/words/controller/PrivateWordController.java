@@ -1,18 +1,16 @@
 package com.martingago.words.controller;
 
-import com.martingago.words.dto.global.ApiResponse;
+import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.DeleteWordRequestDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.WordModel;
-import com.martingago.words.repository.LanguageRepository;
 import com.martingago.words.service.batchInsertion.BatchProcessingInsertionService;
 import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.utils.JsonValidation;
-import com.netflix.discovery.converters.Auto;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +55,11 @@ public class PrivateWordController {
      * @return
      */
     @PostMapping("/add-word")
-    public ResponseEntity<ApiResponse<WordResponseViewDTO>> insertWord(
+    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> insertWord(
             @RequestBody @Valid FullWordRequestDTO fullWordResponseDTO){
         WordModel updatedWord= wordInsertionService.insertFullWord(fullWordResponseDTO);
         WordResponseViewDTO updatedWordResponseViewDTO = wordMapper.toResponseDTO(updatedWord);
-        return ApiResponse.build(true,
+        return ApiResponseDTO.build(true,
                 "Word successfully created",
                 HttpStatus.CREATED.value(),
                 updatedWordResponseViewDTO,
@@ -74,7 +72,7 @@ public class PrivateWordController {
      * @param files Lista de ficheros a procesar
      */
     @PostMapping("/upload-words")
-    public ResponseEntity<ApiResponse<List<String>>> insertMultipleJsonFiles(
+    public ResponseEntity<ApiResponseDTO<List<String>>> insertMultipleJsonFiles(
             @RequestParam("files") List<MultipartFile> files) {
         try {
             if (files.isEmpty()) {
@@ -98,7 +96,7 @@ public class PrivateWordController {
 
             String message = jsonValidation.buildResultMessage(processedFiles, failedFiles);
 
-            return ApiResponse.build(
+            return ApiResponseDTO.build(
                     !processedFiles.isEmpty(),
                     message,
                     HttpStatus.CREATED.value(),
@@ -107,7 +105,7 @@ public class PrivateWordController {
 
         } catch (Exception e) {
             log.error("Error processing multiple files: ", e);
-            return ApiResponse.error(
+            return ApiResponseDTO.error(
                     e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR
@@ -121,7 +119,7 @@ public class PrivateWordController {
      * @return
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<Object>> deleteWordByString(
+    public ResponseEntity<ApiResponseDTO<Object>> deleteWordByString(
             @RequestBody @Valid DeleteWordRequestDTO deleteWordRequestDTO) {
         // Comprobar que el idioma sea válido
         languageService.searchLanguageByLangCode(deleteWordRequestDTO.getLangCode());
@@ -133,7 +131,7 @@ public class PrivateWordController {
         wordService.deleteWordByWordModel(wordToDelete);
 
         //Si no se captura ningún error se crea la salida correspondiente
-        return ApiResponse.build(true,
+        return ApiResponseDTO.build(true,
                 "Word: '" + deleteWordRequestDTO.getWord() + "' successfully deleted",
                 HttpStatus.OK.value(),
                 deleteWordRequestDTO,

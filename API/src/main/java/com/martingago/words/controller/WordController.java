@@ -2,8 +2,9 @@ package com.martingago.words.controller;
 
 import com.martingago.words.POJO.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
-import com.martingago.words.dto.global.ApiResponse;
+import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.ScrapWordRequestDTO;
+import com.martingago.words.dto.word.response.WordApiResponse;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.dto.word.request.BaseWordRequestDTO;
 import com.martingago.words.dto.word.request.FullWordRequestDTO;
@@ -15,6 +16,13 @@ import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.service.word.WordValidationService;
 import com.martingago.words.utils.CsvValidation;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -27,6 +35,8 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(   name ="Buscar palabras",
+        description = "Operaciones relacionadas con la búsqueda de palabras en la API de WordRadar")
 @Slf4j
 public class WordController {
 
@@ -55,16 +65,35 @@ public class WordController {
      * Busca en la base de datos una palabra
      *
      * @param word string de la palabra que se quiere buscar en la base de datos
-     * @return Objeto ApiResponse que contiene la información de la palabra encontrada.
+     * @return Objeto ApiResponseDTO que contiene la información de la palabra encontrada.
      */
+    @Operation(summary = "/search/{word}",
+            description = "Método 'GET' que busca una palabra  específica en la API de WordRadar.",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Ok",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = WordApiResponse.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request"),
+                    @ApiResponse(responseCode = "404",
+                            description = "Not found"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error")
+            })
     @GetMapping("/search/{word}")
-    public ResponseEntity<ApiResponse<WordResponseViewDTO>> findWordByName(@PathVariable String word) {
+    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> findWordByName(
+            @Parameter(description = "Palabra que quiere ser buscada en la Base de datos de WordRadar.",
+            required = true,
+            example = "piedra")
+            @PathVariable String word
+    ) {
         WordResponseViewDTO wordResponseViewDTO = wordService.getWordByName(word);
-        return ApiResponse.build(true,
+        return ApiResponseDTO.build(true,
                 "Word successfully founded",
-                HttpStatus.FOUND.value(),
+                HttpStatus.OK.value(),
                 wordResponseViewDTO,
-                HttpStatus.FOUND);
+                HttpStatus.OK);
     }
 
 
@@ -72,27 +101,56 @@ public class WordController {
      * Obtiene una palabra aleatoria de toda la base de datos de palabras
      *
      * @param wordLength tamaño de la palabra que se quiere obtener aleatoriamente
-     * @return Objeto ApiResponse que contiene la información de la palabra aleatoria obtenida.
+     * @return Objeto ApiResponseDTO que contiene la información de la palabra aleatoria obtenida.
      */
+    @Operation(summary = "/word",
+            description = "Método 'GET' que obtiene una palabra aleatoria de la API de WordRadar.",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Ok",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = WordApiResponse.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error")
+            })
     @GetMapping("/word")
-    public ResponseEntity<ApiResponse<WordResponseViewDTO>> getRandomWord(@RequestParam(value = "length", required = false) Integer wordLength) {
+    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getRandomWord(
+            @Parameter(description = "Longitud de la palabra aleatoria",
+                    required = false,
+                    example = "5")
+            @RequestParam(value = "length", required = false) Integer wordLength
+    ) {
         WordResponseViewDTO wordResponseViewDTO = wordService.getRandomWord(wordLength);
-        return ApiResponse.build(true,
+        return ApiResponseDTO.build(true,
                 "Word successfully founded",
-                HttpStatus.FOUND.value(),
+                HttpStatus.OK.value(),
                 wordResponseViewDTO,
-                HttpStatus.FOUND);
+                HttpStatus.OK);
     }
 
+    @Operation(summary = "/daily",
+            description = "Método 'GET' que obtiene la palabra diaria generada por el servidor. La palabra diaria se genera a las 00:00 CET (Madrid)",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Ok",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = WordApiResponse.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Bad request"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error")
+            })
     @GetMapping("/daily")
-    public ResponseEntity<ApiResponse<WordResponseViewDTO>> getDailyWord() {
+    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getDailyWord() {
         WordModel wordModel = dailyWordService.getDailyWord();
         WordResponseViewDTO wordResponseViewDTO = wordMapper.toResponseDTO(wordModel);
-        return ApiResponse.build(true,
+        return ApiResponseDTO.build(true,
                 "Daily word founded",
-                HttpStatus.FOUND.value(),
+                HttpStatus.OK.value(),
                 wordResponseViewDTO,
-                HttpStatus.FOUND);
+                HttpStatus.OK);
     }
 
     /**
@@ -102,6 +160,7 @@ public class WordController {
      * @return fichero .csv con 2 columnas: word y status
      * @throws IOException
      */
+    @Hidden
     @PostMapping(value = "/validate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> validateWords(@RequestParam("file") MultipartFile file) throws IOException {
         //Procesa el fichero .csv y lo convierte a un set de Strings:
@@ -128,14 +187,15 @@ public class WordController {
      * @param scrapWordRequestDTO String de la palabra que se quiere validar y scrapear
      * @return
      */
+    @Hidden
     @PostMapping("/scrap-word")
-    public ResponseEntity<ApiResponse<Object>> scrapWord(@RequestBody ScrapWordRequestDTO scrapWordRequestDTO) {
+    public ResponseEntity<ApiResponseDTO<Object>> scrapWord(@RequestBody ScrapWordRequestDTO scrapWordRequestDTO) {
         String baseWord = scrapWordRequestDTO.getWord();
         //Antes de iniciar el proceso de scrapping comprueba que la palabra no exista y si existe que sea un placeholder:
         WordValidator wordValidator = wordService.isWordLocatedAndNotPlaceholder(baseWord);
 
         if (wordValidator.isExists()) {
-            return ApiResponse.build(
+            return ApiResponseDTO.build(
                     true,
                     "Word already exists on database",
                     HttpStatus.CONFLICT.value(),
@@ -149,7 +209,7 @@ public class WordController {
         // Comprueba si lo que recibe del microservicio es una full o related word
         if (baseWordRequestDTO instanceof RelatedWordRequestDTO) {
             RelatedWordRequestDTO relatedWordResponse = (RelatedWordRequestDTO) baseWordRequestDTO;
-            return ApiResponse.build(
+            return ApiResponseDTO.build(
                     false,
                     "Couldn't add word '" + baseWord + "', did you mean: '" + relatedWordResponse.getRelatedWord() + "'?",
                     HttpStatus.UNPROCESSABLE_ENTITY.value(),
@@ -161,14 +221,14 @@ public class WordController {
             WordModel wordModel = wordInsertionService.insertFullWord(fullWordResponseDTO);
 
 
-            return ApiResponse.build(
+            return ApiResponseDTO.build(
                     true,
                     "Word successfully validate and added",
                     HttpStatus.CREATED.value(),
                     wordMapper.toResponseDTO(wordModel),
                     HttpStatus.CREATED);
         }
-        return ApiResponse.build(
+        return ApiResponseDTO.build(
                 false,
                 "Invalid Object to upload on database",
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

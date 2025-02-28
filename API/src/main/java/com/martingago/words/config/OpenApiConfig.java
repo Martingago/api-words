@@ -17,16 +17,14 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         // Crear el objeto Info primero
         Info info = new Info()
-                .title("API WordRadar documentación")
-                .description("Documentación de la API REST WordRadar con la información de sus Endpoints")
+                .title("Documentación de WordRadar")
+                .description("WordRadar es una API REST que permite a los desarrolladores buscar palabras en una base de datos, devolver información sobre ellas (definiciones, sinónimos, etc.), y generar palabras aleatorias, incluyendo una palabra del día.")
                 .version("1.0.0")
                 .contact(new Contact()
-                        .name("Soporte de API")
+                        .name("Contacto")
                         .url("http://martingago.dev")
-                        .email("soporte@wordradar.es"))
-                .license(new License()
-                        .name("Licencia Apache 2.0")
-                        .url("http://springdoc.org"));
+                        .email("soporte@wordradar.es"));
+
 
         // Añadir la extensión x-logo
         Map<String, Object> logo = new HashMap<>();
@@ -37,9 +35,6 @@ public class OpenApiConfig {
 
         // Construir y devolver el objeto OpenAPI
         return new OpenAPI()
-                .info(info)
-                .externalDocs(new ExternalDocumentation()
-                        .description("Documentación completa")
-                        .url("http://martingago.dev/docs"));
+                .info(info);
     }
 }
