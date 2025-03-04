@@ -1,14 +1,14 @@
 <div class="bg-primary">
     <div class="md:w-[80%] max-w-[1200px] m-auto text-white">
-        <mat-toolbar>
+        <mat-toolbar class="flex items-center justify-between">
             <!-- Logotipo -->
-            <span class="logo">WordRadar</span>
+            <span class="font-bold text-2xl">WordRadar</span>
             <!-- Menú de hamburguesa (solo visible en móviles) -->
-            <button mat-icon-button (click)="toggleMenu()" class="menu-button">
+            <button (click)="toggleMenu()" class="flex justify-center items-center w-[50px] h-[50px] md:hidden">
               <mat-icon>menu</mat-icon>
             </button>
             <!-- Enlaces (visibles en escritorio) -->
-            <div class="links" [ngClass]="{'hidden': !menuOpen && isMobile, 'md:block': true}">
+            <div class="links flex gap-4 top-[54px] sm:top-[64px] md:top-0" [ngClass]="{'hidden': !menuOpen && isMobile, 'md:block': true}">
               <a mat-button routerLink="/inicio">Inicio</a>
               <a mat-button routerLink="/servicios">Servicios</a>
               <a mat-button routerLink="/acerca-de">Acerca de</a>
