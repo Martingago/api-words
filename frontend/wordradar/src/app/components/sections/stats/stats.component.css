@@ -1,0 +1,10 @@
+
+@media (min-width: 1280px) {
+   .section-stats-component{
+    max-height: 500px;
+   } 
+}
+.section-stats-component{
+    min-height: calc(100dvh - (64px + 400px));
+    
+}
