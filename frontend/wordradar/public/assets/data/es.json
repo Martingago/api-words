@@ -1,0 +1,26 @@
+{
+    "usages": [
+        {
+            "image": "/assets/icons/global/icon-developers.svg",
+            "title": "Desarrolladores",
+            "description": "Integra WordRadar en tus aplicaciones para añadir funcionalidades de diccionario."
+        },
+        {
+            "image": "/assets/icons/global/icon-escritores.svg",
+            "title": "Educadores",
+            "description": "Crea herramientas de aprendizaje interactivas para tus estudiantes."
+        },
+        {
+            "image": "/assets/icons/global/icon-profesores.svg",
+            "title": "Escritores",
+            "description": "Encuentra sinónimos y ejemplos para mejorar tus textos."
+        },
+        {
+            "image": "/assets/icons/global/icon-translations.svg",
+            "title": "Traducciones",
+            "description": "Mejora la precisión de tus traducciones con definiciones y ejemplos en contexto."
+        }
+               
+    ]
+
+}
