@@ -1,0 +1,44 @@
+<div class="bg-gray-300 text-white p-4 rounded-lg mx-auto">
+    <!-- Input para el endpoint -->
+    <div class="flex">
+        
+            <input type="text" [(ngModel)]="endpoint"
+                class="w-[300px] p-2 bg-gray-800 border rounded text-white" />
+        
+        <!-- Input para el parámetro -->
+        
+            <input type="text" [(ngModel)]="param"
+                class="w-full p-2 bg-gray-800 border rounded text-white"
+                placeholder="Ejemplo: 123" />
+       
+
+        <!-- Botón copiar path -->
+        <button (click)="tryRequest()"
+            class="w-auto bg-gray-200 hover:bg-gray-400 px-4 rounded">
+            
+        </button>
+
+        <!-- Botón de ejecutar -->
+        <button (click)="tryRequest()"
+            class="w-auto bg-blue-500 hover:bg-blue-600 px-4 rounded">
+            Probar
+        </button>
+    </div>
+
+    <!-- Spinner de carga -->
+    <div *ngIf="loading" class="text-center my-2">⏳ Cargando...</div>
+
+    <!-- Mostrar error -->
+    <div *ngIf="error" class="text-red-400 mt-2">{{ error }}</div>
+
+    <!-- Mostrar respuesta -->
+    <div *ngIf="responseData" class="bg-gray-800 p-2 rounded mt-4 relative">
+        <pre class="whitespace-pre-wrap text-xs">{{ responseData | json }}</pre>
+
+        <!-- Botón copiar -->
+        <button (click)="copyToClipboard()"
+            class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs">
+            📋 Copiar
+        </button>
+    </div>
+</div>

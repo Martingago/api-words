@@ -5,10 +5,12 @@ import { CallToActionComponent } from "./components/call-to-action/call-to-actio
 import { StatsComponent } from './components/sections/stats/stats.component';
 import { FaqComponent } from './components/sections/faq/faq.component';
 import { UsagesComponent } from "./components/sections/usages/usages.component";
+import { FooterComponent } from "./components/sections/footer/footer.component";
+import { ApidemoComponent } from "./components/sections/apidemo/apidemo.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MenuComponent, CallToActionComponent, StatsComponent, FaqComponent, UsagesComponent],
+  imports: [RouterOutlet, MenuComponent, CallToActionComponent, StatsComponent, FaqComponent, UsagesComponent, FooterComponent, ApidemoComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

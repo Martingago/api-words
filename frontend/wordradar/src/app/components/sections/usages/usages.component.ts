@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UsageComponent } from "../../global/usage/usage.component";
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { H2Component } from "../../global/titles/h2/h2.component";
 
 interface Usage {
   image: string;
@@ -11,7 +12,7 @@ interface Usage {
 
 @Component({
   selector: 'app-usages',
-  imports: [UsageComponent,CommonModule],
+  imports: [UsageComponent, CommonModule, H2Component],
   templateUrl: './usages.component.html',
   styleUrl: './usages.component.css'
 })
