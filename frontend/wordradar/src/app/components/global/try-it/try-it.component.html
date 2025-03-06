@@ -1,30 +1,27 @@
-<div class="bg-gray-300 text-white p-4 rounded-lg mx-auto">
-    <!-- Input para el endpoint -->
-    <div class="flex">
-        
-            <input type="text" [(ngModel)]="endpoint"
-                class="w-[300px] p-2 bg-gray-800 border rounded text-white" />
-        
-        <!-- Input para el parámetro -->
-        
-            <input type="text" [(ngModel)]="param"
-                class="w-full p-2 bg-gray-800 border rounded text-white"
-                placeholder="Ejemplo: 123" />
-       
+<div class="grid grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto]">
 
-        <!-- Botón copiar path -->
-        <button (click)="tryRequest()"
-            class="w-auto bg-gray-200 hover:bg-gray-400 px-4 rounded">
-            
-        </button>
+    <p type="text" class="p-2 text-xs sm:text-base bg-gray-400 border border-gray-400 text-white rounded-tl rounded-bl">
+        {{endpoint}}
+    </p>
 
-        <!-- Botón de ejecutar -->
-        <button (click)="tryRequest()"
-            class="w-auto bg-blue-500 hover:bg-blue-600 px-4 rounded">
-            Probar
-        </button>
-    </div>
+    <!-- Input para el parámetro -->
+    <input type="text" [(ngModel)]="param" class="w-full text-xs sm:text-base p-2 bg-gray-50 border-t border-b border-gray-400"
+        placeholder="search/piedra" />
 
+
+    <!-- Botón copiar path -->
+    <button (click)="copyToClipboard()" class="w-auto cursor-pointer bg-gray-200 hover:bg-gray-400 px-4 transition-all border border-gray-400">
+        <img class="h-[18px] sm:h-[24px]" src="/assets/icons/global/copy-icon.svg" alt="Icon copy to clipboard">
+    </button>
+
+    <!-- Botón de ejecutar -->
+    <button (click)="tryRequest()" class="w-auto col-span-full sm:col-auto 
+    rounded sm:rounded-none sm:rounded-tr sm:rounded-br py-2 sm:py-none mt-2 sm:mt-0 cursor-pointer bg-primary hover:bg-primary-dark text-white px-4 ">
+        Probar
+    </button>
+</div>
+
+<div class="p-4 rounded-lg mx-auto">
     <!-- Spinner de carga -->
     <div *ngIf="loading" class="text-center my-2">⏳ Cargando...</div>
 
