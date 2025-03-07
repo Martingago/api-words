@@ -1,41 +1,66 @@
+<!-- Barra de búsqueda -->
 <div class="grid grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto]">
 
+    <!-- Base de la URL -->
     <p type="text" class="p-2 text-xs sm:text-base bg-gray-400 border border-gray-400 text-white rounded-tl rounded-bl">
         {{endpoint}}
     </p>
 
     <!-- Input para el parámetro -->
-    <input type="text" [(ngModel)]="param" class="w-full text-xs sm:text-base p-2 bg-gray-50 border-t border-b border-gray-400"
-        placeholder="search/piedra" />
+    <input type="text" [(ngModel)]="param" (keydown.enter)="tryRequest()"
+        class="w-full text-xs sm:text-base p-2 bg-gray-50 border-t border-b border-gray-400"
+        placeholder="search/emperador" />
 
 
     <!-- Botón copiar path -->
-    <button (click)="copyToClipboard()" class="w-auto cursor-pointer bg-gray-200 hover:bg-gray-400 px-4 transition-all border border-gray-400">
-        <img class="h-[18px] sm:h-[24px]" src="/assets/icons/global/copy-icon.svg" alt="Icon copy to clipboard">
-    </button>
+    <div class="relative">
+        <button (click)="copyToClipboard('url')"
+            class="w-auto h-full cursor-pointer relative  bg-gray-200 hover:bg-gray-400 px-4 transition-all border border-gray-400">
+            <img class="h-[18px] sm:h-[24px]" src="/assets/icons/global/copy-icon.svg" alt="Icon copy to clipboard">
+        </button>
+        <!-- Tooltip dinámico para URL -->
+        <div *ngIf="copySuccess['url']"
+            class="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded shadow-lg">
+            Copiado!
+        </div>
+    </div>
 
     <!-- Botón de ejecutar -->
-    <button (click)="tryRequest()" class="w-auto col-span-full sm:col-auto 
-    rounded sm:rounded-none sm:rounded-tr sm:rounded-br py-2 sm:py-none mt-2 sm:mt-0 cursor-pointer bg-primary hover:bg-primary-dark text-white px-4 ">
+    <button (click)="tryRequest()"
+        class="w-auto col-span-full sm:col-auto 
+    rounded sm:rounded-none sm:rounded-tr sm:rounded-br py-2 sm:py-none mt-2 sm:mt-0 transition-all cursor-pointer bg-primary hover:bg-primary-dark text-white px-4 ">
         Probar
     </button>
 </div>
 
-<div class="p-4 rounded-lg mx-auto">
-    <!-- Spinner de carga -->
-    <div *ngIf="loading" class="text-center my-2">⏳ Cargando...</div>
-
-    <!-- Mostrar error -->
-    <div *ngIf="error" class="text-red-400 mt-2">{{ error }}</div>
-
+<!-- Display de código -->
+<div class="bg-gray-100 h-[80dvh] p-2 rounded mt-2 shadow">
     <!-- Mostrar respuesta -->
-    <div *ngIf="responseData" class="bg-gray-800 p-2 rounded mt-4 relative">
-        <pre class="whitespace-pre-wrap text-xs">{{ responseData | json }}</pre>
+    <div *ngIf="responseData" class= "flex flex-col h-full">
+        <div class="flex justify-end z-10 relative">
+            <div class="relative">
+                <button (click)="copyToClipboard('response')"
+                    class="block bg-white border cursor-pointer hover:bg-gray-400 transition-all px-2 py-1 rounded text-xs">
+                    <img class="h-[18px] sm:h-[24px]" src="/assets/icons/global/copy-icon.svg"
+                        alt="Icon copy to clipboard">
+                </button>
+                <!-- Tooltip posicionado relativamente al botón -->
+                <div *ngIf="copySuccess['response']"
+                    class="absolute -top-7 left-1/2 -translate-x-1/2 z-50 bg-gray-700 text-white text-xs px-2 py-1 rounded shadow-lg">
+                    Copiado!
+                </div>
+            </div>
+        </div>
 
-        <!-- Botón copiar -->
-        <button (click)="copyToClipboard()"
-            class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs">
-            📋 Copiar
-        </button>
+        <!-- Línea divisoria -->
+        <hr class="border-gray-300 my-2">
+
+        <!-- Bloque de código -->
+        <div class="overflow-y-auto">
+            <!-- Spinner de carga -->
+            <div *ngIf="loading" class="text-center my-2">⏳ Cargando...</div>
+            <!-- Contenido JSON -->
+            <pre class="whitespace-pre-wrap text-xs p-2">{{ responseData | json }}</pre>
+        </div>
     </div>
 </div>

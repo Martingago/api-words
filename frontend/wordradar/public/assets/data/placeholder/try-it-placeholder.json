@@ -1,0 +1,50 @@
+{
+    "status": true,
+    "message": "Word successfully founded",
+    "serverCode": 200,
+    "responseObject": {
+      "language": "esp",
+      "word": "emperador",
+      "length": 9,
+      "definitions": [
+        {
+          "qualification": "nombre masculino y femenino",
+          "definition": "Soberano que gobierna sobre otros reyes o grandes príncipes, o en un extenso territorio.",
+          "examples": [],
+          "synonyms": [
+            "césar",
+            "soberano",
+            "rey"
+          ],
+          "antonyms": []
+        },
+        {
+          "qualification": "nombre femenino",
+          "definition": "Mujer del emperador",
+          "examples": [],
+          "synonyms": [],
+          "antonyms": []
+        },
+        {
+          "qualification": "nombre masculino",
+          "definition": "Jefe supremo del antiguo Imperio romano, y que originariamente se nombraba por aclamación del Ejército o decreto del Senado.",
+          "examples": [],
+          "synonyms": [],
+          "antonyms": []
+        },
+        {
+          "qualification": "nombre masculino",
+          "definition": "pez espada.",
+          "examples": [],
+          "synonyms": [
+            "alfanje",
+            "espadarte",
+            "albacora",
+            "jifia"
+          ],
+          "antonyms": []
+        }
+      ]
+    },
+    "timeStamp": "2025-03-07T11:12:34.926116562Z"
+  }

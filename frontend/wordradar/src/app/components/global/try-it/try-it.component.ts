@@ -11,13 +11,32 @@ import { ApiTryItService } from '../../../service/api-try-it.service';
 })
 export class TryItComponent {
   endpoint = 'http://localhost:8080/api/v1/'; // Endpoint base
-  param = ''; // Input del usuario
+  param = 'search/emperador'; // Input del usuario
   responseData: any = null; // Respuesta de la API
   loading = false; // Indicador de carga
   error = ''; // Manejo de errores
 
+  // Estado de los tooltips de cada botón
+  copySuccess: { [key: string]: boolean } = {};
+
   constructor(private apiTryItService: ApiTryItService) {}
 
+  // Cargar el placeholder desde un JSON local al iniciar el componente
+  ngOnInit() {
+    this.apiTryItService.getData('/assets/data/placeholder/try-it-placeholder.json').subscribe({
+      next: (data) => {
+        this.responseData = data;
+      },
+      error: (err) => {
+        console.error('Error cargando el placeholder:', err);
+      }
+    });
+  }
+
+
+  /**
+   * Realiza las peticiones al servidor
+   */
   tryRequest() {
     this.loading = true;
     this.error = '';
@@ -30,18 +49,26 @@ export class TryItComponent {
       next: (data) => {
         this.responseData = data;
         this.loading = false;
+        console.log(data);
       },
       error: (err) => {
-        this.error = 'Error al hacer la petición';
+        this.error = err.error;
+        this.responseData = this.error;
         this.loading = false;
-        console.log(err)
+        console.log(  err.error)
       },
     });
   }
 
-  // Copia al portapapeles la información
-  copyToClipboard() {
-    navigator.clipboard.writeText(JSON.stringify(this.responseData, null, 2));
+  copyToClipboard(type: string) {
+    let textToCopy = type === 'response' 
+      ? JSON.stringify(this.responseData, null, 2) 
+      : `${this.endpoint}${this.param}`;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      this.copySuccess[type] = true;
+      setTimeout(() => this.copySuccess[type] = false, 1500);
+    });
   }
 
 
