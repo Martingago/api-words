@@ -1,26 +1,59 @@
 {
-    "usages": [
-        {
-            "image": "/assets/icons/global/icon-developers.svg",
-            "title": "Desarrolladores",
-            "description": "Integra WordRadar en tus aplicaciones para añadir funcionalidades de diccionario."
-        },
-        {
-            "image": "/assets/icons/global/icon-escritores.svg",
-            "title": "Educadores",
-            "description": "Crea herramientas de aprendizaje interactivas para tus estudiantes."
-        },
-        {
-            "image": "/assets/icons/global/icon-profesores.svg",
-            "title": "Escritores",
-            "description": "Encuentra sinónimos y ejemplos para mejorar tus textos."
-        },
-        {
-            "image": "/assets/icons/global/icon-translations.svg",
-            "title": "Traducciones",
-            "description": "Mejora la precisión de tus traducciones con definiciones y ejemplos en contexto."
-        }
-               
+  "stats_section": {
+    "title": "WordRadar en números.",
+    "paragraphs": [
+      {
+        "title": "",
+        "content": "Obtén rápidamente la información que necesites para tu proyecto."
+      }
+    ],
+    "stats": [
+      { "value": "Palabras", "count": "567234" },
+      { "value": "Definiciones", "count": "964172" },
+      { "value": "Sinónimos", "count": "406791" },
+      { "value": "Ejemplos", "count": "182489" }
     ]
-
+  },
+  "faq_section": {
+    "title": "¿Qué es WordRadar?",
+    "paragraphs": [
+      {
+        "title": "",
+        "content": "<span class=\"font-semibold text-primary\">WordRadar</span> es un proyecto de API REST para palabras, accesible para todo el mundo. Esta API es ideal si quieres crear una aplicación que requiera información rápida sobre palabras existentes en la lengua española."
+      },
+      {
+        "title": "",
+        "content": "<span class=\"font-semibold text-primary\">WordRadar</span> no solo ofrece palabras y definiciones, sino también clasificaciones detalladas por cada definición, ejemplos de uso, relaciones de sinónimos y antónimos, palabras aleatorias y una variedad de filtros avanzados."
+      },
+      {
+        "title": "",
+        "content": "Si deseas conocer más sobre las funcionalidades disponibles en <span class=\"font-semibold text-primary\">WordRadar</span>, no dudes en visitar la documentación para desarrolladores y ver cómo funciona."
+      }
+    ]
+  },
+  "usages_section": {
+    "title": "¿Para qué puedes usar WordRadar?",
+    "usages": [
+      {
+        "image": "/assets/icons/global/icon-developers.svg",
+        "title": "Desarrolladores",
+        "description": "Integra WordRadar en tus aplicaciones para añadir funcionalidades de diccionario."
+      },
+      {
+        "image": "/assets/icons/global/icon-escritores.svg",
+        "title": "Educadores",
+        "description": "Crea herramientas de aprendizaje interactivas para tus estudiantes."
+      },
+      {
+        "image": "/assets/icons/global/icon-profesores.svg",
+        "title": "Escritores",
+        "description": "Encuentra sinónimos y ejemplos para mejorar tus textos."
+      },
+      {
+        "image": "/assets/icons/global/icon-translations.svg",
+        "title": "Traducciones",
+        "description": "Mejora la precisión de tus traducciones con definiciones y ejemplos en contexto."
+      }
+    ]
+  }
 }

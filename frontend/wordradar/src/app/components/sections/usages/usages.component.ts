@@ -18,12 +18,14 @@ interface Usage {
 })
 export class UsagesComponent implements OnInit{
   usages: Usage[] = [];
+  usagesTitle : String = '';
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.http.get<{ usages: Usage[] }>('/assets/data/es.json').subscribe(data => {
-      this.usages = data.usages;
+    this.http.get<{ usages_section: {title: String, usages: Usage[] }}>('/assets/data/es.json').subscribe(data => {
+      this.usagesTitle = data.usages_section.title;
+      this.usages = data.usages_section.usages;
     });
   }
 }

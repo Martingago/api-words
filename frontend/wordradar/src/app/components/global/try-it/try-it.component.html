@@ -34,10 +34,14 @@
 </div>
 
 <!-- Display de código -->
-<div class="bg-gray-100 h-[80dvh] p-2 rounded mt-2 shadow">
+<div class="bg-gray-100 code-try-it p-2 rounded mt-2 shadow">
     <!-- Mostrar respuesta -->
-    <div *ngIf="responseData" class= "flex flex-col h-full">
+    <!-- Spinner de carga -->
+    <div *ngIf="loading" class="flex justify-center text-center h-full mt-10">⏳ Cargando...</div>
+    <div *ngIf="responseData" class="flex flex-col h-full">
+        
         <div class="flex justify-end z-10 relative">
+            <p *ngIf="requestTime" class="w-full flex items-center">Tiempo de ejecución: {{requestTime}}ms</p>
             <div class="relative">
                 <button (click)="copyToClipboard('response')"
                     class="block bg-white border cursor-pointer hover:bg-gray-400 transition-all px-2 py-1 rounded text-xs">
@@ -57,8 +61,7 @@
 
         <!-- Bloque de código -->
         <div class="overflow-y-auto">
-            <!-- Spinner de carga -->
-            <div *ngIf="loading" class="text-center my-2">⏳ Cargando...</div>
+
             <!-- Contenido JSON -->
             <pre class="whitespace-pre-wrap text-xs p-2">{{ responseData | json }}</pre>
         </div>

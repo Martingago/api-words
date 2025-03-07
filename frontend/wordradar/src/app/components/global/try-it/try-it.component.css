@@ -1,0 +1,4 @@
+/* Calc de la altura del nav + title + botones de busqueda */
+.code-try-it{
+    height: calc(100dvh - (65px + 150px));
+}
