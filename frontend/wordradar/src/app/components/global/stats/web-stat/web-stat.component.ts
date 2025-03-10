@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-web-stat',
@@ -7,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrl: './web-stat.component.css'
 })
 export class WebStatComponent {
-
+  @Input() atribute: string = "Item";
+  @Input() count: string = "0";
 }

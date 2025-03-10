@@ -8,10 +8,10 @@
       }
     ],
     "stats": [
-      { "value": "Palabras", "count": "567234" },
-      { "value": "Definiciones", "count": "964172" },
-      { "value": "Sinónimos", "count": "406791" },
-      { "value": "Ejemplos", "count": "182489" }
+      { "atribute": "Palabras", "count": 56724 },
+      { "atribute": "Definiciones", "count": 96472 },
+      { "atribute": "Sinónimos", "count": 40691 },
+      { "atribute": "Ejemplos", "count": 18289 }
     ]
   },
   "faq_section": {
