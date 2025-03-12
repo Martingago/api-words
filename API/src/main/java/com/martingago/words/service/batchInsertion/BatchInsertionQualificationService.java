@@ -18,6 +18,10 @@ import java.util.Set;
 @Service
 public class BatchInsertionQualificationService {
 
+
+    private static final int BATCH_SIZE = 100;
+
+
     @Autowired
     WordQualificationRepository wordQualificationRepository;
 
@@ -36,7 +40,7 @@ public class BatchInsertionQualificationService {
         Map<String, WordQualificationModel> insertedQualificationsMap = new HashMap<>();
 
         // Procesa las qualifications en lotes de 50
-        BatchUtils.processMapInBatches(stringWordListDefinitionsPojoMap, 50, batch -> {
+        BatchUtils.processMapInBatches(stringWordListDefinitionsPojoMap, BATCH_SIZE, batch -> {
 
             try {
                 //Set que contiene la información de las qualifications que vamos a insertar

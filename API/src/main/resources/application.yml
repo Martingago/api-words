@@ -2,17 +2,21 @@ spring:
   application:
     name: words-service
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
       show-sql: true
       properties:
         hibernate:
+          connection:
+            characterEncoding: utf8
+            charSet: utf8
           jdbc:
-            batch_size: 20
+            batch_size: 100
           order_inserts: true
           order_updates: true
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}

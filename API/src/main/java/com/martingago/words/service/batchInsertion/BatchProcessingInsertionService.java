@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class BatchProcessingInsertionService {
 
-    private static final int BATCH_SIZE = 50;
+    private static final int BATCH_SIZE = 100;
 
     @Autowired
     BatchWordInsertionService batchWordInsertionService;

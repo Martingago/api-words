@@ -39,7 +39,7 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
     @Query(value = "SELECT id FROM words " +
             "WHERE words.is_placeholder = false " + //placeholder
             "AND (:wordLength IS NULL OR words.word_length = :wordLength) " + //longitud carácteres palabra
-            "ORDER BY RAND() LIMIT 1", nativeQuery = true)
+            "ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Long findRandomWordId(@Param("wordLength") Integer wordLength);
 
     @Query("SELECT DISTINCT w FROM WordModel w " +

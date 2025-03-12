@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @Service
 public class BatchInsertionDefinitionService {
 
+    private static final int BATCH_SIZE = 100;
+
     @Autowired
     WordDefinitionRepository wordDefinitionRepository;
 
@@ -41,7 +43,7 @@ public class BatchInsertionDefinitionService {
             Map<String, WordQualificationModel> mappedQualifications
     ) {
 
-        BatchUtils.processMapInBatches(stringWordListDefinitionsPojoMap, 50, batch -> {
+        BatchUtils.processMapInBatches(stringWordListDefinitionsPojoMap, BATCH_SIZE, batch -> {
             try {
                 Set<WordDefinitionModel> definitionModelSet = new HashSet<>();
 

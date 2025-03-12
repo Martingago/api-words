@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 public class BatchWordInsertionService {
 
+    private static final int BATCH_SIZE = 100;
+
     @Autowired
     private WordRepository wordRepository;
 
@@ -105,7 +107,7 @@ public class BatchWordInsertionService {
         // Inserta las palabras faltantes en batches de 50
 
         if (!missingWords.isEmpty()) {
-            BatchUtils.processInBatches(missingWords, 50, batch -> {
+            BatchUtils.processInBatches(missingWords, BATCH_SIZE, batch -> {
                 try {
                     List<WordModel> newWords = batch.stream()
                             .map(wordPojo -> WordModel.builder()

@@ -17,6 +17,8 @@ import java.util.*;
 @Slf4j
 public class BatchInsertionRelationService {
 
+    private static final int BATCH_SIZE = 100;
+
     @Autowired
     BatchWordInsertionService batchWordInsertionService;
 
@@ -28,7 +30,7 @@ public class BatchInsertionRelationService {
 
         Set<WordRelationModel> insertedWordRelationModelSet = new HashSet<>();
 
-        BatchUtils.processInBatches(setDefinitionPojoToInsert, 50, batch -> {
+        BatchUtils.processInBatches(setDefinitionPojoToInsert, BATCH_SIZE, batch -> {
             try {
                 // Usamos un Map para evitar palabras duplicadas
                 Map<String, WordPojo> uniqueWordsMap = new HashMap<>();
