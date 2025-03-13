@@ -24,7 +24,7 @@ public class WordExampleService {
      * @param wordDefinitionDTOSet Set<WordDefinitionDTO> que contiene la información de las definiciones
      * @return Set<WordExampleModel> que contiene las entidades que se han introducido en la BBDD.
      */
-    @Transactional
+
     public Set<WordExampleModel> insertExamplesForDefinitions(
             Set<WordDefinitionModel> definitions,
             Set<WordDefinitionDTO> wordDefinitionDTOSet) {

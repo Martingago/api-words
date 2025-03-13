@@ -13,7 +13,8 @@ import lombok.*;
 public class WordExampleModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_example_entity_seq")
+    @SequenceGenerator(name = "word_example_entity_seq", sequenceName = "word_example_entity_seq", allocationSize = 100)
     private Long id;
 
     private String example;

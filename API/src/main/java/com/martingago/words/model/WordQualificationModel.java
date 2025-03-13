@@ -13,7 +13,8 @@ import lombok.*;
 public class WordQualificationModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_qualification_entity_seq")
+    @SequenceGenerator(name = "word_qualification_entity_seq", sequenceName = "word_qualification_entity_seq", allocationSize = 1)
     private Long id;
 
     @Column(unique = true, nullable = false)

@@ -16,7 +16,8 @@ import java.util.Set;
 public class RoleModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_entity_seq")
+    @SequenceGenerator(name = "role_entity_seq", sequenceName = "role_entity_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "role_name")

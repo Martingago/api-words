@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class BatchesInsertionExamplesService {
 
+    private static final int BATCH_SIZE = 100;
+
     @Autowired
     WordExampleRepository wordExampleRepository;
 
@@ -29,7 +31,7 @@ public class BatchesInsertionExamplesService {
         // Declaración del set a devolver con los ejemplos insertados:
         Set<WordExampleModel> insertedExamples = new HashSet<>();
 
-        BatchUtils.processInBatches(setDefinicionesPojo, 50, batch -> {
+        BatchUtils.processInBatches(setDefinicionesPojo, 10git 0, batch -> {
             try {
                 Set<WordExampleModel> examplesToInsert = new HashSet<>();
 

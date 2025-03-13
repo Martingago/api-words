@@ -13,7 +13,8 @@ import lombok.*;
 public class LanguageModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lang_entity_seq")
+    @SequenceGenerator(name = "lang_entity_seq", sequenceName = "lang_entity_seq", allocationSize = 1)
     private Long id;
 
     @Column(unique = true)

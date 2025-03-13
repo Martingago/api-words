@@ -16,7 +16,8 @@ import java.util.Set;
 public class WordModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_entity_seq")
+    @SequenceGenerator(name = "word_entity_seq", sequenceName = "word_entity_seq", allocationSize = 100)
     private long id;
 
     @Column(name = "word", unique = true)

@@ -1,25 +1,24 @@
 spring:
   application:
     name: words-service
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          connection:
-            characterEncoding: utf8
-            charSet: utf8
-          jdbc:
-            batch_size: 100
-          order_inserts: true
-          order_updates: true
+    properties:
+      hibernate:
+        jdbc.batch_size: 100
+        order_inserts: true
+        generate_statistics: true  # Para ver estadísticas del batch insert en logs
+
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}
+    url: ${DB_URL}?reWriteBatchedInserts=true
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+    hikari:
+      auto-commit: false  # Desactivar auto-commit para mejor rendimiento en batch
 
   servlet:
     multipart:

@@ -38,7 +38,6 @@ public class WordDefinitionService {
      * @param languageModel idioma de referencia de la palabra para usar en la creación de posibles placeholders
      * @return Set de WordDefinitionModel que contiene la información de las definiciones de la palabra que han sido añadidos a la BBDD.
      */
-    @Transactional
     public Set<WordDefinitionModel> validateAndInsertDefinitions(WordModel wordModel,
                                                                  Set<WordDefinitionDTO> wordDefinitionDTOSet,
                                                                  LanguageModel languageModel) {
