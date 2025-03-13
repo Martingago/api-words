@@ -21,16 +21,16 @@ INSERT INTO roles (id, role_name) VALUES
 (4, 'ADMIN');
 
 -- CREA RELACIONES ENTRE ROLES Y PERMISOS
-INSERT INTO roles_permissions (id, role_id, permission_id) VALUES
-(1, 1,4), -- guess
-(2, 2,4), -- user
-(3, 3,1), -- moderator
-(4, 3,2),
-(5, 3,3),
-(6, 4,1), -- admin
-(7, 4,2),
-(8, 4,3),
-(9, 4,4);
+INSERT INTO roles_permissions (role_id, permission_id) VALUES
+(1,4), -- guess
+(2,4), -- user
+(3,1), -- moderator
+(3,2),
+(3,3),
+(4,1), -- admin
+(4,2),
+(4,3),
+(4,4);
 
 -- CREA USUARIOS EN LA BASE DE DATOS
 INSERT INTO users (id, credential_non_expired, account_non_expired, account_non_locked, username, is_enabled, password) VALUES
@@ -42,7 +42,7 @@ INSERT INTO users (id, credential_non_expired, account_non_expired, account_non_
 (1, TRUE, TRUE, TRUE, 'martin', TRUE, '$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'); -- admin 12345
 
 -- ASIGNA ROLES A LOS USUARIOS
-INSERT INTO users_roles (id, user_id, role_id) VALUES
-(1, 1,4),
-(2, 2,3),
-(3, 3,2);
+INSERT INTO users_roles (user_id, role_id) VALUES
+(1,4),
+(2,3),
+(3,2);

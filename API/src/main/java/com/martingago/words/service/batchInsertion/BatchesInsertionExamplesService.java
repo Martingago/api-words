@@ -31,7 +31,7 @@ public class BatchesInsertionExamplesService {
         // Declaración del set a devolver con los ejemplos insertados:
         Set<WordExampleModel> insertedExamples = new HashSet<>();
 
-        BatchUtils.processInBatches(setDefinicionesPojo, 10git 0, batch -> {
+        BatchUtils.processInBatches(setDefinicionesPojo, BATCH_SIZE, batch -> {
             try {
                 Set<WordExampleModel> examplesToInsert = new HashSet<>();
 

@@ -85,18 +85,18 @@ public class BatchProcessingInsertionService {
         // Insertar palabras
         Map<String, WordModel> insertedWords = batchWordInsertionService.insertBatchWordsMap(batch, mappedLanguages);
 
-        // Generar el mapeo de palabras con sus definiciones
-        Map<String, WordListDefinitionsPojo> wordListDefinitionsPojoMap = wordListDefinitionUtils.getCommonWordsWithDefinitions(insertedWords, batch);
-
-        // Insertar qualifications para las palabras del batch y actualizar el mapa compartido
-        Map<String, WordQualificationModel> insertedQualifications = batchInsertionQualificationService.insertBatchWordQualificationMap(
-                wordListDefinitionsPojoMap, mappedQualifications
-        );
-        mappedQualifications.putAll(insertedQualifications);
-
-        // Insertar definiciones del lote
-        if (!insertedWords.isEmpty()) {
-            batchInsertionDefinitionService.insertBatchWordDefinitionMap(wordListDefinitionsPojoMap, mappedQualifications);
-        }
+//        // Generar el mapeo de palabras con sus definiciones
+//        Map<String, WordListDefinitionsPojo> wordListDefinitionsPojoMap = wordListDefinitionUtils.getCommonWordsWithDefinitions(insertedWords, batch);
+//
+//        // Insertar qualifications para las palabras del batch y actualizar el mapa compartido
+//        Map<String, WordQualificationModel> insertedQualifications = batchInsertionQualificationService.insertBatchWordQualificationMap(
+//                wordListDefinitionsPojoMap, mappedQualifications
+//        );
+//        mappedQualifications.putAll(insertedQualifications);
+//
+//        // Insertar definiciones del lote
+//        if (!insertedWords.isEmpty()) {
+//            batchInsertionDefinitionService.insertBatchWordDefinitionMap(wordListDefinitionsPojoMap, mappedQualifications);
+//        }
     }
 }
