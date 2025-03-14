@@ -13,7 +13,7 @@ import lombok.*;
 public class WordRelationModel {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_relation_entity_seq")
-    @SequenceGenerator(name = "word_relation_entity_seq", sequenceName = "word_relation_entity_seq", allocationSize = 100)
+    @SequenceGenerator(name = "word_relation_entity_seq", sequenceName = "word_relation_entity_seq")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

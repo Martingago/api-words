@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class BatchesInsertionExamplesService {
 
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 50;
 
     @Autowired
     WordExampleRepository wordExampleRepository;

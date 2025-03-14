@@ -17,10 +17,12 @@ public class WordModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_entity_seq")
-    @SequenceGenerator(name = "word_entity_seq", sequenceName = "word_entity_seq", allocationSize = 100)
+    @SequenceGenerator(name = "word_entity_seq", sequenceName = "word_entity_seq")
     private long id;
 
-    @Column(name = "word", unique = true)
+    @Column(name = "word"
+            //, unique = true
+    )
     private String word;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +31,7 @@ public class WordModel {
 
     private int wordLength; //Longitud de la palabra
 
-    @OneToMany(mappedBy = "word", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "word", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
     private Set<WordDefinitionModel> wordDefinitionModelSet = new HashSet<>(); //Listado de definiciones que puede tener una palabra
 
     private boolean isPlaceholder;

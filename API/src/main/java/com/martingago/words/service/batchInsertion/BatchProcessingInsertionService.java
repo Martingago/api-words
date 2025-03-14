@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class BatchProcessingInsertionService {
 
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 50;
 
     @Autowired
     BatchWordInsertionService batchWordInsertionService;
@@ -77,7 +77,6 @@ public class BatchProcessingInsertionService {
      * @param mappedLanguages mapeo de los idiomas existentes en la BBDD para validar la integridad de las palabras
      * @param mappedQualifications mapeo de las qualificaciones existentes en la BBDD asociadas a las palabras a añadir.
      */
-    @Transactional
     public void processBatchWordsTransactional(Map<String, WordResponseViewDTO> batch,
                                                Map<String, LanguageModel> mappedLanguages,
                                                Map<String, WordQualificationModel> mappedQualifications) {

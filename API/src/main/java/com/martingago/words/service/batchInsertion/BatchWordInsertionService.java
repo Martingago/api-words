@@ -7,6 +7,7 @@ import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.utils.BatchUtils;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class BatchWordInsertionService {
 
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 50;
 
     @Autowired
     private WordRepository wordRepository;
@@ -33,6 +34,7 @@ public class BatchWordInsertionService {
      * @param mappedLanguages    Mapa con la información extraída de los idiomas para evitar múltiples consultas en cada batch.
      * @return Mapa con las palabras insertadas o actualizadas como placeholders.
      */
+    @Transactional
     public Map<String, WordModel> insertBatchWordsMap(
             Map<String, WordResponseViewDTO> wordResponseDTOMap,
             Map<String, LanguageModel> mappedLanguages) {

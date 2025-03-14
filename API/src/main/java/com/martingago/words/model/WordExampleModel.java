@@ -14,7 +14,7 @@ public class WordExampleModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_example_entity_seq")
-    @SequenceGenerator(name = "word_example_entity_seq", sequenceName = "word_example_entity_seq", allocationSize = 100)
+    @SequenceGenerator(name = "word_example_entity_seq", sequenceName = "word_example_entity_seq")
     private Long id;
 
     private String example;

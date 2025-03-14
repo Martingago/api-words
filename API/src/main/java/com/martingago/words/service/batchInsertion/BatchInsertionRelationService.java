@@ -17,7 +17,7 @@ import java.util.*;
 @Slf4j
 public class BatchInsertionRelationService {
 
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 50;
 
     @Autowired
     BatchWordInsertionService batchWordInsertionService;

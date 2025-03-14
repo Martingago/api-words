@@ -38,9 +38,6 @@ INSERT INTO users (id, credential_non_expired, account_non_expired, account_non_
 (2, TRUE, TRUE, TRUE, 'chgnitram@gmail.com', TRUE, '$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'), -- moderator 12345
 (3, TRUE, TRUE, TRUE, 'test@test.com', TRUE, '$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'); -- user 12345
 
-INSERT INTO users (id, credential_non_expired, account_non_expired, account_non_locked, username, is_enabled, password) VALUES
-(1, TRUE, TRUE, TRUE, 'martin', TRUE, '$2a$10$stG8zdkNxF6Zwnz9tnN2Meg8b4QZWW537H1zsyK3JcAc1nupsiXia'); -- admin 12345
-
 -- ASIGNA ROLES A LOS USUARIOS
 INSERT INTO users_roles (user_id, role_id) VALUES
 (1,4),
