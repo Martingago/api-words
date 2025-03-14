@@ -2,8 +2,10 @@ package com.martingago.words.test;
 
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.LanguageModel;
+import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.utils.BatchUtils;
 import com.martingago.words.utils.JsonValidation;
+import com.netflix.discovery.converters.Auto;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
@@ -31,22 +33,25 @@ public class TestWords {
     @Autowired
     WordTestRepository wordTestRepository;
 
+    @Autowired
+    BatchUtilsTest batchUtilsTest;
+
+    @Autowired
+    LanguageService languageService;
+
     @Transactional
     public void processAllJsonData(Map<String, WordResponseViewDTO> allWords) {
         int totalWords = allWords.size();
         final int[] processedWords = {0};
 
-        // Procesa todo el lote en lotes más pequeños dentro de una única transacción
-        BatchUtils.processMapInBatches(allWords, 50, batch -> {
-            try {
-                // Procesar el batch sin transacción adicional
-                insertBatchedWordToDatabase(batch);
+        LanguageModel languageModel = languageService.searchLanguageByLangCode("esp");
 
-                // Limpiar caché de entidades cada cierto número de lotes para evitar problemas de memoria
-                if (processedWords[0] % 200 == 0 && processedWords[0] > 0) {
-                    entityManager.flush();
-                    entityManager.clear();
-                }
+        // Procesa todo el lote en lotes más pequeños dentro de una única transacción empleando la funcion que integra su entityManager
+        batchUtilsTest.processMapInBatches(allWords, 50, batch -> {
+            try {
+
+                // Procesar el batch sin transacción adicional
+                insertBatchedWordToDatabase(batch, languageModel);
 
                 // Log del progreso
                 processedWords[0] += batch.size();
@@ -58,15 +63,12 @@ public class TestWords {
                 // No hacemos throw de la excepción para permitir que continúe con otros lotes
             }
         });
-
-        // Flush final para asegurar que todo se guarde
-        entityManager.flush();
         log.info("Finished processing {} words out of {}", processedWords[0], totalWords);
     }
 
-    //Funcion que añade un batch de palabras en un unico lote.
-    public void insertBatchedWordToDatabase(Map<String, WordResponseViewDTO> batchedWords){
-        LanguageModel languageModel = entityManager.getReference(LanguageModel.class, 1L);
+    //Funcion que añade un lote de operaciones bajo una unica transaccion
+    public void insertBatchedWordToDatabase(Map<String, WordResponseViewDTO> batchedWords, LanguageModel languageModel){
+
         List<WordModelTest> wordModelList = new ArrayList<>();
         batchedWords.values().forEach(wordDto -> {
             WordModelTest wordModel = WordModelTest.builder()
@@ -77,10 +79,9 @@ public class TestWords {
                     .build();
             wordModelList.add(wordModel);
         });
-        //Save all
         wordTestRepository.saveAll(wordModelList);
-        //entityManager.flush(); // Flush explícito
-        //entityManager.clear(); // Limpia la sesión para evitar consumo de memoria
+        entityManager.flush();
+        entityManager.clear();
     }
 
 }
