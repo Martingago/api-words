@@ -35,6 +35,46 @@ public class JsonValidation {
         return isJsonl || isJson;
     }
 
+    /**
+     * Convierte la entrada de un fichero json a un map
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public Set<WordResponseViewDTO> parseJsonFileToWordSet(MultipartFile file) throws IOException {
+        // Leer el JSON y convertirlo a un conjunto de WordResponseDTO
+        Set<WordResponseViewDTO> wordSet = objectMapper.readValue(
+                file.getInputStream(),
+                objectMapper.getTypeFactory().constructCollectionType(Set.class, WordResponseViewDTO.class)
+        );
+        return wordSet;
+    }
+
+    /**
+     * Función que recibe un fichero jsonl y lo mapea a un Set de WordResponseViewDTO
+     * @param file El archivo JSONL de entrada
+     * @return Un Set de WordResponseViewDTO
+     * @throws IOException Si ocurre un error al leer el archivo
+     */
+    public Set<WordResponseViewDTO> parseJsonlFileToWordSet(MultipartFile file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Set<WordResponseViewDTO> wordSet;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            wordSet = reader.lines()
+                    .map(line -> {
+                        try {
+                            return objectMapper.readValue(line, WordResponseViewDTO.class);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error parsing JSON line: " + line, e);
+                        }
+                    })
+                    .collect(Collectors.toSet()); // Recolecta los objetos en un Set
+        }
+
+        return wordSet;
+    }
+
 
     /**
      * Convierte la entrada de un fichero json a un map

@@ -31,6 +31,9 @@ spring:
     loadbalancer:
       enabled: true
 
+  batch:
+    job.enabled: false
+
   doc:
     api-docs:
       enabled: true
