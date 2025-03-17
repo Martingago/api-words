@@ -32,6 +32,8 @@ spring:
       enabled: true
 
   batch:
+    jdbc:
+      initialize-schema: always
     job.enabled: false
 
   doc:
