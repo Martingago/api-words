@@ -1,5 +1,6 @@
 package com.martingago.words.batch;
 
+import com.martingago.words.model.LanguageModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,9 +23,11 @@ public class WordBatch {
 
     private String word;
 
-    private String languageModel; //Idioma al que está asociada la palabra
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_language", nullable = false)
+    private LanguageModel language; //Idioma al que está asociada la palabra
 
-    private int wordLength; //Longitud de la palabra
+    private int length; //Longitud de la palabra
 
     private boolean isPlaceholder;
 
