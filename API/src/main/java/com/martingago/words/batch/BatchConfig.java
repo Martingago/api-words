@@ -1,6 +1,8 @@
 package com.martingago.words.batch;
 
 import com.martingago.words.batch.dto.WordBatchDTO;
+import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.repository.LanguageRepository;
 import jakarta.persistence.EntityManagerFactory;
@@ -34,6 +36,7 @@ public class BatchConfig {
     private final PlatformTransactionManager transactionManager;
     private final EntityManagerFactory entityManagerFactory;
     private final LanguageRepository languageRepository;
+    private final WordBatchRepository wordBatchRepository;
 
     private Map<String, LanguageModel> languageMap;
 
@@ -46,14 +49,24 @@ public class BatchConfig {
     }
 
     @Bean
-    public JpaItemWriter<WordBatch> wordWriter() {
+    public JpaItemWriter<WordBatch> jpaItemWriter() {
         return new JpaItemWriterBuilder<WordBatch>()
                 .entityManagerFactory(entityManagerFactory)
                 .build();
     }
 
     @Bean
-    public ItemProcessor<WordBatchDTO, WordBatch> processor() {
+    public ItemWriter<WordBatch> filteredWordWriter() {
+        return new FilteredWordBatchWriter(wordBatchRepository, jpaItemWriter());
+    }
+
+    /**
+     * Procesa la creación de una palabra. Para poder procesar correctamente la palabra es necesario comprobar desde memoria que el idioma
+     * relacionado exista con anterioridad. Esto se consigue en el step anterior.
+     * @return
+     */
+    @Bean
+    public ItemProcessor<WordBatchDTO, WordBatch> wordProcessor() {
         return dto -> {
             WordBatch wordBatch = new WordBatch();
             wordBatch.setWord(dto.getWord());
@@ -63,7 +76,7 @@ public class BatchConfig {
             // Buscar el LanguageModel en el Map
             LanguageModel language = languageMap.get(dto.getLanguage());
             if (language == null) {
-                throw new IllegalArgumentException("No se encontró el idioma: " + dto.getLanguage());
+                return null; //Si el idioma no existe se salta la palabra.
             }
             wordBatch.setLanguage(language);
 
@@ -103,8 +116,8 @@ public class BatchConfig {
         return new StepBuilder("wordBatchStep", jobRepository)
                 .<WordBatchDTO, WordBatch>chunk(100, transactionManager) // Corrección del tipado
                 .reader(itemReader())
-                .processor(processor())
-                .writer(wordWriter())
+                .processor(wordProcessor())
+                .writer(filteredWordWriter())
                 .build();
     }
 

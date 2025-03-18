@@ -7,7 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,8 +20,8 @@ import org.springframework.stereotype.Repository;
 @Table(name = "word_batch")
 public class WordBatch {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_entity_seq")
-    @SequenceGenerator(name = "word_entity_seq", sequenceName = "word_entity_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_batch_seq")
+    @SequenceGenerator(name = "word_batch_seq", sequenceName = "word_batch_seq", allocationSize = 100)
     private long id;
 
     private String word;
@@ -33,6 +36,3 @@ public class WordBatch {
 
 }
 
-@Repository
-interface WordBatchRepository extends JpaRepository<WordBatch, Long> {
-}
