@@ -1,4 +1,4 @@
-package com.martingago.words.batch;
+package com.martingago.words.batch.model;
 
 import com.martingago.words.model.LanguageModel;
 import jakarta.persistence.*;
@@ -6,10 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +31,9 @@ public class WordBatch {
     private int length; //Longitud de la palabra
 
     private boolean isPlaceholder;
+
+    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DefinitionBatch> definitions = new ArrayList<>();
 
 }
 

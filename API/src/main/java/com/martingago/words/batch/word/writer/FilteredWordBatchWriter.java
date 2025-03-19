@@ -1,6 +1,6 @@
 package com.martingago.words.batch.word.writer;
 
-import com.martingago.words.batch.WordBatch;
+import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.batch.item.Chunk;

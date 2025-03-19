@@ -1,6 +1,6 @@
 package com.martingago.words.batch.repository.word;
 
-import com.martingago.words.batch.WordBatch;
+import com.martingago.words.batch.model.WordBatch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

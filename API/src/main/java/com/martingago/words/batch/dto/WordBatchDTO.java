@@ -1,20 +1,19 @@
 package com.martingago.words.batch.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+import java.util.List;
+
+
 /**
  * DTO que contiene la información que se recibe desde el front-end para cargar los datos
  */
+@Data
 public class WordBatchDTO {
     private String word;
     private String language; // Código del idioma, como "esp"
     private int length;
     private boolean isPlaceholder;
+    private List<DefinitionBatchDTO> definitions;
 }
+

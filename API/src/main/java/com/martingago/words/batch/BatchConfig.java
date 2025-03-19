@@ -1,6 +1,9 @@
 package com.martingago.words.batch;
 
+import com.martingago.words.batch.dto.DefinitionBatchDTO;
 import com.martingago.words.batch.dto.WordBatchDTO;
+import com.martingago.words.batch.model.DefinitionBatch;
+import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
@@ -71,7 +74,7 @@ public class BatchConfig {
             WordBatch wordBatch = new WordBatch();
             wordBatch.setWord(dto.getWord());
             wordBatch.setLength(dto.getLength());
-            wordBatch.setPlaceholder(dto.isPlaceholder());
+            wordBatch.setPlaceholder(false); //Por defecto las palabras que se añaden no son placeholders
 
             // Buscar el LanguageModel en el Map
             LanguageModel language = languageMap.get(dto.getLanguage());
@@ -79,6 +82,15 @@ public class BatchConfig {
                 return null; //Si el idioma no existe se salta la palabra.
             }
             wordBatch.setLanguage(language);
+            // Procesar las definiciones
+            if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
+                for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
+                    DefinitionBatch definitionBatch = new DefinitionBatch();
+                    definitionBatch.setDefinition(defDto.getDefinition());
+                    definitionBatch.setWord(wordBatch);
+                    wordBatch.getDefinitions().add(definitionBatch);
+                }
+            }
 
             return wordBatch;
         };
@@ -86,7 +98,7 @@ public class BatchConfig {
 
     // Step0: Cargar los idiomas en un Map
     @Bean
-    public Step step0() {
+    public Step getLanguagesListStep() {
         return new StepBuilder("step0", jobRepository)
                 .<LanguageModel, LanguageModel>chunk(100, transactionManager)
                 .reader(languageReader())
@@ -112,7 +124,7 @@ public class BatchConfig {
 
     // Step1: Escribir las palabras en la BBDD
     @Bean
-    public Step wordBatchStep() {
+    public Step addWordStep() {
         return new StepBuilder("wordBatchStep", jobRepository)
                 .<WordBatchDTO, WordBatch>chunk(100, transactionManager) // Corrección del tipado
                 .reader(itemReader())
@@ -124,8 +136,8 @@ public class BatchConfig {
     @Bean
     public Job runJob() {
         return new JobBuilder("wordJob", jobRepository)
-                .start(step0())
-                .next(wordBatchStep())
+                .start(getLanguagesListStep()) //Obtiene listado de idiomas
+                .next(addWordStep()) //Añade la palabra a la BBDD
                 .build();
     }
 
