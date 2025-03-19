@@ -3,11 +3,14 @@ package com.martingago.words.batch;
 import com.martingago.words.batch.dto.DefinitionBatchDTO;
 import com.martingago.words.batch.dto.WordBatchDTO;
 import com.martingago.words.batch.model.DefinitionBatch;
+import com.martingago.words.batch.model.ExampleBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
+import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.LanguageRepository;
+import com.martingago.words.repository.WordQualificationRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -27,9 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,8 +41,10 @@ public class BatchConfig {
     private final EntityManagerFactory entityManagerFactory;
     private final LanguageRepository languageRepository;
     private final WordBatchRepository wordBatchRepository;
+    private final WordQualificationRepository wordQualificationRepository;
 
     private Map<String, LanguageModel> languageMap;
+    private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
 
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
@@ -83,18 +86,68 @@ public class BatchConfig {
             }
             wordBatch.setLanguage(language);
             // Procesar las definiciones
+            List<DefinitionBatch> definitions = new ArrayList<>();
             if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
                 for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
                     DefinitionBatch definitionBatch = new DefinitionBatch();
                     definitionBatch.setDefinition(defDto.getDefinition());
+
+                    //Se añade la qualification a la definición de la palabra:
+                    WordQualificationModel qualificationModel = qualificationMap.get(defDto.getQualification());
+                    if(qualificationModel == null){
+                        qualificationModel = new WordQualificationModel();
+                        qualificationModel.setQualification(defDto.getQualification());
+                        qualificationModel = wordQualificationRepository.save(qualificationModel);
+                        qualificationMap.put(qualificationModel.getQualification(), qualificationModel);
+                    }
+                    definitionBatch.setWordQualificationModel(qualificationModel);
                     definitionBatch.setWord(wordBatch);
-                    wordBatch.getDefinitions().add(definitionBatch);
+
+                    //Se establecen los ejemplos existentes para cada definición.
+                    Set<ExampleBatch> examples = new HashSet<>();
+                    if(defDto.getExamples() != null && !defDto.getExamples().isEmpty()){
+                        for(String ex : defDto.getExamples()){
+                            ExampleBatch example = new ExampleBatch();
+                            example.setExample(ex);
+                            example.setDefinitionBatch(definitionBatch);
+                            examples.add(example);
+                        }
+                    }
+                    definitionBatch.setExamples(examples); //Añade los examples dentro del objeto de las definitions
+
+                    definitions.add(definitionBatch);
                 }
             }
-
+            wordBatch.setDefinitions(definitions);
             return wordBatch;
         };
     }
+
+    @Bean
+    public ItemReader<WordQualificationModel> qualificationReader() {
+        List<WordQualificationModel> qualifications = wordQualificationRepository.findAll();
+        return new ListItemReader<>(qualifications);
+    }
+
+    @Bean
+    public ItemWriter<WordQualificationModel> qualificationWriter() {
+        return items -> {
+            qualificationMap = new HashMap<>();
+            for (WordQualificationModel qualification : items) {
+                qualificationMap.put(qualification.getQualification(), qualification);
+            }
+        };
+    }
+
+    @Bean
+    public Step getQualificationsListStep() {
+        return new StepBuilder("step1", jobRepository)
+                .<WordQualificationModel, WordQualificationModel>chunk(100, transactionManager)
+                .reader(qualificationReader())
+                .writer(qualificationWriter())
+                .build();
+    }
+
 
     // Step0: Cargar los idiomas en un Map
     @Bean
@@ -137,6 +190,7 @@ public class BatchConfig {
     public Job runJob() {
         return new JobBuilder("wordJob", jobRepository)
                 .start(getLanguagesListStep()) //Obtiene listado de idiomas
+                .next(getQualificationsListStep()) //Obtiene las qualifications existentes en la BBDD
                 .next(addWordStep()) //Añade la palabra a la BBDD
                 .build();
     }

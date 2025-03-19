@@ -1,10 +1,15 @@
 package com.martingago.words.batch.model;
 
+import com.martingago.words.model.WordExampleModel;
+import com.martingago.words.model.WordQualificationModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -25,4 +30,11 @@ public class DefinitionBatch {
 
     @Column(length = 5000)
     private String definition;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_qualification")
+    private WordQualificationModel wordQualificationModel; // Clasificación a la que está asociada una definición de palabra. Ej: "Sustantivo masculino"
+
+    @OneToMany(mappedBy = "definitionBatch", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ExampleBatch> examples = new HashSet<>(); // Listado de ejemplos que puede tener una palabra
 }

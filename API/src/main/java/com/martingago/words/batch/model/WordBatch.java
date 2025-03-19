@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "word_batch")
+@Table(name = "words_batch")
 public class WordBatch {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_batch_seq")
