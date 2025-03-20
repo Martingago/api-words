@@ -4,10 +4,12 @@ import com.martingago.words.batch.dto.DefinitionBatchDTO;
 import com.martingago.words.batch.dto.WordBatchDTO;
 import com.martingago.words.batch.model.DefinitionBatch;
 import com.martingago.words.batch.model.ExampleBatch;
+import com.martingago.words.batch.model.RelationBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
+import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.LanguageRepository;
 import com.martingago.words.repository.WordQualificationRepository;
@@ -31,6 +33,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -45,6 +48,7 @@ public class BatchConfig {
 
     private Map<String, LanguageModel> languageMap;
     private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
+    private Map<String, WordBatch> existingWordsMap = new HashMap<>();
 
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
@@ -69,7 +73,6 @@ public class BatchConfig {
     /**
      * Procesa la creación de una palabra. Para poder procesar correctamente la palabra es necesario comprobar desde memoria que el idioma
      * relacionado exista con anterioridad. Esto se consigue en el step anterior.
-     * @return
      */
     @Bean
     public ItemProcessor<WordBatchDTO, WordBatch> wordProcessor() {
@@ -77,14 +80,15 @@ public class BatchConfig {
             WordBatch wordBatch = new WordBatch();
             wordBatch.setWord(dto.getWord());
             wordBatch.setLength(dto.getLength());
-            wordBatch.setPlaceholder(false); //Por defecto las palabras que se añaden no son placeholders
+            wordBatch.setPlaceholder(false); // Por defecto las palabras que se añaden no son placeholders
 
             // Buscar el LanguageModel en el Map
             LanguageModel language = languageMap.get(dto.getLanguage());
             if (language == null) {
-                return null; //Si el idioma no existe se salta la palabra.
+                return null; // Si el idioma no existe se salta la palabra.
             }
             wordBatch.setLanguage(language);
+
             // Procesar las definiciones
             List<DefinitionBatch> definitions = new ArrayList<>();
             if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
@@ -92,9 +96,9 @@ public class BatchConfig {
                     DefinitionBatch definitionBatch = new DefinitionBatch();
                     definitionBatch.setDefinition(defDto.getDefinition());
 
-                    //Se añade la qualification a la definición de la palabra:
+                    // Se añade la qualification a la definición de la palabra:
                     WordQualificationModel qualificationModel = qualificationMap.get(defDto.getQualification());
-                    if(qualificationModel == null){
+                    if (qualificationModel == null) {
                         qualificationModel = new WordQualificationModel();
                         qualificationModel.setQualification(defDto.getQualification());
                         qualificationModel = wordQualificationRepository.save(qualificationModel);
@@ -103,17 +107,51 @@ public class BatchConfig {
                     definitionBatch.setWordQualificationModel(qualificationModel);
                     definitionBatch.setWord(wordBatch);
 
-                    //Se establecen los ejemplos existentes para cada definición.
+                    // Se establecen los ejemplos existentes para cada definición.
                     Set<ExampleBatch> examples = new HashSet<>();
-                    if(defDto.getExamples() != null && !defDto.getExamples().isEmpty()){
-                        for(String ex : defDto.getExamples()){
+                    if (defDto.getExamples() != null && !defDto.getExamples().isEmpty()) {
+                        for (String ex : defDto.getExamples()) {
                             ExampleBatch example = new ExampleBatch();
                             example.setExample(ex);
                             example.setDefinitionBatch(definitionBatch);
                             examples.add(example);
                         }
                     }
-                    definitionBatch.setExamples(examples); //Añade los examples dentro del objeto de las definitions
+                    definitionBatch.setExamples(examples); // Añade los examples dentro del objeto de las definitions
+
+                    // Procesar sinónimos
+                    if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
+                        // Obtener palabras existentes de la base de datos
+                        List<String> synonymWords = defDto.getSynonyms();
+                        List<WordBatch> existingSynonyms = findExistingWords(synonymWords);
+
+                        // Crear placeholders para palabras que no existen
+                        List<WordBatch> newSynonyms = createPlaceholderWords(synonymWords, existingSynonyms, language);
+
+                        // Combinar todas las palabras sinónimas
+                        List<WordBatch> allSynonyms = new ArrayList<>();
+                        allSynonyms.addAll(existingSynonyms);
+                        allSynonyms.addAll(newSynonyms);
+
+                        // Crear relaciones de sinónimos
+                        Set<RelationBatch> synonymRelations = createWordRelations(definitionBatch, allSynonyms, RelationEnumType.SINONIMA);
+
+                        definitionBatch.setSynonymRelations(synonymRelations);
+                    }
+
+                    // Procesar antónimos (similar a sinónimos pero con tipo ANTONIMA)
+                    if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
+                        List<String> antonymWords = defDto.getAntonyms();
+                        List<WordBatch> existingAntonyms = findExistingWords(antonymWords);
+                        List<WordBatch> newAntonyms = createPlaceholderWords(antonymWords, existingAntonyms, language);
+
+                        List<WordBatch> allAntonyms = new ArrayList<>();
+                        allAntonyms.addAll(existingAntonyms);
+                        allAntonyms.addAll(newAntonyms);
+
+                        Set<RelationBatch> antonymRelations = createWordRelations(definitionBatch, allAntonyms, RelationEnumType.ANTONIMA);
+                        definitionBatch.setAntonymRelations(antonymRelations);
+                    }
 
                     definitions.add(definitionBatch);
                 }
@@ -121,6 +159,64 @@ public class BatchConfig {
             wordBatch.setDefinitions(definitions);
             return wordBatch;
         };
+    }
+
+    /**
+     * Encuentra palabras existentes en la base de datos.
+     */
+    private List<WordBatch> findExistingWords(List<String> words) {
+        List<WordBatch> existingWords = new ArrayList<>();
+        for (String word : words) {
+            WordBatch existingWord = existingWordsMap.get(word);
+            if (existingWord != null) {
+                existingWords.add(existingWord);
+            }
+        }
+        return existingWords;
+    }
+
+    /**
+     * Crea palabras placeholder para aquellas que no existen en la base de datos.
+     */
+    private List<WordBatch> createPlaceholderWords(List<String> allWords, List<WordBatch> existingWords, LanguageModel language) {
+        // Obtener una lista de palabras que no existen en la base de datos
+        Set<String> existingWordTexts = existingWords.stream()
+                .map(WordBatch::getWord)
+                .collect(Collectors.toSet());
+
+        List<String> missingWords = allWords.stream()
+                .filter(word -> !existingWordTexts.contains(word))
+                .collect(Collectors.toList());
+
+        List<WordBatch> newWords = new ArrayList<>();
+        for (String missingWord : missingWords) {
+            WordBatch newWord = new WordBatch();
+            newWord.setWord(missingWord);
+            newWord.setLength(missingWord.length());
+            newWord.setLanguage(language);
+            newWord.setPlaceholder(true); // Marcar como placeholder
+
+            newWord = wordBatchRepository.save(newWord); // Guardar en la base de datos
+            existingWordsMap.put(missingWord, newWord); // Actualizar el mapa en memoria
+            newWords.add(newWord);
+        }
+
+        return newWords;
+    }
+
+    /**
+     * Crea relaciones entre la definición y las palabras relacionadas.
+     */
+    private Set<RelationBatch> createWordRelations(DefinitionBatch definitionBatch, List<WordBatch> relatedWords, RelationEnumType relationType) {
+        Set<RelationBatch> relations = new HashSet<>();
+        for (WordBatch relatedWord : relatedWords) {
+            RelationBatch relation = new RelationBatch();
+            relation.setDefinitionBatch(definitionBatch);
+            relation.setWordRelated(relatedWord);
+            relation.setRelationEnumType(relationType);
+            relations.add(relation);
+        }
+        return relations;
     }
 
     @Bean
@@ -147,7 +243,6 @@ public class BatchConfig {
                 .writer(qualificationWriter())
                 .build();
     }
-
 
     // Step0: Cargar los idiomas en un Map
     @Bean
@@ -179,7 +274,7 @@ public class BatchConfig {
     @Bean
     public Step addWordStep() {
         return new StepBuilder("wordBatchStep", jobRepository)
-                .<WordBatchDTO, WordBatch>chunk(100, transactionManager) // Corrección del tipado
+                .<WordBatchDTO, WordBatch>chunk(100, transactionManager)
                 .reader(itemReader())
                 .processor(wordProcessor())
                 .writer(filteredWordWriter())
@@ -189,10 +284,9 @@ public class BatchConfig {
     @Bean
     public Job runJob() {
         return new JobBuilder("wordJob", jobRepository)
-                .start(getLanguagesListStep()) //Obtiene listado de idiomas
-                .next(getQualificationsListStep()) //Obtiene las qualifications existentes en la BBDD
-                .next(addWordStep()) //Añade la palabra a la BBDD
+                .start(getLanguagesListStep()) // Obtiene listado de idiomas
+                .next(getQualificationsListStep()) // Obtiene las qualifications existentes en la BBDD
+                .next(addWordStep()) // Añade la palabra a la BBDD
                 .build();
     }
-
 }

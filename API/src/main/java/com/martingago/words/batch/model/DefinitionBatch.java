@@ -37,4 +37,10 @@ public class DefinitionBatch {
 
     @OneToMany(mappedBy = "definitionBatch", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExampleBatch> examples = new HashSet<>(); // Listado de ejemplos que puede tener una palabra
+
+    @OneToMany(mappedBy = "definitionBatch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RelationBatch> synonymRelations = new HashSet<>();
+
+    @OneToMany(mappedBy = "definitionBatch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RelationBatch> antonymRelations = new HashSet<>();
 }
