@@ -1,13 +1,15 @@
 package com.martingago.words.batch.word.listener;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.stereotype.Component;
+
 import java.lang.reflect.Field;
 
 @Slf4j
+@Component
 public class WordChunkListener implements ChunkListener {
 
     @Override

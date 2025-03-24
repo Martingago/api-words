@@ -30,7 +30,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     private Map<String, LanguageModel> languageMap;
     private Map<String, WordQualificationModel> qualificationMap;
 
-    // Memoria local por chunk
+    // Memoria local por chunk de palabras relacionadas existentes en la BBDD (Se reinicia en cada batch)
     private Map<String, WordBatch> chunkWordMap;
 
 
