@@ -33,12 +33,16 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     // Memoria local por chunk de palabras relacionadas existentes en la BBDD (Se reinicia en cada batch)
     private Map<String, WordBatch> chunkWordMap;
 
+    // Palabras principales encontradas en la BBDD para el chunk (Determinará si la palabra se actualiza/crea/ignora)
+    private Map<String, WordBatch> wordFoundedData;
+
 
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
         // Inicializar la memoria local al comienzo del chunk
-        if (chunkWordMap == null) {
+        if (chunkWordMap == null || wordFoundedData == null) {
             chunkWordMap = new HashMap<>();
+            wordFoundedData = new HashMap<>();
             initializeChunkWordMap(item); // Al iniciar el batch se cargan en memoria los datos de las palabras relacionadas.
         }
         WordBatch wordBatch = createWordBatch(item); //Se persiste el objeto WordBatch en la base de datos.
@@ -58,7 +62,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      * @param dto objeto del que se quieren extraer y almacenar datos en memoria.
      */
     private void initializeChunkWordMap(WordBatchDTO dto) {
-        // Recolectar todos los sinónimos y antónimos del chunk
+        // Recolectar todas las palabras relacionadas (sinónimos y antónimos) del chunk
         Set<String> relatedWords = new HashSet<>();
         if (dto.getDefinitions() != null) {
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
@@ -71,11 +75,19 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
             }
         }
 
+        //Contiene las palabras relacionadas(sinónimos/antónimos) y la palabra principal a añadir (Para ver si es placeholder/existe en la BBDD)
+        Set<String> allWordsToCheck = new HashSet<>(relatedWords);
+        allWordsToCheck.add(dto.getWord());
+
         // Consultar todas las palabras existentes en una sola query
-        if (!relatedWords.isEmpty()) {
-            Set<WordBatch> existingWords = wordBatchRepository.findByWordIn(relatedWords);
-            existingWords.forEach(word -> chunkWordMap.put(word.getWord(), word));
-        }
+        Set<WordBatch> existingWords = wordBatchRepository.findByWordIn(allWordsToCheck);
+        existingWords.forEach(word -> {
+            if (relatedWords.contains(word.getWord())) {
+                chunkWordMap.put(word.getWord(), word); // Palabras relacionadas
+            }
+            wordFoundedData.put(word.getWord(), word); // Todas las palabras existentes (Se usará para validar palabras existentes/placeholders)
+        });
+
     }
 
     /**
@@ -84,6 +96,26 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      * @return objeto persistido en la BDDD.
      */
     private WordBatch createWordBatch(WordBatchDTO dto) {
+
+        // Verificar si la palabra ya existe en wordFoundedData y en caso de existir, comprobar que sea un placeholder para actualizarlo
+        WordBatch existingWord = wordFoundedData.get(dto.getWord());
+        if (existingWord != null) {
+            if (existingWord.isPlaceholder()) {
+                // Si es placeholder, actualizarla con los nuevos datos
+                existingWord.setPlaceholder(false);
+                existingWord.setLength(dto.getLength());
+                LanguageModel language = languageMap.get(dto.getLanguage());
+                if (language == null) {
+                    return null;
+                }
+                existingWord.setLanguage(language);
+                return existingWord;
+            }
+            // Si existe y no es placeholder, ignorarla
+            return null;
+        }
+        // Si la palabra no se encuentra en el map, quiere decir que no existe en la BBDD, debe ser añadida.
+
         WordBatch wordBatch = new WordBatch();
         wordBatch.setWord(dto.getWord());
         wordBatch.setLength(dto.getLength());
@@ -165,6 +197,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     private void processSynonyms(DefinitionBatchDTO defDto, DefinitionBatch definitionBatch, List<WordBatch> placeholdersToSave) {
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
             Set<WordBatch> synonymWords = processRelatedWords(defDto.getSynonyms(), placeholdersToSave, definitionBatch.getWord().getLanguage());
+
             Set<RelationBatch> synonymRelations = createWordRelations(definitionBatch, synonymWords, RelationEnumType.SINONIMA);
             definitionBatch.setSynonymRelations(synonymRelations);
         }

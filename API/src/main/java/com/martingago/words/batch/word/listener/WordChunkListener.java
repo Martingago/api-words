@@ -21,6 +21,7 @@ public class WordChunkListener implements ChunkListener {
 
         if (processor != null) {
             resetChunkWordMap(processor);
+            resetWordFoundedData(processor);
         }
     }
 
@@ -36,4 +37,18 @@ public class WordChunkListener implements ChunkListener {
             log.error("No se pudo acceder al campo chunkWordMap");
         }
     }
+
+    private void resetWordFoundedData(ItemProcessor<?, ?> processor) {
+        try {
+            Field field = processor.getClass().getDeclaredField("wordFoundedData");
+            field.setAccessible(true);
+            field.set(processor, null);
+            log.debug("wordFoundedData limpiado exitosamente");
+        } catch (NoSuchFieldException e) {
+            log.error("No se encontró el campo wordFoundedData", e);
+        } catch (IllegalAccessException e) {
+            log.error("No se pudo acceder al campo wordFoundedData", e);
+        }
+    }
+
 }
