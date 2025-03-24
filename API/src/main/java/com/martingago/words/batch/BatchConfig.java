@@ -7,6 +7,8 @@ import com.martingago.words.batch.model.ExampleBatch;
 import com.martingago.words.batch.model.RelationBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.batch.word.listener.WordChunkListener;
+import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.RelationEnumType;
@@ -15,12 +17,10 @@ import com.martingago.words.repository.LanguageRepository;
 import com.martingago.words.repository.WordQualificationRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -33,10 +33,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -48,9 +45,10 @@ public class BatchConfig {
     private final LanguageRepository languageRepository;
     private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
+    private final WordBatchProcessor wordBatchProcessor;
 
-    private Map<String, LanguageModel> languageMap;
-    private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
+    private Map<String, LanguageModel> languageMap; //Almacena información de los idiomas
+    private Map<String, WordQualificationModel> qualificationMap = new HashMap<>(); //Almacena información de las qualifications
 
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
@@ -284,6 +282,8 @@ public class BatchConfig {
             for (WordQualificationModel qualification : items) {
                 qualificationMap.put(qualification.getQualification(), qualification);
             }
+            //Se establece el qualification map en el processor
+            wordBatchProcessor.setQualificationMap(qualificationMap);
         };
     }
 
@@ -308,6 +308,11 @@ public class BatchConfig {
     }
 
     @Bean
+    public WordChunkListener wordChunkListener() {
+        return new WordChunkListener();
+    }
+
+    @Bean
     public ItemReader<LanguageModel> languageReader() {
         List<LanguageModel> languages = languageRepository.findAll();
         return new ListItemReader<>(languages);
@@ -320,6 +325,8 @@ public class BatchConfig {
             for (LanguageModel language : items) {
                 languageMap.put(language.getLangCode(), language);
             }
+            //Se le pasa al wordBatchProcessor el map de idiomas
+            wordBatchProcessor.setLanguageMap(languageMap);
         };
     }
 
@@ -328,24 +335,9 @@ public class BatchConfig {
         return new StepBuilder("wordBatchStep", jobRepository)
                 .<WordBatchDTO, WordBatch>chunk(100, transactionManager)
                 .reader(itemReader())
-                .processor(wordProcessor())
+                .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())
-                .listener(new ChunkListener() { // Listener para limpiar la memoria al final del chunk
-                    @Override
-                    public void afterChunk(ChunkContext context) {
-                        ItemProcessor<WordBatchDTO, WordBatch> processor = (ItemProcessor<WordBatchDTO, WordBatch>) context.getStepContext()
-                                .getStepExecution().getExecutionContext().get("processor");
-                        if (processor != null) {
-                            try {
-                                Field field = processor.getClass().getDeclaredField("chunkWordMap");
-                                field.setAccessible(true);
-                                field.set(processor, null); // Resetear la memoria local
-                            } catch (Exception e) {
-                                // Log error if necessary
-                            }
-                        }
-                    }
-                })
+                .listener(wordChunkListener())
                 .build();
     }
 

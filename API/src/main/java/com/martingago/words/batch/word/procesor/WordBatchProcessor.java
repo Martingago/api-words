@@ -12,27 +12,27 @@ import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Getter
 @Setter
+@Component
+@RequiredArgsConstructor
 public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch> {
 
-    private Map<String, WordBatch> chunkWordMap = new HashMap<>();
     private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
-    private Map<String, WordQualificationModel> qualificationMap;
-    private Map<String, LanguageModel> languageMap;
 
-    public WordBatchProcessor(
-            WordBatchRepository wordBatchRepository,
-            WordQualificationRepository wordQualificationRepository) {
-        this.wordBatchRepository = wordBatchRepository;
-        this.wordQualificationRepository = wordQualificationRepository;
-    }
+    private Map<String, LanguageModel> languageMap;
+    private Map<String, WordQualificationModel> qualificationMap;
+
+    // Memoria local por chunk
+    private Map<String, WordBatch> chunkWordMap;
+
 
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
@@ -223,9 +223,5 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
         return relations;
     }
 
-    // Método para limpiar el mapa
-    public void clearChunkWordMap() {
-        this.chunkWordMap = new HashMap<>();
-    }
 }
 
