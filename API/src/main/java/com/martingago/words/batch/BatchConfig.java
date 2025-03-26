@@ -59,7 +59,7 @@ public class BatchConfig {
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
         FlatFileItemReader<WordBatchDTO> reader = new FlatFileItemReader<>();
-        reader.setResource(new ClassPathResource("files/long_test.jsonl"));
+        reader.setResource(new ClassPathResource("files/test.jsonl"));
         reader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
         return reader;
     }
@@ -74,7 +74,7 @@ public class BatchConfig {
 
     @Bean
     public ItemWriter<WordBatch> filteredWordWriter() {
-        return new FilteredWordBatchWriter(wordBatchRepository, jpaItemWriter());
+        return new FilteredWordBatchWriter(jpaItemWriter());
     }
 
 
