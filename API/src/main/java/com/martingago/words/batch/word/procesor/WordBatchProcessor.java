@@ -7,6 +7,7 @@ import com.martingago.words.batch.model.ExampleBatch;
 import com.martingago.words.batch.model.RelationBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.batch.word.listener.WordChunkListener;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
@@ -14,7 +15,9 @@ import com.martingago.words.repository.WordQualificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -27,65 +30,31 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
     private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
-
+    private final WordChunkListener wordChunkListener;
+    //Memoria local para almacenar los idiomas existentes
     private Map<String, LanguageModel> languageMap;
+
+    //Memoria local para almacenar las qualificaciones existentes
     private Map<String, WordQualificationModel> qualificationMap;
-    private Map<String, WordBatch> chunkWordMap;
-    private Map<String, WordBatch> existingWordsInDb;
 
 
-    // Guardamos el StepExecution para acceder al contexto
-    private StepExecution stepExecution;
-
-    @BeforeStep
-    public void beforeStep(StepExecution stepExecution) {
-        this.stepExecution = stepExecution;
-        this.chunkWordMap = new HashMap<>();
-        this.existingWordsInDb = new HashMap<>();
-    }
 
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
-        // Inicializar la memoria local al comienzo del chunk
-        if (chunkWordMap == null) {
-            chunkWordMap = new HashMap<>();
-            initializeChunkWordMap(item); // Al iniciar el batch se cargan en memoria los datos de las palabras relacionadas.
+        Set<String> existingWords = wordChunkListener.getExistingWords();
+        // Comprobar desde los datos locales del step si la palabra existe o no
+        if (existingWords != null && existingWords.contains(item.getWord())) {
+            return null; // Omitir si la palabra ya existe
         }
-        WordBatch wordBatch = createWordBatch(item); //Se persiste el objeto WordBatch en la base de datos.
+
+        // Si no existe, proceder con la creación
+        WordBatch wordBatch = createWordBatch(item); // Se persiste el objeto WordBatch en la base de datos
         if (wordBatch == null) {
             return null;
         }
+
         processDefinitions(item, wordBatch);
-
-        // Limpiar la memoria al final del chunk (esto lo manejará el writer)
         return wordBatch;
-    }
-
-
-    /**
-     * Recorre todos los sinónimos/antónimos existentes en las definiciones de una palabra y los almacena en un map en memoria.
-     * Esta funcion al aplicarse en el batch recorrerá todos los elementos word del batch y almacenará estas relaciones en memoria
-     * @param dto objeto del que se quieren extraer y almacenar datos en memoria.
-     */
-    private void initializeChunkWordMap(WordBatchDTO dto) {
-        // Recolectar todos los sinónimos y antónimos del chunk
-        Set<String> relatedWords = new HashSet<>();
-        if (dto.getDefinitions() != null) {
-            for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
-                if (defDto.getSynonyms() != null) {
-                    relatedWords.addAll(defDto.getSynonyms());
-                }
-                if (defDto.getAntonyms() != null) {
-                    relatedWords.addAll(defDto.getAntonyms());
-                }
-            }
-        }
-
-        // Consultar todas las palabras existentes en una sola query
-        if (!relatedWords.isEmpty()) {
-            Set<WordBatch> existingWords = wordBatchRepository.findByWordIn(relatedWords);
-            existingWords.forEach(word -> chunkWordMap.put(word.getWord(), word));
-        }
     }
 
     /**
@@ -115,22 +84,22 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     private void processDefinitions(WordBatchDTO dto, WordBatch wordBatch) {
         List<DefinitionBatch> definitions = new ArrayList<>();
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
-            List<WordBatch> placeholdersToSave = new ArrayList<>();
+            //List<WordBatch> placeholdersToSave = new ArrayList<>();
 
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
                 DefinitionBatch definitionBatch = createDefinitionBatch(defDto, wordBatch);
                 definitions.add(definitionBatch);
 
                 processExamples(defDto, definitionBatch); //Procesa los ejemplos
-                processSynonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los sinónimos.
-                processAntonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los antónimos.
+                //processSynonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los sinónimos.
+                //processAntonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los antónimos.
             }
 
             // Guardar todos los placeholders en un solo batch
-            if (!placeholdersToSave.isEmpty()) {
-                wordBatchRepository.saveAll(placeholdersToSave);
-                placeholdersToSave.forEach(word -> chunkWordMap.put(word.getWord(), word));
-            }
+//            if (!placeholdersToSave.isEmpty()) {
+//                wordBatchRepository.saveAll(placeholdersToSave);
+//                placeholdersToSave.forEach(word -> chunkWordMap.put(word.getWord(), word));
+//            }
         }
         wordBatch.setDefinitions(definitions);
     }
@@ -203,21 +172,21 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      */
     private Set<WordBatch> processRelatedWords(Set<String> relatedWords, List<WordBatch> placeholdersToSave, LanguageModel language) {
         Set<WordBatch> result = new HashSet<>();
-        for (String word : relatedWords) {
-            WordBatch existingWord = chunkWordMap.get(word);
-            if (existingWord != null) {
-                result.add(existingWord);
-            } else {
-                WordBatch newWord = new WordBatch();
-                newWord.setWord(word);
-                newWord.setLength(word.length());
-                newWord.setLanguage(language);
-                newWord.setPlaceholder(true);
-                placeholdersToSave.add(newWord);
-                chunkWordMap.put(word, newWord);
-                result.add(newWord);
-            }
-        }
+//        for (String word : relatedWords) {
+//            WordBatch existingWord = chunkWordMap.get(word);
+//            if (existingWord != null) {
+//                result.add(existingWord);
+//            } else {
+//                WordBatch newWord = new WordBatch();
+//                newWord.setWord(word);
+//                newWord.setLength(word.length());
+//                newWord.setLanguage(language);
+//                newWord.setPlaceholder(true);
+//                placeholdersToSave.add(newWord);
+//                chunkWordMap.put(word, newWord);
+//                result.add(newWord);
+//            }
+//        }
         return result;
     }
 

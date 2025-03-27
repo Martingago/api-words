@@ -1,43 +1,33 @@
 package com.martingago.words.batch;
 
-import com.martingago.words.batch.dto.DefinitionBatchDTO;
 import com.martingago.words.batch.dto.WordBatchDTO;
 import com.martingago.words.batch.language.reader.LanguageReader;
 import com.martingago.words.batch.language.writer.LanguageWriter;
-import com.martingago.words.batch.model.DefinitionBatch;
-import com.martingago.words.batch.model.ExampleBatch;
-import com.martingago.words.batch.model.RelationBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
-import com.martingago.words.batch.repository.word.WordBatchRepository;
 import com.martingago.words.batch.word.listener.WordChunkListener;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
-import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
-import com.martingago.words.repository.LanguageRepository;
-import com.martingago.words.repository.WordQualificationRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
-import java.util.*;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,8 +36,6 @@ public class BatchConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final EntityManagerFactory entityManagerFactory;
-    private final WordBatchRepository wordBatchRepository;
-    private final WordQualificationRepository wordQualificationRepository;
     private final WordBatchProcessor wordBatchProcessor;
     private final LanguageReader languageReader; //Reader para los idiomas
     private final LanguageWriter languageWriter; //Writer para los idiomas
@@ -59,7 +47,7 @@ public class BatchConfig {
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
         FlatFileItemReader<WordBatchDTO> reader = new FlatFileItemReader<>();
-        reader.setResource(new ClassPathResource("files/test.jsonl"));
+        reader.setResource(new ClassPathResource("files/small_test.jsonl"));
         reader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
         return reader;
     }
