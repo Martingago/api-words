@@ -22,6 +22,7 @@ public class WordBatch {
     @SequenceGenerator(name = "word_batch_seq", sequenceName = "word_batch_seq", allocationSize = 100)
     private long id;
 
+    @Column(unique = true)
     private String word;
 
     @ManyToOne(fetch = FetchType.LAZY)
