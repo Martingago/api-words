@@ -7,17 +7,12 @@ import com.martingago.words.batch.model.ExampleBatch;
 import com.martingago.words.batch.model.RelationBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
-import com.martingago.words.batch.word.listener.WordChunkListener;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeChunk;
-import org.springframework.batch.core.annotation.BeforeStep;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +25,6 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
     private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
-    private final WordChunkListener wordChunkListener;
     //Memoria local para almacenar los idiomas existentes
     private Map<String, LanguageModel> languageMap;
 
@@ -41,11 +35,21 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
+        //Se comprueba en la BBDD la existencia de la palabra.
+        WordBatch wordBatch = null;
+        WordBatch existingWordBatch = wordBatchRepository.findByWord(item.getWord());
 
-        // Si no existe, proceder con la creación
-        WordBatch wordBatch = createWordBatch(item); // Se persiste el objeto WordBatch en la base de datos
-        if (wordBatch == null) {
-            return null;
+        if(existingWordBatch != null){
+            //Si no es un placeholder se salta
+            if(!existingWordBatch.isPlaceholder()){
+                return null;
+            }
+            // Si existe en la BBDD y no es un placeholder se actualiza su información.
+            wordBatch = existingWordBatch;
+            wordBatch.setPlaceholder(false);
+
+        }else{
+            wordBatch = createWordBatch(item);
         }
 
         processDefinitions(item, wordBatch);

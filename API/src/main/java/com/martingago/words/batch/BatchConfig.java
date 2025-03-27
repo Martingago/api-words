@@ -6,14 +6,12 @@ import com.martingago.words.batch.language.writer.LanguageWriter;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
-import com.martingago.words.batch.word.listener.WordChunkListener;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordQualificationModel;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -41,7 +39,6 @@ public class BatchConfig {
     private final LanguageWriter languageWriter; //Writer para los idiomas
     private final QualificationReader qualificationReader; //Reader de las qualificaciones
     private final QualificationWriter qualificationWriter; //Writer de las qualificaciones
-    private final WordChunkListener wordChunkListener; //Listener para las palabras
 
 
     @Bean
@@ -104,7 +101,6 @@ public class BatchConfig {
                 .reader(itemReader())
                 .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())
-                .listener(wordChunkListener)
                 .build();
     }
 

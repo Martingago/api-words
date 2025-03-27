@@ -20,4 +20,6 @@ public interface WordBatchRepository extends JpaRepository<WordBatch, Long> {
     List<String> findExistingNonPlaceholderWords(List<String> words);
 
     Set<WordBatch> findByWordIn(Set<String> words);
+
+    WordBatch findByWord(String word);
 }
