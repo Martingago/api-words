@@ -27,8 +27,8 @@ public class FilteredWordBatchWriter implements ItemWriter<WordBatch> {
      */
     @Override
     public void write(Chunk<? extends WordBatch> chunk) throws Exception {
-        System.out.println("Palabras a añadir/actualizar: " + chunk.size());
-        log.info("Palabras a añadir/actualizar: {}",chunk.size());
+        System.out.println("Palabras a escribir: " + chunk.size());
+        log.info("Palabras a escribir: {}",chunk.size());
         if (!chunk.isEmpty()) {
             jpaItemWriter.write(chunk);
         }

@@ -6,6 +6,9 @@ import com.martingago.words.batch.language.writer.LanguageWriter;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
+import com.martingago.words.batch.word.ChunkCollectingItemReader;
+import com.martingago.words.batch.word.ItemReadLogger;
+import com.martingago.words.batch.word.WordChunkListener;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
@@ -17,6 +20,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
@@ -39,14 +43,16 @@ public class BatchConfig {
     private final LanguageWriter languageWriter; //Writer para los idiomas
     private final QualificationReader qualificationReader; //Reader de las qualificaciones
     private final QualificationWriter qualificationWriter; //Writer de las qualificaciones
+    private final ItemReadLogger itemReadLogger;
 
 
     @Bean
-    public FlatFileItemReader<WordBatchDTO> itemReader() {
-        FlatFileItemReader<WordBatchDTO> reader = new FlatFileItemReader<>();
-        reader.setResource(new ClassPathResource("files/small_test.jsonl"));
-        reader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
-        return reader;
+    public ItemStreamReader<WordBatchDTO> itemReader() {
+        FlatFileItemReader<WordBatchDTO> baseReader = new FlatFileItemReader<>();
+        baseReader.setResource(new ClassPathResource("files/small_test.jsonl"));
+        baseReader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
+
+        return new ChunkCollectingItemReader(baseReader);
     }
 
     @Bean
@@ -101,6 +107,7 @@ public class BatchConfig {
                 .reader(itemReader())
                 .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())
+                .listener(itemReadLogger)
                 .build();
     }
 
