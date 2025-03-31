@@ -47,7 +47,7 @@ public class BatchConfig {
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
         FlatFileItemReader<WordBatchDTO> reader = new FlatFileItemReader<>();
-        reader.setResource(new ClassPathResource("files/test.jsonl"));
+        reader.setResource(new ClassPathResource("files/test_02.jsonl"));
         reader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
 
         return reader;

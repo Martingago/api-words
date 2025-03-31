@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @StepScope
 @RequiredArgsConstructor
@@ -53,13 +54,30 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
         // Si el buffer no está vacío, consultamos en bloque la BBDD
         if (!chunkBuffer.isEmpty()) {
-            // Obtenemos las palabras del chunk
-            List<String> words = chunkBuffer.stream()
-                    .map(WordBatchDTO::getWord)
-                    .collect(Collectors.toList());
+
+            // Obtenemos las palabras del chunk y sus sinónimos y antónimos.
+            Set<String> words = chunkBuffer.stream()
+                    .flatMap(wordBatch -> {
+                        // Stream de la palabra principal
+                        Stream<String> mainWord = Stream.of(wordBatch.getWord());
+
+                        // Stream de todos los sinónimos y antónimos de todas las definiciones
+                        Stream<String> synonymsAntonyms = wordBatch.getDefinitions().stream()
+                                .flatMap(definition -> {
+                                    Stream<String> synStream = definition.getSynonyms() != null ?
+                                            definition.getSynonyms().stream() : Stream.empty();
+                                    Stream<String> antStream = definition.getAntonyms() != null ?
+                                            definition.getAntonyms().stream() : Stream.empty();
+                                    return Stream.concat(synStream, antStream);
+                                });
+
+                        return Stream.concat(mainWord, synonymsAntonyms);
+                    })
+                    .collect(Collectors.toSet());
 
             // Obtenemos de la BBDD los WordBatch que ya existen para estas palabras
-            Set<WordBatch> existingBatchSet = wordBatchRepository.findByWordIn(new java.util.HashSet<>(words));
+            
+            Set<WordBatch> existingBatchSet = wordBatchRepository.findByWordIn(words);
             Map<String, WordBatch> wordBatchMap = existingBatchSet.stream()
                     .collect(Collectors.toMap(WordBatch::getWord, wb -> wb));
 

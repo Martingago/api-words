@@ -3,6 +3,8 @@ package com.martingago.words.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Builder
 @Getter
@@ -10,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "words_qualifications")
-public class WordQualificationModel {
+public class WordQualificationModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_qualification_entity_seq")

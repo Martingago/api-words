@@ -29,13 +29,15 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
     //Memoria local para almacenar los idiomas existentes
-    private Map<String, LanguageModel> languageMap;
+    private Map<String, LanguageModel> languageMap = new HashMap<>();;
 
     //Memoria local para almacenar las qualificaciones existentes
-    private Map<String, WordQualificationModel> qualificationMap;
+    private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
 
     //Palabras existentes en la base de datos.
     private Map<String, WordBatch> chunkWordMap = new HashMap<>();
+
+
 
     private ExecutionContext executionContext;
 
@@ -48,10 +50,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
         // Recuperamos el mapa previamente almacenado en el ExecutionContext
-        Map<String, WordBatch> wordBatchMap = (Map<String, WordBatch>) this.executionContext.get("wordBatchMap");
+        chunkWordMap = (Map<String, WordBatch>) this.executionContext.get("wordBatchMap");
 
         // Buscamos la referencia de la palabra en el mapa
-        WordBatch existingWordBatch = wordBatchMap != null ? wordBatchMap.get(item.getWord()) : null;
+        WordBatch existingWordBatch = chunkWordMap != null ? chunkWordMap.get(item.getWord()) : null;
 
         WordBatch wordBatch;
         if (existingWordBatch != null) {
@@ -96,26 +98,26 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      * @param wordBatch
      */
     private void processDefinitions(WordBatchDTO dto, WordBatch wordBatch) {
-        List<DefinitionBatch> definitions = new ArrayList<>();
+        // Limpia las definiciones existentes
+        wordBatch.getDefinitions().clear();
+
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
             List<WordBatch> placeholdersToSave = new ArrayList<>();
 
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
                 DefinitionBatch definitionBatch = createDefinitionBatch(defDto, wordBatch);
-                definitions.add(definitionBatch);
+                wordBatch.getDefinitions().add(definitionBatch); // Añade a la colección existente
 
-                processExamples(defDto, definitionBatch); //Procesa los ejemplos
-                //processSynonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los sinónimos.
-                //processAntonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los antónimos.
+                processExamples(defDto, definitionBatch);
+                processSynonyms(defDto, definitionBatch, placeholdersToSave);
+                processAntonyms(defDto, definitionBatch, placeholdersToSave);
             }
 
-            // Guardar todos los placeholders en un solo batch
             if (!placeholdersToSave.isEmpty()) {
                 wordBatchRepository.saveAll(placeholdersToSave);
                 placeholdersToSave.forEach(word -> chunkWordMap.put(word.getWord(), word));
             }
         }
-        wordBatch.setDefinitions(definitions);
     }
 
 
