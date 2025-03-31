@@ -6,10 +6,9 @@ import com.martingago.words.batch.language.writer.LanguageWriter;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
-import com.martingago.words.batch.word.ChunkCollectingItemReader;
-import com.martingago.words.batch.word.ItemReadLogger;
-import com.martingago.words.batch.word.WordChunkListener;
+import com.martingago.words.batch.repository.word.WordBatchRepository;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
+import com.martingago.words.batch.word.reader.CustomChunkItemReader;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordQualificationModel;
@@ -17,10 +16,10 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
@@ -43,16 +42,22 @@ public class BatchConfig {
     private final LanguageWriter languageWriter; //Writer para los idiomas
     private final QualificationReader qualificationReader; //Reader de las qualificaciones
     private final QualificationWriter qualificationWriter; //Writer de las qualificaciones
-    private final ItemReadLogger itemReadLogger;
-
+    private final WordBatchRepository wordBatchRepository;
 
     @Bean
-    public ItemStreamReader<WordBatchDTO> itemReader() {
-        FlatFileItemReader<WordBatchDTO> baseReader = new FlatFileItemReader<>();
-        baseReader.setResource(new ClassPathResource("files/small_test.jsonl"));
-        baseReader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
+    public FlatFileItemReader<WordBatchDTO> itemReader() {
+        FlatFileItemReader<WordBatchDTO> reader = new FlatFileItemReader<>();
+        reader.setResource(new ClassPathResource("files/test.jsonl"));
+        reader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
 
-        return new ChunkCollectingItemReader(baseReader);
+        return reader;
+    }
+
+    @Bean
+    @StepScope
+    public CustomChunkItemReader customChunkItemReader(FlatFileItemReader<WordBatchDTO> itemReader,
+                                                       WordBatchRepository wordBatchRepository) {
+        return new CustomChunkItemReader(itemReader, wordBatchRepository);
     }
 
     @Bean
@@ -101,27 +106,23 @@ public class BatchConfig {
      * @return
      */
     @Bean
-    public Step addWordStep() {
+    public Step addWordStep(CustomChunkItemReader customChunkItemReader) {
         return new StepBuilder("wordBatchStep", jobRepository)
                 .<WordBatchDTO, WordBatch>chunk(100, transactionManager)
-                .reader(itemReader())
+                .reader(customChunkItemReader)
                 .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())
-                .listener(itemReadLogger)
                 .build();
     }
 
-    /**
-     * Job que obtiene la información de idiomas, las qualifications existentes, y con toda esa informacion, posteriormente
-     * añade palabras a la BBDD
-     * @return
-     */
+    // Definición del job que orquesta los steps. Aquí se aprovecha la inyección de dependencias,
+    // pasando cada step ya definido.
     @Bean
-    public Job runJob() {
+    public Job runJob(Step getLanguagesListStep, Step getQualificationsListStep, Step addWordStep) {
         return new JobBuilder("wordJob", jobRepository)
-                .start(getLanguagesListStep())
-                .next(getQualificationsListStep())
-                .next(addWordStep())
+                .start(getLanguagesListStep)
+                .next(getQualificationsListStep)
+                .next(addWordStep)
                 .build();
     }
 }

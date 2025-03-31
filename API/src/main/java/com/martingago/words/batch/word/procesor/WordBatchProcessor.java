@@ -11,7 +11,6 @@ import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
-import jakarta.websocket.OnError;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.batch.item.ExecutionContext;
@@ -36,32 +35,35 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     private Map<String, WordQualificationModel> qualificationMap;
 
     //Palabras existentes en la base de datos.
-    private Map<String, WordBatch> chunkWordMap;
+    private Map<String, WordBatch> chunkWordMap = new HashMap<>();
+
+    private ExecutionContext executionContext;
+
 
     @Override
-    public void open(ExecutionContext executionContext) {
-        System.out.println("================================");
-        System.out.println("ejecución apertura de processor");
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        this.executionContext = executionContext;
     }
-
 
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
-        System.out.println(item.getWord() + "procesado con éxito");
-        //Se comprueba en la BBDD la existencia de la palabra.
-        WordBatch wordBatch = null;
-        WordBatch existingWordBatch = wordBatchRepository.findByWord(item.getWord());
+        // Recuperamos el mapa previamente almacenado en el ExecutionContext
+        Map<String, WordBatch> wordBatchMap = (Map<String, WordBatch>) this.executionContext.get("wordBatchMap");
 
-        if(existingWordBatch != null){
-            //Si no es un placeholder se salta
-            if(!existingWordBatch.isPlaceholder()){
-                return null;
+        // Buscamos la referencia de la palabra en el mapa
+        WordBatch existingWordBatch = wordBatchMap != null ? wordBatchMap.get(item.getWord()) : null;
+
+        WordBatch wordBatch;
+        if (existingWordBatch != null) {
+            // Si la palabra ya existe, comprobamos si no es un placeholder
+            if (!existingWordBatch.isPlaceholder()) {
+                return null;   // O ajusta la lógica según lo que necesites
             }
-            // Si existe en la BBDD y no es un placeholder se actualiza su información.
+            // Si existe y es un placeholder, trabajamos sobre ese objeto
             wordBatch = existingWordBatch;
             wordBatch.setPlaceholder(false);
-
-        }else{
+        } else {
+            // Si no se encuentra en el mapa, se crea un nuevo objeto
             wordBatch = createWordBatch(item);
         }
 
@@ -103,8 +105,8 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
                 definitions.add(definitionBatch);
 
                 processExamples(defDto, definitionBatch); //Procesa los ejemplos
-                processSynonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los sinónimos.
-                processAntonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los antónimos.
+                //processSynonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los sinónimos.
+                //processAntonyms(defDto, definitionBatch, placeholdersToSave); //Procesa los antónimos.
             }
 
             // Guardar todos los placeholders en un solo batch
