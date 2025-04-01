@@ -30,7 +30,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch>, ItemStream {
 
-    private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
     private final WordMapper wordMapper;
 
@@ -77,8 +76,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
         }
 
         processDefinitions(item, wordBatch);
-        // Actualizar el mapa en el ExecutionContext después de procesar
-        this.executionContext.put("wordBatchMap", chunkWordMap);
+
         return wordBatch;
     }
 
@@ -111,20 +109,14 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
         wordBatch.getDefinitions().clear();
 
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
-            List<WordBatch> placeholdersToSave = new ArrayList<>();
-
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
                 DefinitionBatch definitionBatch = createDefinitionBatch(defDto, wordBatch);
                 wordBatch.getDefinitions().add(definitionBatch); // Añade a la colección existente
 
                 processExamples(defDto, definitionBatch);
-                processSynonyms(defDto, definitionBatch, placeholdersToSave);
-                processAntonyms(defDto, definitionBatch, placeholdersToSave);
-            }
 
-            if (!placeholdersToSave.isEmpty()) {
-                wordBatchRepository.saveAll(placeholdersToSave);
-                placeholdersToSave.forEach(word -> chunkWordMap.put(word.getWord(), wordMapper.toWordReference(word)));
+                processSynonyms(defDto, definitionBatch);
+                processAntonyms(defDto, definitionBatch);
             }
         }
     }
@@ -162,13 +154,14 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
     /**
      *
-     * @param defDto
-     * @param definitionBatch
-     * @param placeholdersToSave
+     * @param defDto DTO que contiene la información del objeto a procesar
+     * @param definitionBatch definición sobre la que se van a crear las relaciones
      */
-    private void processSynonyms(DefinitionBatchDTO defDto, DefinitionBatch definitionBatch, List<WordBatch> placeholdersToSave) {
+    private void processSynonyms(DefinitionBatchDTO defDto, DefinitionBatch definitionBatch) {
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
-            Set<WordBatch> synonymWords = processRelatedWords(defDto.getSynonyms(), placeholdersToSave, definitionBatch.getWord().getLanguage());
+            //Si la palabra que se está procesando tiene un listado de sinónimos:
+            Set<WordBatch> synonymWords = processRelatedWords(defDto.getSynonyms(), definitionBatch.getWord().getLanguage());
+
             Set<RelationBatch> synonymRelations = createWordRelations(definitionBatch, synonymWords, RelationEnumType.SINONIMA);
             definitionBatch.setSynonymRelations(synonymRelations);
         }
@@ -178,11 +171,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      *
      * @param defDto
      * @param definitionBatch
-     * @param placeholdersToSave
      */
-    private void processAntonyms(DefinitionBatchDTO defDto, DefinitionBatch definitionBatch, List<WordBatch> placeholdersToSave) {
+    private void processAntonyms(DefinitionBatchDTO defDto, DefinitionBatch definitionBatch) {
         if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
-            Set<WordBatch> antonymWords = processRelatedWords(defDto.getAntonyms(), placeholdersToSave, definitionBatch.getWord().getLanguage());
+            Set<WordBatch> antonymWords = processRelatedWords(defDto.getAntonyms(), definitionBatch.getWord().getLanguage());
             Set<RelationBatch> antonymRelations = createWordRelations(definitionBatch, antonymWords, RelationEnumType.ANTONIMA);
             definitionBatch.setAntonymRelations(antonymRelations);
         }
@@ -191,11 +183,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     /**
      * Gestiona las palabras relacionadas (sinónimos/antónimos)
      * @param relatedWords Conjunto de palabras relacionadas
-     * @param placeholdersToSave Lista donde se añaden nuevos placeholders para guardar
      * @param language Idioma de las palabras
      * @return Conjunto de entidades WordBatch (reales o referencias)
      */
-    private Set<WordBatch> processRelatedWords(Set<String> relatedWords, List<WordBatch> placeholdersToSave, LanguageModel language) {
+    private Set<WordBatch> processRelatedWords(Set<String> relatedWords, LanguageModel language) {
         Set<WordBatch> result = new HashSet<>();
 
         for (String word : relatedWords) {
@@ -217,10 +208,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
                 newWord.setPlaceholder(true);
 
                 // Añadir a la lista para guardar
-                placeholdersToSave.add(newWord);
 
                 // Después de guardar, asegurarse de actualizar el mapa de referencias
                 result.add(newWord);
+                chunkWordMap.put(word, wordMapper.toWordReference(newWord));
             }
         }
         return result;
