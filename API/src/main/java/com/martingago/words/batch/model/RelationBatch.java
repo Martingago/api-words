@@ -1,8 +1,6 @@
 package com.martingago.words.batch.model;
 
 import com.martingago.words.model.RelationEnumType;
-import com.martingago.words.model.WordDefinitionModel;
-import com.martingago.words.model.WordModel;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Table(name = "relations_batch")
-public class RelationBatch implements Serializable {
+public class RelationBatch {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "relation_entity_seq")
     @SequenceGenerator(name = "relation_entity_seq", sequenceName = "relation_entity_seq")

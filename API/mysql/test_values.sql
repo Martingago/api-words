@@ -1,4 +1,8 @@
-SELECT COUNT(*) FROM words_batch where is_placeholder = false;
+SELECT COUNT(*) FROM words_batch;
+
+SELECT COUNT(*) FROM definitions_batch;
+
+SELECT COUNT(*) FROM examples_batch;
 
 SELECT * FROM words_batch where word = 'aguazur';
 SELECT * FROM definitions_batch where word_id = 259167;

@@ -18,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "definitions_batch")
-public class DefinitionBatch implements Serializable {
+public class DefinitionBatch{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "definition_seq")
@@ -36,12 +36,12 @@ public class DefinitionBatch implements Serializable {
     @JoinColumn(name = "id_qualification")
     private WordQualificationModel wordQualificationModel; // Clasificación a la que está asociada una definición de palabra. Ej: "Sustantivo masculino"
 
-    @OneToMany(mappedBy = "definitionBatch", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "definitionBatch", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<ExampleBatch> examples = new HashSet<>(); // Listado de ejemplos que puede tener una palabra
 
-    @OneToMany(mappedBy = "definitionBatch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "definitionBatch", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<RelationBatch> synonymRelations = new HashSet<>();
 
-    @OneToMany(mappedBy = "definitionBatch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "definitionBatch", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<RelationBatch> antonymRelations = new HashSet<>();
 }

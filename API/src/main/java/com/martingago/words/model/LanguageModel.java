@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Table(name = "languages")
-public class LanguageModel  implements Serializable {
+public class LanguageModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lang_entity_seq")

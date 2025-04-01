@@ -2,15 +2,19 @@ package com.martingago.words.batch.word.procesor;
 
 import com.martingago.words.batch.dto.DefinitionBatchDTO;
 import com.martingago.words.batch.dto.WordBatchDTO;
+import com.martingago.words.batch.dto.WordBatchReferenceDTO;
 import com.martingago.words.batch.model.DefinitionBatch;
 import com.martingago.words.batch.model.ExampleBatch;
 import com.martingago.words.batch.model.RelationBatch;
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.RelationEnumType;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.batch.item.ExecutionContext;
@@ -28,6 +32,8 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
     private final WordBatchRepository wordBatchRepository;
     private final WordQualificationRepository wordQualificationRepository;
+    private final WordMapper wordMapper;
+
     //Memoria local para almacenar los idiomas existentes
     private Map<String, LanguageModel> languageMap = new HashMap<>();;
 
@@ -35,9 +41,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
 
     //Palabras existentes en la base de datos.
-    private Map<String, WordBatch> chunkWordMap = new HashMap<>();
+    private Map<String, WordBatchReferenceDTO> chunkWordMap = new HashMap<>();
 
-
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private ExecutionContext executionContext;
 
@@ -50,10 +57,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
         // Recuperamos el mapa previamente almacenado en el ExecutionContext
-        chunkWordMap = (Map<String, WordBatch>) this.executionContext.get("wordBatchMap");
+        chunkWordMap = (Map<String, WordBatchReferenceDTO>) this.executionContext.get("wordBatchMap");
 
         // Buscamos la referencia de la palabra en el mapa
-        WordBatch existingWordBatch = chunkWordMap != null ? chunkWordMap.get(item.getWord()) : null;
+        WordBatchReferenceDTO existingWordBatch = chunkWordMap != null ? chunkWordMap.get(item.getWord()) : null;
 
         WordBatch wordBatch;
         if (existingWordBatch != null) {
@@ -62,7 +69,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
                 return null;   // O ajusta la lógica según lo que necesites
             }
             // Si existe y es un placeholder, trabajamos sobre ese objeto
-            wordBatch = existingWordBatch;
+            wordBatch = entityManager.getReference(WordBatch.class, existingWordBatch.getId());
             wordBatch.setPlaceholder(false);
         } else {
             // Si no se encuentra en el mapa, se crea un nuevo objeto
@@ -70,6 +77,8 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
         }
 
         processDefinitions(item, wordBatch);
+        // Actualizar el mapa en el ExecutionContext después de procesar
+        this.executionContext.put("wordBatchMap", chunkWordMap);
         return wordBatch;
     }
 
@@ -115,7 +124,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
             if (!placeholdersToSave.isEmpty()) {
                 wordBatchRepository.saveAll(placeholdersToSave);
-                placeholdersToSave.forEach(word -> chunkWordMap.put(word.getWord(), word));
+                placeholdersToSave.forEach(word -> chunkWordMap.put(word.getWord(), wordMapper.toWordReference(word)));
             }
         }
     }
@@ -180,26 +189,37 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     }
 
     /**
-     * Gestiona las
-     * @param relatedWords
-     * @param placeholdersToSave
-     * @param language
-     * @return
+     * Gestiona las palabras relacionadas (sinónimos/antónimos)
+     * @param relatedWords Conjunto de palabras relacionadas
+     * @param placeholdersToSave Lista donde se añaden nuevos placeholders para guardar
+     * @param language Idioma de las palabras
+     * @return Conjunto de entidades WordBatch (reales o referencias)
      */
     private Set<WordBatch> processRelatedWords(Set<String> relatedWords, List<WordBatch> placeholdersToSave, LanguageModel language) {
         Set<WordBatch> result = new HashSet<>();
+
         for (String word : relatedWords) {
-            WordBatch existingWord = chunkWordMap.get(word);
-            if (existingWord != null) {
-                result.add(existingWord);
+            WordBatchReferenceDTO existingWordRef = chunkWordMap != null ? chunkWordMap.get(word) : null;
+
+            if (existingWordRef != null) {
+                // Crear una referencia de WordBatch con el ID existente
+                WordBatch wordBatch = entityManager.getReference(WordBatch.class, existingWordRef.getId());
+                // Solo añadimos los campos mínimos necesarios para mantener la relación
+                result.add(wordBatch);
             } else {
+                // Crear un nuevo placeholder
                 WordBatch newWord = new WordBatch();
                 newWord.setWord(word);
                 newWord.setLength(word.length());
+
+                // Establecer referencia al idioma
                 newWord.setLanguage(language);
                 newWord.setPlaceholder(true);
+
+                // Añadir a la lista para guardar
                 placeholdersToSave.add(newWord);
-                chunkWordMap.put(word, newWord);
+
+                // Después de guardar, asegurarse de actualizar el mapa de referencias
                 result.add(newWord);
             }
         }

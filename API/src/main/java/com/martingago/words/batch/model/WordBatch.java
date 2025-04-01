@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "words_batch")
-public class WordBatch implements Serializable{
+public class WordBatch{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_batch_seq")
     @SequenceGenerator(name = "word_batch_seq", sequenceName = "word_batch_seq", allocationSize = 100)
@@ -34,7 +34,7 @@ public class WordBatch implements Serializable{
 
     private boolean isPlaceholder;
 
-    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "word", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<DefinitionBatch> definitions = new ArrayList<>();
 
 }

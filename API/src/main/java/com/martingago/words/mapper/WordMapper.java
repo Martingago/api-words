@@ -1,5 +1,7 @@
 package com.martingago.words.mapper;
 
+import com.martingago.words.batch.dto.WordBatchReferenceDTO;
+import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.WordModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,15 @@ public class WordMapper {
         return wordModelList.stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toSet());
+    }
+
+    public WordBatchReferenceDTO toWordReference(WordBatch wordBatch){
+        if(wordBatch == null) return null;
+        return WordBatchReferenceDTO.builder()
+                .id(wordBatch.getId())
+                .isPlaceholder(wordBatch.isPlaceholder())
+                .languageId(wordBatch.getLanguage().getId())
+                .build();
     }
 
 }

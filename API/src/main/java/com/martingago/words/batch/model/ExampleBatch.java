@@ -12,7 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "examples_batch")
-public class ExampleBatch implements Serializable {
+public class ExampleBatch {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "example_seq")

@@ -42,7 +42,7 @@ public class BatchConfig {
     private final LanguageWriter languageWriter; //Writer para los idiomas
     private final QualificationReader qualificationReader; //Reader de las qualificaciones
     private final QualificationWriter qualificationWriter; //Writer de las qualificaciones
-    private final WordBatchRepository wordBatchRepository;
+
 
     @Bean
     public FlatFileItemReader<WordBatchDTO> itemReader() {
