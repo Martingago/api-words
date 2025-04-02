@@ -1,10 +1,10 @@
-DROP TABLE IF EXISTS api_words.words_examples;
-DROP TABLE IF EXISTS api_words.words_relations;
-DROP TABLE IF EXISTS api_words.words_definitions;
-DROP TABLE IF EXISTS api_words.words;
-DROP TABLE IF EXISTS api_words.languages;
-DROP TABLE IF EXISTS api_words.words_qualifications;
+DROP TABLE IF EXISTS words_examples;
+DROP TABLE IF EXISTS words_relations;
+DROP TABLE IF EXISTS words_definitions;
+DROP TABLE IF EXISTS words;
+DROP TABLE IF EXISTS words_qualifications;
 
+DROP TABLE IF EXISTS api_words.languages;
 -- BATCH TEST TABLES
 
 DROP TABLE IF EXISTS relations_batch;
