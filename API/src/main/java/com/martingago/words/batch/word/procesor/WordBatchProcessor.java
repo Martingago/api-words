@@ -32,7 +32,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
 
     private final WordQualificationRepository wordQualificationRepository;
     private final WordMapper wordMapper;
-
+    private final WordBatchRepository wordBatchRepository;
     //Memoria local para almacenar los idiomas existentes
     private Map<String, LanguageModel> languageMap = new HashMap<>();;
 
@@ -105,16 +105,14 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      * @param wordBatch
      */
     private void processDefinitions(WordBatchDTO dto, WordBatch wordBatch) {
-        // Limpia las definiciones existentes
         wordBatch.getDefinitions().clear();
 
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
                 DefinitionBatch definitionBatch = createDefinitionBatch(defDto, wordBatch);
-                wordBatch.getDefinitions().add(definitionBatch); // Añade a la colección existente
+                wordBatch.getDefinitions().add(definitionBatch);
 
                 processExamples(defDto, definitionBatch);
-
                 processSynonyms(defDto, definitionBatch);
                 processAntonyms(defDto, definitionBatch);
             }
@@ -159,9 +157,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
      */
     private void processSynonyms(DefinitionBatchDTO defDto, DefinitionBatch definitionBatch) {
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
-            //Si la palabra que se está procesando tiene un listado de sinónimos:
             Set<WordBatch> synonymWords = processRelatedWords(defDto.getSynonyms(), definitionBatch.getWord().getLanguage());
-
             Set<RelationBatch> synonymRelations = createWordRelations(definitionBatch, synonymWords, RelationEnumType.SINONIMA);
             definitionBatch.setSynonymRelations(synonymRelations);
         }
@@ -193,25 +189,17 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
             WordBatchReferenceDTO existingWordRef = chunkWordMap != null ? chunkWordMap.get(word) : null;
 
             if (existingWordRef != null) {
-                // Crear una referencia de WordBatch con el ID existente
                 WordBatch wordBatch = entityManager.getReference(WordBatch.class, existingWordRef.getId());
-                // Solo añadimos los campos mínimos necesarios para mantener la relación
                 result.add(wordBatch);
             } else {
-                // Crear un nuevo placeholder
-                WordBatch newWord = new WordBatch();
-                newWord.setWord(word);
-                newWord.setLength(word.length());
-
-                // Establecer referencia al idioma
-                newWord.setLanguage(language);
-                newWord.setPlaceholder(true);
-
-                // Añadir a la lista para guardar
-
-                // Después de guardar, asegurarse de actualizar el mapa de referencias
-                result.add(newWord);
-                chunkWordMap.put(word, wordMapper.toWordReference(newWord));
+                    WordBatch newWord = new WordBatch();
+                    newWord.setWord(word);
+                    newWord.setLength(word.length());
+                    newWord.setLanguage(language);
+                    newWord.setPlaceholder(true);
+                    result.add(newWord);
+                    newWord = wordBatchRepository.save(newWord);
+                    chunkWordMap.put(word, wordMapper.toWordReference(newWord));
             }
         }
         return result;

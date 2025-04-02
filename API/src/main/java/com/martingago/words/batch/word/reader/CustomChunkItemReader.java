@@ -2,6 +2,7 @@ package com.martingago.words.batch.word.reader;
 
 import com.martingago.words.batch.dto.WordBatchDTO;
 import com.martingago.words.batch.dto.WordBatchReferenceDTO;
+import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -12,7 +13,6 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @StepScope
 @RequiredArgsConstructor
@@ -71,6 +71,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
             // Guardamos las referencias en el ExecutionContext
             executionContext.put("wordBatchMap", wordReferenceMap);
+
         }
 
         // Reiniciamos el iterador del buffer
