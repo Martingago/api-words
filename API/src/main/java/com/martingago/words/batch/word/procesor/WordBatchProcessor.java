@@ -39,8 +39,11 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     //Memoria local para almacenar las qualificaciones existentes
     private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
 
-    //Palabras existentes en la base de datos.
+    //Palabras ya existentes en la base de datos.
     private Map<String, WordBatchReferenceDTO> chunkWordMap = new HashMap<>();
+
+    //Palabras que se van a persistir en la base de datos.
+    private Map<String, WordBatch> newWordBatchMap = new HashMap<>();
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -54,28 +57,51 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     }
 
     @Override
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+        newWordBatchMap.clear();
+    }
+
+    @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
         // Recuperamos el mapa previamente almacenado en el ExecutionContext
         chunkWordMap = (Map<String, WordBatchReferenceDTO>) this.executionContext.get("wordBatchMap");
-
-        // Buscamos la referencia de la palabra en el mapa
-        WordBatchReferenceDTO existingWordBatch = chunkWordMap != null ? chunkWordMap.get(item.getWord()) : null;
-
+        newWordBatchMap = (Map<String, WordBatch>) this.executionContext.get("newWordsToPersistMap");
         WordBatch wordBatch;
+
+        // PRIMERA COMPROBACIÓN: Verificar si la palabra ya está en el mapa temporal de palabras nuevas
+        wordBatch = newWordBatchMap.get(item.getWord());
+        if (wordBatch != null) {
+            // La palabra ya se ha creado en este lote como placeholder
+            // Actualizamos para que ya no sea placeholder y añadimos datos completos
+            wordBatch.setPlaceholder(false);
+            processDefinitions(item, wordBatch);
+            return wordBatch;
+        }
+
+        // SEGUNDA COMPROBACIÓN: Verificar si existe en la base de datos
+        WordBatchReferenceDTO existingWordBatch = chunkWordMap != null ? chunkWordMap.get(item.getWord()) : null;
         if (existingWordBatch != null) {
             // Si la palabra ya existe, comprobamos si no es un placeholder
             if (!existingWordBatch.isPlaceholder()) {
-                return null;   // O ajusta la lógica según lo que necesites
+                return null;   // Ya existe como palabra completa, no placeholder
             }
             // Si existe y es un placeholder, trabajamos sobre ese objeto
+
             wordBatch = entityManager.getReference(WordBatch.class, existingWordBatch.getId());
             wordBatch.setPlaceholder(false);
         } else {
-            // Si no se encuentra en el mapa, se crea un nuevo objeto
+            // Si no se encuentra en ninguno de los mapas, se crea un nuevo objeto
             wordBatch = createWordBatch(item);
+
+            if (wordBatch != null) {
+                // Almacenar en el mapa temporal de palabras nuevas (no persistidas)
+                newWordBatchMap.put(item.getWord(), wordBatch);
+            }
         }
 
-        processDefinitions(item, wordBatch);
+        if (wordBatch != null) {
+            processDefinitions(item, wordBatch);
+        }
 
         return wordBatch;
     }
@@ -186,20 +212,33 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
         Set<WordBatch> result = new HashSet<>();
 
         for (String word : relatedWords) {
-            WordBatchReferenceDTO existingWordRef = chunkWordMap != null ? chunkWordMap.get(word) : null;
+            // Primero buscamos en el mapa de palabras nuevas de este lote
+            WordBatch newWord = newWordBatchMap.get(word);
 
+            if (newWord != null) {
+                // La palabra ya está creada (pero no persistida) en este lote
+                result.add(newWord);
+                continue;
+            }
+
+            // Si no está en las nuevas, buscamos en las existentes
+            WordBatchReferenceDTO existingWordRef = chunkWordMap != null ? chunkWordMap.get(word) : null;
             if (existingWordRef != null) {
+                // Ya existe en la BD
                 WordBatch wordBatch = entityManager.getReference(WordBatch.class, existingWordRef.getId());
                 result.add(wordBatch);
             } else {
-                    WordBatch newWord = new WordBatch();
-                    newWord.setWord(word);
-                    newWord.setLength(word.length());
-                    newWord.setLanguage(language);
-                    newWord.setPlaceholder(true);
-                    result.add(newWord);
-                    newWord = wordBatchRepository.save(newWord);
-                    chunkWordMap.put(word, wordMapper.toWordReference(newWord));
+                // No existe ni en el lote ni en la BD, crear placeholder
+                newWord = new WordBatch();
+                newWord.setWord(word);
+                newWord.setLength(word.length());
+                newWord.setLanguage(language);
+                newWord.setPlaceholder(true);
+
+                // Importante: almacenar en el mapa temporal sin persistir todavía
+                newWordBatchMap.put(word, newWord);
+
+                result.add(newWord);
             }
         }
         return result;

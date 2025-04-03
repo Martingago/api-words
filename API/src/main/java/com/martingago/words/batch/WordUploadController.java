@@ -5,10 +5,7 @@ import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.utils.JsonValidation;
 import feign.Response;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,19 +28,42 @@ public class WordUploadController {
     private final Job job;
     private final JobLauncher jobLauncher;
 
-    @GetMapping("/validate-jsonl")
-    public void validateJsonlFile(){
+    @PostMapping("/upload-jsonl")
+    public ResponseEntity<ApiResponseDTO<Entity>> uploadJsonlFile(@RequestParam("file") MultipartFile file) {
         try {
+            // Crear un archivo temporal para almacenar el contenido subido
+            long currentTime = System.currentTimeMillis();
+            Path tempFile = Files.createTempFile("upload-"+ currentTime, ".jsonl");
+            file.transferTo(tempFile.toFile());
+
+            // Pasar la ruta del archivo como parámetro al job
             JobParameters jobParameters = new JobParametersBuilder()
-                    .addLong("time", System.currentTimeMillis()) // Asegura una ejecución única
+                    .addLong("time", System.currentTimeMillis())
+                    .addString("filePath", tempFile.toAbsolutePath().toString())
                     .toJobParameters();
 
             JobExecution execution = jobLauncher.run(job, jobParameters);
-            System.out.println("Estado del Job: " + execution.getStatus());
+
+            // Limpieza del archivo temporal después de procesar
+            Files.deleteIfExists(tempFile);
+
+            return ApiResponseDTO.build(
+                    true,
+                    "Words successfully added",
+                    HttpStatus.CREATED.value(),
+                    null,
+                    HttpStatus.CREATED);
 
         } catch (Exception e) {
             e.printStackTrace();
+            return ApiResponseDTO.build(
+                    false,
+                    e.toString(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
-
     }
+
 }

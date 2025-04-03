@@ -19,11 +19,11 @@ public class RelationBatch {
     @SequenceGenerator(name = "relation_entity_seq", sequenceName = "relation_entity_seq")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_definition", nullable = false)
     private DefinitionBatch definitionBatch; //FK hacia la definición de palabra con la que tiene relación
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_word", nullable = false)
     private WordBatch wordRelated; //FK hacia la palabra con la que tiene la relación
 

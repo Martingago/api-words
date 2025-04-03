@@ -23,6 +23,8 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
     private final List<WordBatchDTO> chunkBuffer = new ArrayList<>();
     private final Set<String> wordsToFetch = new HashSet<>();
+
+    private final Map<String, WordBatch> newWordsToPersist = new HashMap<>();
     private Iterator<WordBatchDTO> currentChunkIterator;
 
     private ExecutionContext executionContext;
@@ -73,6 +75,8 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
             executionContext.put("wordBatchMap", wordReferenceMap);
 
         }
+        //Genera el map de palabras a persistir limpio
+        executionContext.put("newWordsToPersistMap", newWordsToPersist);
 
         // Reiniciamos el iterador del buffer
         currentChunkIterator = chunkBuffer.iterator();

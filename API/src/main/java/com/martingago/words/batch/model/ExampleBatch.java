@@ -21,7 +21,7 @@ public class ExampleBatch {
 
     private String example;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_definition", nullable = false) // Clave foránea
     private DefinitionBatch definitionBatch; // Relación bidireccional
 }
