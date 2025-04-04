@@ -21,10 +21,9 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
     private final FlatFileItemReader<WordBatchDTO> delegate;
     private final WordBatchRepository wordBatchRepository;
 
-    private final List<WordBatchDTO> chunkBuffer = new ArrayList<>();
-    private final Set<String> wordsToFetch = new HashSet<>();
-
-    private final Map<String, WordBatch> newWordsToPersist = new HashMap<>();
+    private List<WordBatchDTO> chunkBuffer = new ArrayList<>();
+    private Set<String> wordsToFetch = new HashSet<>();
+    private Map<String, WordBatch> newWordsToPersist = new HashMap<>();
     private Iterator<WordBatchDTO> currentChunkIterator;
 
     private ExecutionContext executionContext;
@@ -48,6 +47,8 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
         // Cargamos hasta 100 elementos en el buffer
         WordBatchDTO item;
+
+
         while (chunkBuffer.size() < 100 && (item = delegate.read()) != null) {
             chunkBuffer.add(item);
 
@@ -73,23 +74,13 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
             // Guardamos las referencias en el ExecutionContext
             executionContext.put("wordBatchMap", wordReferenceMap);
-
+            //Genera el map de palabras a persistir limpio
+            executionContext.put("newWordsToPersistMap", newWordsToPersist);
         }
-        //Genera el map de palabras a persistir limpio
-        executionContext.put("newWordsToPersistMap", newWordsToPersist);
 
         // Reiniciamos el iterador del buffer
         currentChunkIterator = chunkBuffer.iterator();
         return currentChunkIterator.next();
     }
 
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        delegate.update(executionContext);
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-        delegate.close();
-    }
 }

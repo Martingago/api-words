@@ -1,33 +1,28 @@
 package com.martingago.words.batch.word;
 
-import com.martingago.words.batch.dto.WordBatchDTO;
-import com.martingago.words.batch.model.WordBatch;
-import com.martingago.words.batch.repository.word.WordBatchRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.stereotype.Component;
-import java.util.List;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WordChunkListener implements ChunkListener {
 
-    private final WordBatchRepository wordBatchRepository;
-    private Map<String, WordBatch> existingWordMap;
-
-
-
+    /**
+     * Tras ejecutarse cada chunk, se limpian los datos del contexto para evitar sobresaturar la memoria local.
+     * @param context
+     */
     @Override
-    public void afterChunk(ChunkContext chunkContext) {
-        existingWordMap = null; // Limpiar después del chunk
+    public void afterChunk(ChunkContext context) {
+        ExecutionContext executionContext = context.getStepContext()
+                .getStepExecution().getExecutionContext();
+        executionContext.remove("wordBatchMap");
+        executionContext.remove("newWordsToPersistMap");
+        log.info("Datos del chunk limpiados correctamente.");
     }
 
-    public Map<String, WordBatch> getExistingWordMap() {
-        return existingWordMap;
-    }
 }

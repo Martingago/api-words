@@ -7,6 +7,8 @@ import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.batch.word.WordChunkListener;
+import com.martingago.words.batch.word.WordProcessingStepListener;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.reader.CustomChunkItemReader;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
@@ -44,6 +46,8 @@ public class BatchConfig {
     private final LanguageWriter languageWriter; //Writer para los idiomas
     private final QualificationReader qualificationReader; //Reader de las qualificaciones
     private final QualificationWriter qualificationWriter; //Writer de las qualificaciones
+    private final WordChunkListener wordChunkListener;
+    private final WordProcessingStepListener wordProcessingStepListener;
 
 
     @Bean
@@ -120,6 +124,8 @@ public class BatchConfig {
                 .reader(customChunkItemReader)
                 .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())
+                .listener(wordChunkListener)
+                .listener(wordProcessingStepListener)
                 .build();
     }
 
