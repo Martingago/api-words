@@ -17,6 +17,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
@@ -28,12 +30,12 @@ import java.util.*;
 @Setter
 @Component
 @RequiredArgsConstructor
-public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch>, ItemStream {
+public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch>, ItemStream, StepExecutionListener {
 
     private final WordQualificationRepository wordQualificationRepository;
 
     //Memoria local para almacenar los idiomas existentes
-    private Map<String, LanguageModel> languageMap = new HashMap<>();
+    private Map<String, LanguageModel> languageMap;
 
     //Memoria local para almacenar las qualificaciones existentes
     private Map<String, WordQualificationModel> qualificationMap = new HashMap<>();
@@ -44,31 +46,34 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordBatch
     //Palabras que se van a persistir en la base de datos
     private Map<String, WordBatch> newWordBatchMap = new HashMap<>();
 
+    private StepExecution stepExecution;
+
     @PersistenceContext
     private EntityManager entityManager;
 
-    private ExecutionContext executionContext;
+    private ExecutionContext jobContext;
+
+    @Override
+    public void beforeStep(StepExecution stepExecution) {
+        this.stepExecution = stepExecution; // Captura el StepExecution
+    }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        this.executionContext = executionContext;
+        // Inicializa los mapas desde el Job ExecutionContext
+        this.jobContext = stepExecution.getJobExecution().getExecutionContext();
+
+        this.languageMap = (Map<String, LanguageModel>) jobContext.get("languageMap");
+        System.out.println("tamaño del language map: " + languageMap.size());
     }
 
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        newWordBatchMap.clear();
-    }
 
     @Override
     public WordBatch process(WordBatchDTO item) throws Exception {
-        // Recuperamos el mapa previamente almacenado en el ExecutionContext
-        chunkWordMap = (Map<String, WordBatchReferenceDTO>) this.executionContext.get("wordBatchMap");
-        newWordBatchMap = (Map<String, WordBatch>) this.executionContext.get("newWordsToPersistMap");
-
-        WordBatch wordBatch;
-
+        this.chunkWordMap = (Map<String, WordBatchReferenceDTO>) jobContext.get("wordBatchMap");
+        this.newWordBatchMap = (Map<String, WordBatch>) jobContext.get("newWordsToPersistMap");
         // PRIMERA COMPROBACIÓN: Verificar si la palabra ya está en el mapa temporal de palabras nuevas
-        wordBatch = newWordBatchMap.get(item.getWord());
+        WordBatch wordBatch = newWordBatchMap.get(item.getWord());
         if (wordBatch != null) {
             // La palabra ya se ha creado en este lote como placeholder
             // Actualizamos para que ya no sea placeholder y añadimos datos completos
