@@ -13,7 +13,9 @@ import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.reader.CustomChunkItemReader;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
 import com.martingago.words.model.LanguageModel;
+import com.martingago.words.model.WordModel;
 import com.martingago.words.model.WordQualificationModel;
+import com.martingago.words.repository.WordRepository;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -68,20 +70,20 @@ public class BatchConfig {
     @Bean
     @StepScope
     public CustomChunkItemReader customChunkItemReader(FlatFileItemReader<WordBatchDTO> itemReader,
-                                                       WordBatchRepository wordBatchRepository) {
-        return new CustomChunkItemReader(itemReader, wordBatchRepository);
+                                                       WordRepository wordRepository) {
+        return new CustomChunkItemReader(itemReader, wordRepository);
     }
 
     @Bean
-    public JpaItemWriter<WordBatch> jpaItemWriter() {
-        return new JpaItemWriterBuilder<WordBatch>()
+    public JpaItemWriter<WordModel> jpaItemWriter() {
+        return new JpaItemWriterBuilder<WordModel>()
                 .entityManagerFactory(entityManagerFactory)
                 .usePersist(true)
                 .build();
     }
 
     @Bean
-    public ItemWriter<WordBatch> filteredWordWriter() {
+    public ItemWriter<WordModel> filteredWordWriter() {
         return new FilteredWordBatchWriter(jpaItemWriter());
     }
 
@@ -120,7 +122,7 @@ public class BatchConfig {
     @Bean
     public Step addWordStep(CustomChunkItemReader customChunkItemReader) {
         return new StepBuilder("wordBatchStep", jobRepository)
-                .<WordBatchDTO, WordBatch>chunk(100, transactionManager)
+                .<WordBatchDTO, WordModel>chunk(100, transactionManager)
                 .reader(customChunkItemReader)
                 .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())

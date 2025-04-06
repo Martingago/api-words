@@ -2,6 +2,7 @@ package com.martingago.words.batch.word.writer;
 
 import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.model.WordModel;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +17,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class FilteredWordBatchWriter implements ItemWriter<WordBatch> {
+public class FilteredWordBatchWriter implements ItemWriter<WordModel> {
 
-    private final JpaItemWriter<WordBatch> jpaItemWriter;
+    private final JpaItemWriter<WordModel> jpaItemWriter;
 
     /**
      * Recibe un chunk de WordBatch, realiza un filtrado previo comprobando las entidades previamente existentes.
@@ -26,7 +27,7 @@ public class FilteredWordBatchWriter implements ItemWriter<WordBatch> {
      * @throws Exception
      */
     @Override
-    public void write(Chunk<? extends WordBatch> chunk) throws Exception {
+    public void write(Chunk<? extends WordModel> chunk) throws Exception {
         System.out.println("Palabras a escribir: " + chunk.size());
         if (!chunk.isEmpty()) {
             jpaItemWriter.write(chunk);

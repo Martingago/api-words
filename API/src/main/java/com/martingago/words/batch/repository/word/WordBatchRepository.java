@@ -21,8 +21,8 @@ public interface WordBatchRepository extends JpaRepository<WordBatch, Long> {
     @Query("SELECT w.word FROM WordBatch w WHERE w.word IN :words AND w.isPlaceholder = false")
     List<String> findExistingNonPlaceholderWords(List<String> words);
 
-    @Query("SELECT new com.martingago.words.batch.dto.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder, w.language.id) FROM WordBatch w WHERE w.word IN :words")
-    List<WordBatchReferenceDTO> findReferencesByWordIn(@Param("words") Set<String> words);
+//    @Query("SELECT new com.martingago.words.batch.dto.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder, w.language.id) FROM WordBatch w WHERE w.word IN :words")
+//    List<WordBatchReferenceDTO> findReferencesByWordIn(@Param("words") Set<String> words);
 
 
     Set<WordBatch> findByWordIn(Set<String> words);

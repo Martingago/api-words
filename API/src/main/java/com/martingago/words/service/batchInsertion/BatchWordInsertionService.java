@@ -67,7 +67,7 @@ public class BatchWordInsertionService {
                 // Si la palabra no existe, crear un nuevo WordModel para insertar
                 WordModel newWord = WordModel.builder()
                         .languageModel(mappedLanguages.get(wordDto.getLanguage()))
-                        .wordLength(wordDto.getLength())
+                        .length(wordDto.getLength())
                         .word(wordDto.getWord())
                         .isPlaceholder(false)
                         .build();
@@ -115,7 +115,7 @@ public class BatchWordInsertionService {
                             .map(wordPojo -> WordModel.builder()
                                     .isPlaceholder(true)
                                     .word(wordPojo.getWord())
-                                    .wordLength(wordPojo.getWord().length())
+                                    .length(wordPojo.getWord().length())
                                     .languageModel(wordPojo.getLanguageModel()) // Usa el idioma correcto
                                     .build())
                             .toList();

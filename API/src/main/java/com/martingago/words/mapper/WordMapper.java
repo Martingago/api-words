@@ -28,7 +28,7 @@ public class WordMapper {
         return WordResponseViewDTO.builder()
                 .language(wordModel.getLanguageModel().getLangCode())
                 .word(wordModel.getWord())
-                .length(wordModel.getWordLength())
+                .length(wordModel.getLength())
                 .definitions(wordDefinitionMapper.toDTOSet(
                         wordModel.getWordDefinitionModelSet()))
                 .build();

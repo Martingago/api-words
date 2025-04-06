@@ -61,7 +61,7 @@ public class WordInsertionService {
             // 4. Si la palabra no existe, créala
             existingWord = WordModel.builder()
                     .word(fullWordResponseDTO.getWord())
-                    .wordLength(fullWordResponseDTO.getLength())
+                    .length(fullWordResponseDTO.getLength())
                     .languageModel(languageModel)
                     .isPlaceholder(false) // No es un placeholder
                     .build();

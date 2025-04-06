@@ -2,8 +2,9 @@ package com.martingago.words.batch.word.reader;
 
 import com.martingago.words.batch.dto.WordBatchDTO;
 import com.martingago.words.batch.dto.WordBatchReferenceDTO;
-import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.repository.word.WordBatchRepository;
+import com.martingago.words.model.WordModel;
+import com.martingago.words.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ExecutionContext;
@@ -19,11 +20,11 @@ import java.util.stream.Collectors;
 public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
     private final FlatFileItemReader<WordBatchDTO> delegate;
-    private final WordBatchRepository wordBatchRepository;
+    private final WordRepository wordRepository;
 
     private List<WordBatchDTO> chunkBuffer = new ArrayList<>();
     private Set<String> wordsToFetch = new HashSet<>();
-    private Map<String, WordBatch> newWordsToPersist = new HashMap<>();
+    private Map<String, WordModel> newWordsToPersist = new HashMap<>();
     private Iterator<WordBatchDTO> currentChunkIterator;
 
     private ExecutionContext executionContext;
@@ -67,7 +68,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
         // Consultamos la base de datos solo al final del batch
         if (!wordsToFetch.isEmpty()) {
-            List<WordBatchReferenceDTO> existingBatchRefs = wordBatchRepository.findReferencesByWordIn(wordsToFetch);
+            List<WordBatchReferenceDTO> existingBatchRefs = wordRepository.findReferencesByWordIn(wordsToFetch);
 
             Map<String, WordBatchReferenceDTO> wordReferenceMap = existingBatchRefs.stream()
                     .collect(Collectors.toMap(WordBatchReferenceDTO::getWord, ref -> ref));

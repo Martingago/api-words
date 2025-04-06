@@ -2,12 +2,9 @@ package com.martingago.words.mapper;
 
 import com.martingago.words.dto.WordDefinitionDTO;
 import com.martingago.words.model.WordDefinitionModel;
-import com.martingago.words.model.WordExampleModel;
-import com.martingago.words.model.WordRelationModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,8 +31,8 @@ public class WordDefinitionMapper {
                 wordDefinitionModel.getWordQualificationModel().getQualification(),
                 wordDefinitionModel.getWordDefinition(),
                 wordExamplesMapper.toStringSet(wordDefinitionModel.getWordExampleModelSet()),
-                wordRelationMapper.mapSynonyms(wordDefinitionModel.getWordRelationModelSet()),
-                wordRelationMapper.mapAntonyms(wordDefinitionModel.getWordRelationModelSet())
+                wordRelationMapper.mapSynonyms(wordDefinitionModel.getSynonymRelationsSet()),
+                wordRelationMapper.mapAntonyms(wordDefinitionModel.getAntonymRelationsSet())
         );
     }
 

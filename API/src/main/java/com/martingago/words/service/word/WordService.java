@@ -107,7 +107,7 @@ public class WordService {
                 placeholder -> WordModel.builder()
                         .isPlaceholder(true)
                         .word(placeholder)
-                        .wordLength(placeholder.length())
+                        .length(placeholder.length())
                         .languageModel(languageModel)
                         .build()
         ).collect(Collectors.toSet());
