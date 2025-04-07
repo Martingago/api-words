@@ -30,12 +30,6 @@ import java.nio.file.Path;
 public class PrivateWordController {
 
     @Autowired
-    Job job;
-
-    @Autowired
-    JobLauncher jobLauncher;
-
-    @Autowired
     WordInsertionService wordInsertionService;
 
     @Autowired
@@ -63,51 +57,6 @@ public class PrivateWordController {
                 updatedWordResponseViewDTO,
                 HttpStatus.CREATED);
     }
-
-
-    /**
-     * Sube información de un fichero jsonl a la base de datos.
-     * @param file MultipartFile que se va a añadir a la base de datos.
-     * @return
-     */
-    @PostMapping("/upload-jsonl")
-    public ResponseEntity<ApiResponseDTO<Entity>> uploadJsonlFile(@RequestParam("file") MultipartFile file) {
-        try {
-            // Crear un archivo temporal para almacenar el contenido subido
-            long currentTime = System.currentTimeMillis();
-            Path tempFile = Files.createTempFile("upload-"+ currentTime, ".jsonl");
-            file.transferTo(tempFile.toFile());
-
-            // Pasar la ruta del archivo como parámetro al job
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addLong("time", System.currentTimeMillis())
-                    .addString("filePath", tempFile.toAbsolutePath().toString())
-                    .toJobParameters();
-
-            JobExecution execution = jobLauncher.run(job, jobParameters);
-
-            // Limpieza del archivo temporal después de procesar
-            Files.deleteIfExists(tempFile);
-
-            return ApiResponseDTO.build(
-                    true,
-                    "Words successfully added",
-                    HttpStatus.CREATED.value(),
-                    null,
-                    HttpStatus.CREATED);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ApiResponseDTO.build(
-                    false,
-                    e.toString(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    null,
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-    }
-
 
     /**
      * Elimina una palabra bajo un string específico
