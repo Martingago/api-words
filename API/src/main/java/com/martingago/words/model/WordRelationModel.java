@@ -16,11 +16,11 @@ public class WordRelationModel {
     @SequenceGenerator(name = "word_relation_entity_seq", sequenceName = "word_relation_entity_seq")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_definition", nullable = false)
     private WordDefinitionModel wordDefinitionModel; //FK hacia la definición de palabra con la que tiene relación
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_word", nullable = false)
     private WordModel wordRelated; //FK hacia la palabra con la que tiene la relación
 

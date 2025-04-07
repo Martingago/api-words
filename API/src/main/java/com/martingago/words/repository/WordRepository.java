@@ -49,6 +49,7 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Long findRandomWordId(@Param("wordLength") Integer wordLength);
 
+
     @Query("SELECT DISTINCT w FROM WordModel w " +
             "JOIN FETCH w.languageModel " +
             "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +

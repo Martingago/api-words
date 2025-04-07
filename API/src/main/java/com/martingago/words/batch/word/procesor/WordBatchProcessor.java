@@ -126,6 +126,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
                 WordDefinitionModel wordDefinitionModel = createWordDefinition(defDto, wordModel);
+                //Se añade la definición al wordModel
                 wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
 
                 processExamples(defDto, wordDefinitionModel);
@@ -133,7 +134,6 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
                 processAntonyms(defDto, wordDefinitionModel);
             }
         }
-        wordModel.setWordDefinitionModelSet();
     }
 
     private WordDefinitionModel createWordDefinition(DefinitionBatchDTO defDto, WordModel wordModel) {
