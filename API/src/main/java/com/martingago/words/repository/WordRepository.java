@@ -23,10 +23,8 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
             "LEFT JOIN FETCH wd.wordQualificationModel " +
             "LEFT JOIN FETCH wd.wordExampleModelSet " +
-            "LEFT JOIN FETCH wd.synonymRelationsSet ws " +
-            "LEFT JOIN FETCH wd.antonymRelationsSet wa " +
-            "LEFT JOIN FETCH ws.wordRelated " +
-            "LEFT JOIN FETCH wa.wordRelated " +
+            "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
+            "LEFT JOIN FETCH wr.wordRelated " +
             "WHERE w.word = :word")
     Optional<WordModel> findByWordWithRelations(@Param("word") String word);
 
@@ -35,10 +33,8 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
             "LEFT JOIN FETCH wd.wordQualificationModel " +
             "LEFT JOIN FETCH wd.wordExampleModelSet " +
-            "LEFT JOIN FETCH wd.synonymRelationsSet ws " +
-            "LEFT JOIN FETCH wd.antonymRelationsSet wa " +
-            "LEFT JOIN FETCH ws.wordRelated " +
-            "LEFT JOIN FETCH wa.wordRelated " +
+            "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
+            "LEFT JOIN FETCH wr.wordRelated " +
             "WHERE w.word = :word and w.languageModel.langCode = :lang")
     Optional<WordModel> findByWordWithRelationsByLanguage(@Param("word") String word, @Param("lang") String lang);
 
@@ -55,10 +51,8 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
             "LEFT JOIN FETCH wd.wordQualificationModel " +
             "LEFT JOIN FETCH wd.wordExampleModelSet " +
-            "LEFT JOIN FETCH wd.synonymRelationsSet ws " +
-            "LEFT JOIN FETCH wd.antonymRelationsSet wa " +
-            "LEFT JOIN FETCH ws.wordRelated " +
-            "LEFT JOIN FETCH wa.wordRelated " +
+            "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
+            "LEFT JOIN FETCH wr.wordRelated " +
             "WHERE w.id = :idWord")
     Optional<WordModel> findById(@Param("idWord")Long id);
 

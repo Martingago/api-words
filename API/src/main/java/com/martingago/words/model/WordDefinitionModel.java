@@ -35,9 +35,6 @@ public class WordDefinitionModel {
     private WordQualificationModel wordQualificationModel; // Clasificación a la que está asociada una definición de palabra. Ej: "Sustantivo masculino"
 
     @OneToMany(mappedBy = "wordDefinitionModel", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Set<WordRelationModel> synonymRelationsSet = new HashSet<>();
-
-    @OneToMany(mappedBy = "wordDefinitionModel", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Set<WordRelationModel> antonymRelationsSet = new HashSet<>();
+    private Set<WordRelationModel> wordRelationModelSet = new HashSet<>();
 
 }

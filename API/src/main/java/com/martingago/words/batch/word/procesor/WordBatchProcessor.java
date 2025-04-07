@@ -178,7 +178,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
             Set<WordModel> synonymWords = processRelatedWords(defDto.getSynonyms(), wordDefinitionModel.getWord().getLanguageModel());
             Set<WordRelationModel> synonymRelations = createWordRelations(wordDefinitionModel, synonymWords, RelationEnumType.SINONIMA);
-            wordDefinitionModel.setSynonymRelationsSet(synonymRelations);
+            wordDefinitionModel.setWordRelationModelSet(synonymRelations);
         }
     }
 
@@ -186,7 +186,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
             Set<WordModel> antonymWords = processRelatedWords(defDto.getAntonyms(), definitionBatch.getWord().getLanguageModel());
             Set<WordRelationModel> antonymRelations = createWordRelations(definitionBatch, antonymWords, RelationEnumType.ANTONIMA);
-            definitionBatch.setAntonymRelationsSet(antonymRelations);
+            definitionBatch.setWordRelationModelSet(antonymRelations);
         }
     }
 

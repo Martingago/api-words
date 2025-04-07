@@ -31,8 +31,8 @@ public class WordDefinitionMapper {
                 wordDefinitionModel.getWordQualificationModel().getQualification(),
                 wordDefinitionModel.getWordDefinition(),
                 wordExamplesMapper.toStringSet(wordDefinitionModel.getWordExampleModelSet()),
-                wordRelationMapper.mapSynonyms(wordDefinitionModel.getSynonymRelationsSet()),
-                wordRelationMapper.mapAntonyms(wordDefinitionModel.getAntonymRelationsSet())
+                wordRelationMapper.mapSynonyms(wordDefinitionModel.getWordRelationModelSet()),
+                wordRelationMapper.mapAntonyms(wordDefinitionModel.getWordRelationModelSet())
         );
     }
 
