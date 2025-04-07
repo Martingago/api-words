@@ -1,6 +1,6 @@
-SELECT COUNT(*) FROM words_batch;
-SELECT COUNT(*) FROM definitions_batch;
-SELECT COUNT(*) FROM examples_batch;
+SELECT COUNT(*) FROM words where is_placeholder = false;
+SELECT COUNT(*) FROM words_definitions;
+SELECT COUNT(*) FROM words_examples;
 SELECT COUNT(*) FROM relations_batch;
 
 SELECT * FROM words_batch where word = 'aguazur';

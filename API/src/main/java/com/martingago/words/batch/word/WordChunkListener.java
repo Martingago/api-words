@@ -22,7 +22,6 @@ public class WordChunkListener implements ChunkListener {
                 .getStepExecution().getExecutionContext();
         executionContext.remove("wordBatchMap");
         executionContext.remove("newWordsToPersistMap");
-        log.info("Datos del chunk limpiados correctamente.");
     }
 
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
@@ -20,6 +21,7 @@ import java.util.*;
 @Setter
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel>, ItemStream {
 
     private final WordQualificationRepository wordQualificationRepository;
@@ -91,7 +93,6 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         if (wordModel != null) {
             processDefinitions(item, wordModel);
         }
-
         return wordModel;
     }
 
@@ -124,17 +125,18 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
 
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
             for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
-                WordDefinitionModel definitionBatch = createDefinitionBatch(defDto, wordModel);
-                wordModel.getWordDefinitionModelSet().add(definitionBatch);
+                WordDefinitionModel wordDefinitionModel = createWordDefinition(defDto, wordModel);
+                wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
 
-                processExamples(defDto, definitionBatch);
-                processSynonyms(defDto, definitionBatch);
-                processAntonyms(defDto, definitionBatch);
+                processExamples(defDto, wordDefinitionModel);
+                processSynonyms(defDto, wordDefinitionModel);
+                processAntonyms(defDto, wordDefinitionModel);
             }
         }
+        wordModel.setWordDefinitionModelSet();
     }
 
-    private WordDefinitionModel createDefinitionBatch(DefinitionBatchDTO defDto, WordModel wordModel) {
+    private WordDefinitionModel createWordDefinition(DefinitionBatchDTO defDto, WordModel wordModel) {
         WordDefinitionModel wordDefinitionModel = new WordDefinitionModel();
         wordDefinitionModel.setWordDefinition(defDto.getDefinition());
 
