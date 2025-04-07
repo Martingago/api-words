@@ -6,24 +6,22 @@ import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.mapper.WordMapper;
 import com.martingago.words.model.WordModel;
-import com.martingago.words.service.batchInsertion.BatchProcessingInsertionService;
 import com.martingago.words.service.language.LanguageService;
 import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
-import com.martingago.words.utils.JsonValidation;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @RestController
@@ -32,16 +30,16 @@ import java.util.Map;
 public class PrivateWordController {
 
     @Autowired
+    Job job;
+
+    @Autowired
+    JobLauncher jobLauncher;
+
+    @Autowired
     WordInsertionService wordInsertionService;
 
     @Autowired
     WordMapper wordMapper;
-
-    @Autowired
-    BatchProcessingInsertionService batchProcessingInsertionService;
-
-    @Autowired
-    JsonValidation jsonValidation;
 
     @Autowired
     WordService wordService;
@@ -68,50 +66,48 @@ public class PrivateWordController {
 
 
     /**
-     * Función que procesa la inserción de múltiples ficheros en la Base de datos
-     * @param files Lista de ficheros a procesar
+     * Sube información de un fichero jsonl a la base de datos.
+     * @param file MultipartFile que se va a añadir a la base de datos.
+     * @return
      */
-    @PostMapping("/upload-words")
-    public ResponseEntity<ApiResponseDTO<List<String>>> insertMultipleJsonFiles(
-            @RequestParam("files") List<MultipartFile> files) {
+    @PostMapping("/upload-jsonl")
+    public ResponseEntity<ApiResponseDTO<Entity>> uploadJsonlFile(@RequestParam("file") MultipartFile file) {
         try {
-            if (files.isEmpty()) {
-                throw new BadRequestException("No files were uploaded");
-            }
+            // Crear un archivo temporal para almacenar el contenido subido
+            long currentTime = System.currentTimeMillis();
+            Path tempFile = Files.createTempFile("upload-"+ currentTime, ".jsonl");
+            file.transferTo(tempFile.toFile());
 
-            List<String> processedFiles = new ArrayList<>();
-            List<String> failedFiles = new ArrayList<>();
+            // Pasar la ruta del archivo como parámetro al job
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .addString("filePath", tempFile.toAbsolutePath().toString())
+                    .toJobParameters();
 
-            for (MultipartFile file : files) {
-                try {
-                    Map<String, WordResponseViewDTO> words = jsonValidation.parseFileToWordMap(file);
-                    batchProcessingInsertionService.processAllJsonData(words);
-                    processedFiles.add(file.getOriginalFilename());
+            JobExecution execution = jobLauncher.run(job, jobParameters);
 
-                } catch (Exception e) {
-                    log.error("Error processing file {}: ", file.getOriginalFilename(), e);
-                    failedFiles.add(file.getOriginalFilename() + " (" + e.getMessage() + ")");
-                }
-            }
-
-            String message = jsonValidation.buildResultMessage(processedFiles, failedFiles);
+            // Limpieza del archivo temporal después de procesar
+            Files.deleteIfExists(tempFile);
 
             return ApiResponseDTO.build(
-                    !processedFiles.isEmpty(),
-                    message,
+                    true,
+                    "Words successfully added",
                     HttpStatus.CREATED.value(),
-                    processedFiles,
+                    null,
                     HttpStatus.CREATED);
 
         } catch (Exception e) {
-            log.error("Error processing multiple files: ", e);
-            return ApiResponseDTO.error(
-                    e.getMessage(),
+            e.printStackTrace();
+            return ApiResponseDTO.build(
+                    false,
+                    e.toString(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
+
 
     /**
      * Elimina una palabra bajo un string específico

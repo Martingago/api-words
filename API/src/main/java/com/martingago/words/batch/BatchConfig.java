@@ -3,10 +3,8 @@ package com.martingago.words.batch;
 import com.martingago.words.batch.dto.WordBatchDTO;
 import com.martingago.words.batch.language.reader.LanguageReader;
 import com.martingago.words.batch.language.writer.LanguageWriter;
-import com.martingago.words.batch.model.WordBatch;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
-import com.martingago.words.batch.repository.word.WordBatchRepository;
 import com.martingago.words.batch.word.WordChunkListener;
 import com.martingago.words.batch.word.WordProcessingStepListener;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
@@ -31,7 +29,6 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
