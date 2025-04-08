@@ -1,8 +1,8 @@
 package com.martingago.words.batch.word.procesor;
 
-import com.martingago.words.batch.dto.DefinitionBatchDTO;
-import com.martingago.words.batch.dto.WordBatchDTO;
-import com.martingago.words.batch.dto.WordBatchReferenceDTO;
+import com.martingago.words.dto.word.request.WordBatchDTO;
+import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.WordDefinitionDTO;
 import com.martingago.words.model.*;
 import com.martingago.words.repository.WordQualificationRepository;
 import jakarta.persistence.EntityManager;
@@ -124,7 +124,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         wordModel.getWordDefinitionModelSet().clear();
 
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
-            for (DefinitionBatchDTO defDto : dto.getDefinitions()) {
+            for (WordDefinitionDTO defDto : dto.getDefinitions()) {
                 WordDefinitionModel wordDefinitionModel = createWordDefinition(defDto, wordModel);
                 //Se añade la definición al wordModel
                 wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
@@ -136,7 +136,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         }
     }
 
-    private WordDefinitionModel createWordDefinition(DefinitionBatchDTO defDto, WordModel wordModel) {
+    private WordDefinitionModel createWordDefinition(WordDefinitionDTO defDto, WordModel wordModel) {
         WordDefinitionModel wordDefinitionModel = new WordDefinitionModel();
         wordDefinitionModel.setWordDefinition(defDto.getDefinition());
 
@@ -161,7 +161,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
      * @param defDto
      * @param wordDefinitionModel
      */
-    private void processExamples(DefinitionBatchDTO defDto, WordDefinitionModel wordDefinitionModel) {
+    private void processExamples(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
         Set<WordExampleModel> examples = new HashSet<>();
         if (defDto.getExamples() != null && !defDto.getExamples().isEmpty()) {
             for (String ex : defDto.getExamples()) {
@@ -174,7 +174,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         wordDefinitionModel.setWordExampleModelSet(examples);
     }
 
-    private void processSynonyms(DefinitionBatchDTO defDto, WordDefinitionModel wordDefinitionModel) {
+    private void processSynonyms(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
             Set<WordModel> synonymWords = processRelatedWords(defDto.getSynonyms(), wordDefinitionModel.getWord().getLanguageModel());
             Set<WordRelationModel> synonymRelations = createWordRelations(wordDefinitionModel, synonymWords, RelationEnumType.SINONIMA);
@@ -182,7 +182,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         }
     }
 
-    private void processAntonyms(DefinitionBatchDTO defDto, WordDefinitionModel definitionBatch) {
+    private void processAntonyms(WordDefinitionDTO defDto, WordDefinitionModel definitionBatch) {
         if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
             Set<WordModel> antonymWords = processRelatedWords(defDto.getAntonyms(), definitionBatch.getWord().getLanguageModel());
             Set<WordRelationModel> antonymRelations = createWordRelations(definitionBatch, antonymWords, RelationEnumType.ANTONIMA);

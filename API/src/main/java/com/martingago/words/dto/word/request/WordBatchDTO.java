@@ -1,5 +1,6 @@
-package com.martingago.words.batch.dto;
+package com.martingago.words.dto.word.request;
 
+import com.martingago.words.dto.WordDefinitionDTO;
 import lombok.*;
 
 import java.util.List;
@@ -14,6 +15,6 @@ public class WordBatchDTO {
     private String language; // Código del idioma, como "esp"
     private int length;
     private boolean isPlaceholder;
-    private List<DefinitionBatchDTO> definitions;
+    private List<WordDefinitionDTO> definitions;
 }
 

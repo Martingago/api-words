@@ -1,4 +1,4 @@
-package com.martingago.words.controller;
+package com.martingago.words.controller.words;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.DeleteWordRequestDTO;
@@ -12,16 +12,10 @@ import com.martingago.words.service.word.WordService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.*;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Slf4j
 @RestController

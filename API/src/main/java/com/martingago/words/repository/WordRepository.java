@@ -1,6 +1,6 @@
 package com.martingago.words.repository;
 
-import com.martingago.words.batch.dto.WordBatchReferenceDTO;
+import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.model.WordModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -57,18 +57,7 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
     Optional<WordModel> findById(@Param("idWord")Long id);
 
 
-    @Query("SELECT new com.martingago.words.batch.dto.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder, w.languageModel.id) FROM WordModel w WHERE w.word IN :words")
+    @Query("SELECT new com.martingago.words.dto.word.request.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder, w.languageModel.id) FROM WordModel w WHERE w.word IN :words")
     List<WordBatchReferenceDTO> findReferencesByWordIn(@Param("words") Set<String> words);
-
-//    @Query("SELECT DISTINCT w FROM WordModel w " +
-//            "JOIN FETCH w.languageModel " +
-//            "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
-//            "LEFT JOIN FETCH wd.wordQualificationModel " +
-//            "LEFT JOIN FETCH wd.wordExampleModelSet " +
-//            "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
-//            "LEFT JOIN FETCH wr.wordRelated " +
-//            "WHERE w.word = :word and w.languageModel.langCode = :lang")
-//    Optional<WordModel> findByWordWithRelationsByLanguage(@Param("word") String word, @Param("lang") String lang);
-
 
 }

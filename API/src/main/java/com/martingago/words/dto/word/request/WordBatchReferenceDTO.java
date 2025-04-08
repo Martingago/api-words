@@ -1,4 +1,4 @@
-package com.martingago.words.batch.dto;
+package com.martingago.words.dto.word.request;
 
 import lombok.*;
 

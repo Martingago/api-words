@@ -1,4 +1,4 @@
-package com.martingago.words.controller;
+package com.martingago.words.controller.words;
 
 import com.martingago.words.POJO.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;

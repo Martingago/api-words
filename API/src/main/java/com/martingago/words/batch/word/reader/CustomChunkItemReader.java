@@ -1,7 +1,7 @@
 package com.martingago.words.batch.word.reader;
 
-import com.martingago.words.batch.dto.WordBatchDTO;
-import com.martingago.words.batch.dto.WordBatchReferenceDTO;
+import com.martingago.words.dto.word.request.WordBatchDTO;
+import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.martingago.words.batch;
 
-import com.martingago.words.batch.dto.WordBatchDTO;
+import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.batch.language.reader.LanguageReader;
 import com.martingago.words.batch.language.writer.LanguageWriter;
 import com.martingago.words.batch.qualification.reader.QualificationReader;

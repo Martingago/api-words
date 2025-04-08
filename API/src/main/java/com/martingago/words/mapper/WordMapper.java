@@ -1,6 +1,5 @@
 package com.martingago.words.mapper;
 
-import com.martingago.words.batch.dto.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.model.WordModel;
 import org.springframework.beans.factory.annotation.Autowired;
