@@ -22,7 +22,7 @@ public class FilteredWordBatchWriter implements ItemWriter<WordModel> {
      */
     @Override
     public void write(Chunk<? extends WordModel> chunk) throws Exception {
-        System.out.println("Palabras a escribir: " + chunk.size());
+        log.info("Palabras a escribir:" + chunk.size());
         if (!chunk.isEmpty()) {
             jpaItemWriter.write(chunk);
         }

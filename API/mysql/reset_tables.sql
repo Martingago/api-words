@@ -12,6 +12,11 @@ DROP TABLE IF EXISTS words_qualifications;
 DROP TABLE IF EXISTS api_words.languages;
 -- BATCH TEST TABLES
 
+DELETE FROM words_examples;
+DELETE FROM words_relations;
+DELETE FROM words_definitions;
+DELETE FROM words;
+DELETE FROM words_qualifications;
 
 
 -- ROLES TABLES
