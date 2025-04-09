@@ -4,24 +4,16 @@ import com.martingago.words.POJO.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.ScrapWordRequestDTO;
-import com.martingago.words.dto.word.response.WordApiResponse;
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.dto.word.request.BaseWordRequestDTO;
 import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.dto.word.request.RelatedWordRequestDTO;
-import com.martingago.words.mapper.WordMapper;
+import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.model.WordModel;
-import com.martingago.words.service.word.DailyWordService;
 import com.martingago.words.service.word.WordInsertionService;
 import com.martingago.words.service.word.WordService;
 import com.martingago.words.service.word.WordValidationService;
 import com.martingago.words.utils.CsvValidation;
 import io.swagger.v3.oas.annotations.Hidden;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,101 +49,6 @@ public class WordController {
 
     @Autowired
     WordInsertionService wordInsertionService;
-
-    @Autowired
-    DailyWordService dailyWordService;
-
-    /**
-     * Busca en la base de datos una palabra
-     *
-     * @param word string de la palabra que se quiere buscar en la base de datos
-     * @return Objeto ApiResponseDTO que contiene la información de la palabra encontrada.
-     */
-    @Operation(summary = "/search/{word}",
-            description = "Método 'GET' que busca una palabra  específica en la API de WordRadar.",
-            responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Ok",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = WordApiResponse.class))),
-                    @ApiResponse(responseCode = "400",
-                            description = "Bad request"),
-                    @ApiResponse(responseCode = "404",
-                            description = "Not found"),
-                    @ApiResponse(responseCode = "500",
-                            description = "Internal server error")
-            })
-    @GetMapping("/search/{word}")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> findWordByName(
-            @Parameter(description = "Palabra que quiere ser buscada en la Base de datos de WordRadar.",
-            required = true,
-            example = "piedra")
-            @PathVariable String word
-    ) {
-        WordResponseViewDTO wordResponseViewDTO = wordService.getWordByName(word);
-        return ApiResponseDTO.build(true,
-                "Word successfully founded",
-                HttpStatus.OK.value(),
-                wordResponseViewDTO,
-                HttpStatus.OK);
-    }
-
-
-    /**
-     * Obtiene una palabra aleatoria de toda la base de datos de palabras
-     *
-     * @param wordLength tamaño de la palabra que se quiere obtener aleatoriamente
-     * @return Objeto ApiResponseDTO que contiene la información de la palabra aleatoria obtenida.
-     */
-    @Operation(summary = "/word",
-            description = "Método 'GET' que obtiene una palabra aleatoria de la API de WordRadar.",
-            responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Ok",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = WordApiResponse.class))),
-                    @ApiResponse(responseCode = "400",
-                            description = "Bad request"),
-                    @ApiResponse(responseCode = "500",
-                            description = "Internal server error")
-            })
-    @GetMapping("/word")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getRandomWord(
-            @Parameter(description = "Longitud de la palabra aleatoria",
-                    required = false,
-                    example = "5")
-            @RequestParam(value = "length", required = false) Integer wordLength
-    ) {
-        WordResponseViewDTO wordResponseViewDTO = wordService.getRandomWord(wordLength);
-        return ApiResponseDTO.build(true,
-                "Word successfully founded",
-                HttpStatus.OK.value(),
-                wordResponseViewDTO,
-                HttpStatus.OK);
-    }
-
-    @Operation(summary = "/daily",
-            description = "Método 'GET' que obtiene la palabra diaria generada por el servidor. La palabra diaria se genera a las 00:00 CET (Madrid)",
-            responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Ok",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = WordApiResponse.class))),
-                    @ApiResponse(responseCode = "400",
-                            description = "Bad request"),
-                    @ApiResponse(responseCode = "500",
-                            description = "Internal server error")
-            })
-    @GetMapping("/daily")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getDailyWord() {
-        WordModel wordModel = dailyWordService.getDailyWord();
-        WordResponseViewDTO wordResponseViewDTO = wordMapper.toResponseDTO(wordModel);
-        return ApiResponseDTO.build(true,
-                "Daily word founded",
-                HttpStatus.OK.value(),
-                wordResponseViewDTO,
-                HttpStatus.OK);
-    }
 
     /**
      * Recibe un fichero .csv con un listado de palabras a comprobar en la base de datos

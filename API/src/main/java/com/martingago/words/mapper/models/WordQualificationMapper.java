@@ -1,4 +1,4 @@
-package com.martingago.words.mapper;
+package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.WordQualificationDTO;
 import com.martingago.words.model.WordQualificationModel;

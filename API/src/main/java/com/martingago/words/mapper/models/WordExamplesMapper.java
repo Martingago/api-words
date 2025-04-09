@@ -1,11 +1,10 @@
-package com.martingago.words.mapper;
+package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.WordExampleDTO;
 import com.martingago.words.model.WordExampleModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

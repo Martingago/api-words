@@ -39,6 +39,12 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
     Optional<WordModel> findByWordWithRelationsByLanguage(@Param("word") String word, @Param("lang") String lang);
 
 
+    /**
+     * Obtiene un ID aleatorio de una palabra con un tamaño determinado
+     * @param wordLength tamaño de la palabra que se quiere obtener aleatoriamente
+     *                   Si no se proporciona un tamaño, se obtendrá un valor aleatorio
+     * @return Long ID de la palabra obtenida aleatoriamente.
+     */
     @Query(value = "SELECT id FROM words " +
             "WHERE words.is_placeholder = false " + //placeholder
             "AND (:wordLength IS NULL OR words.length = :wordLength) " + //longitud carácteres palabra

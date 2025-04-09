@@ -1,7 +1,7 @@
 package com.martingago.words.service.qualification;
 
 import com.martingago.words.dto.WordQualificationDTO;
-import com.martingago.words.mapper.WordQualificationMapper;
+import com.martingago.words.mapper.models.WordQualificationMapper;
 import com.martingago.words.model.WordQualificationModel;
 import com.martingago.words.repository.WordQualificationRepository;
 import jakarta.persistence.EntityNotFoundException;

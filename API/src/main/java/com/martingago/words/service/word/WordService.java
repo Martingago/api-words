@@ -2,7 +2,7 @@ package com.martingago.words.service.word;
 
 import com.martingago.words.POJO.WordValidator;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
-import com.martingago.words.mapper.WordMapper;
+import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.model.LanguageModel;
 import com.martingago.words.model.WordModel;
 import com.martingago.words.repository.WordRepository;
