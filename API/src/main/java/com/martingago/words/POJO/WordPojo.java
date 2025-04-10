@@ -1,6 +1,6 @@
 package com.martingago.words.POJO;
 
-import com.martingago.words.model.LanguageModel;
+import com.martingago.words.domain.model.LanguageModel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

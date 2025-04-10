@@ -1,7 +1,7 @@
 package com.martingago.words.batch.qualification.writer;
 
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
-import com.martingago.words.model.WordQualificationModel;
+import com.martingago.words.domain.model.WordQualificationModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;

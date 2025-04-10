@@ -1,6 +1,6 @@
 package com.martingago.words.POJO;
 
-import com.martingago.words.model.WordModel;
+import com.martingago.words.domain.model.WordModel;
 import lombok.*;
 
 @Getter

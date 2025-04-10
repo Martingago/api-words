@@ -3,7 +3,7 @@ package com.martingago.words.utils;
 import com.martingago.words.POJO.WordListDefinitionsPojo;
 import com.martingago.words.dto.WordDefinitionDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
-import com.martingago.words.model.WordModel;
+import com.martingago.words.domain.model.WordModel;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

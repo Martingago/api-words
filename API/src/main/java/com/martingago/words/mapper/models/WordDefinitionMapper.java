@@ -1,7 +1,7 @@
 package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.model.WordDefinitionModel;
+import com.martingago.words.domain.model.WordDefinitionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

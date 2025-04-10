@@ -1,10 +1,10 @@
 package com.martingago.words.batch.word.procesor;
 
+import com.martingago.words.domain.model.*;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.model.*;
-import com.martingago.words.repository.WordQualificationRepository;
+import com.martingago.words.domain.repository.WordQualificationRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;

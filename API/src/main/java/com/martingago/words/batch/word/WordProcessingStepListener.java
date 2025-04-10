@@ -1,7 +1,7 @@
 package com.martingago.words.batch.word;
 
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
-import com.martingago.words.model.WordModel;
+import com.martingago.words.domain.model.WordModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;

@@ -3,7 +3,7 @@ package com.martingago.words.controller.authentication;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.authentication.AuthLoginRequestDTO;
 import com.martingago.words.dto.authentication.AuthResponseDTO;
-import com.martingago.words.service.user.UserDetailServiceImpl;
+import com.martingago.words.domain.service.user.UserDetailServiceImpl;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

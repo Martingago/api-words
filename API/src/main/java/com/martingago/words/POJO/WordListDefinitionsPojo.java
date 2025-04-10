@@ -1,7 +1,7 @@
 package com.martingago.words.POJO;
 
 import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.model.WordModel;
+import com.martingago.words.domain.model.WordModel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

@@ -2,9 +2,9 @@ package com.martingago.words.controller.words;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.DeleteWordRequestDTO;
-import com.martingago.words.model.WordModel;
-import com.martingago.words.service.language.LanguageService;
-import com.martingago.words.service.word.WordService;
+import com.martingago.words.domain.model.WordModel;
+import com.martingago.words.domain.service.language.LanguageService;
+import com.martingago.words.domain.service.word.WordService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

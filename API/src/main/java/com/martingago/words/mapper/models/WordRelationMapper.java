@@ -1,8 +1,8 @@
 package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.WordRelationDTO;
-import com.martingago.words.model.RelationEnumType;
-import com.martingago.words.model.WordRelationModel;
+import com.martingago.words.domain.model.RelationEnumType;
+import com.martingago.words.domain.model.WordRelationModel;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;

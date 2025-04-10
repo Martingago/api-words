@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.stereotype.Component;
-import com.martingago.words.model.LanguageModel;
+import com.martingago.words.domain.model.LanguageModel;
 import org.springframework.batch.item.ItemWriter;
 import java.util.HashMap;
 import java.util.Map;

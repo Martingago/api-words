@@ -1,7 +1,7 @@
 package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.LanguageDTO;
-import com.martingago.words.model.LanguageModel;
+import com.martingago.words.domain.model.LanguageModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

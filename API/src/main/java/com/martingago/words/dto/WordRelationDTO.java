@@ -1,6 +1,6 @@
 package com.martingago.words.dto;
 
-import com.martingago.words.model.RelationEnumType;
+import com.martingago.words.domain.model.RelationEnumType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

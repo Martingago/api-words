@@ -2,8 +2,8 @@ package com.martingago.words.controller.relations;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.global.ListStringApiResponse;
-import com.martingago.words.model.RelationEnumType;
-import com.martingago.words.service.relation.WordRelationService;
+import com.martingago.words.domain.model.RelationEnumType;
+import com.martingago.words.domain.service.relation.WordRelationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

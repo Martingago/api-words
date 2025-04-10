@@ -1,6 +1,6 @@
 package com.martingago.words.batch.word.writer;
 
-import com.martingago.words.model.WordModel;
+import com.martingago.words.domain.model.WordModel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;

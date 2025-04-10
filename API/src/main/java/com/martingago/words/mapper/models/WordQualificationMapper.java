@@ -1,7 +1,7 @@
 package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.WordQualificationDTO;
-import com.martingago.words.model.WordQualificationModel;
+import com.martingago.words.domain.model.WordQualificationModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
