@@ -1,6 +1,6 @@
 package com.martingago.words.domain.service.relation;
 
-import com.martingago.words.POJO.DefinitionRelation;
+import com.martingago.words.context.DefinitionRelation;
 import com.martingago.words.domain.model.*;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.dto.WordDefinitionDTO;

@@ -1,4 +1,4 @@
-package com.martingago.words.POJO;
+package com.martingago.words.context;
 
 import com.martingago.words.domain.model.RelationEnumType;
 import lombok.Builder;

@@ -1,8 +1,8 @@
 package com.martingago.words.domain.service.batchInsertion;
 
 
-import com.martingago.words.POJO.DefinitionEstructurePojo;
-import com.martingago.words.POJO.WordPojo;
+import com.martingago.words.context.DefinitionEstructurePojo;
+import com.martingago.words.context.WordPojo;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.model.WordRelationModel;
 import com.martingago.words.domain.repository.WordRelationRepository;

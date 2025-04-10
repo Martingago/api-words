@@ -1,5 +1,6 @@
 package com.martingago.words.batch.word.procesor;
 
+import com.martingago.words.context.DefinitionProcessedContext;
 import com.martingago.words.domain.model.*;
 import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.dto.word.request.WordBatchDTO;
@@ -113,7 +114,18 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
 
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
             for (WordDefinitionDTO defDto : dto.getDefinitions()) {
-                WordDefinitionModel wordDefinitionModel = createWordDefinition(defDto, wordModel);
+
+                //Crea la definición de una palabra y devuelve su objeto model + Qualification creada (opcional)
+                DefinitionProcessedContext definitionProcessedContext = createWordModelService.createWordDefinition(defDto, wordModel,qualificationMap);
+
+                WordDefinitionModel wordDefinitionModel = definitionProcessedContext.definitionModel();
+
+                // Verificamos si se ha creado una nueva qualification y la añadimos al mapa
+                if (definitionProcessedContext.hasNewQualification()) {
+                    WordQualificationModel newQualification = definitionProcessedContext.newQualification().get();
+                    qualificationMap.put(newQualification.getQualification(), newQualification);
+                }
+
                 //Se añade la definición al wordModel
                 wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
 
@@ -124,25 +136,6 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         }
     }
 
-    private WordDefinitionModel createWordDefinition(WordDefinitionDTO defDto, WordModel wordModel) {
-        WordDefinitionModel wordDefinitionModel = new WordDefinitionModel();
-        wordDefinitionModel.setWordDefinition(defDto.getDefinition());
-
-        WordQualificationModel qualificationModel = qualificationMap.get(defDto.getQualification());
-        if (qualificationModel == null) {
-            qualificationModel = new WordQualificationModel();
-            qualificationModel.setQualification(defDto.getQualification());
-            qualificationModel = wordQualificationRepository.save(qualificationModel);
-            qualificationMap.put(qualificationModel.getQualification(), qualificationModel);
-        }
-        //Establece la qualification
-        wordDefinitionModel.setWordQualificationModel(qualificationModel);
-
-        //Establece la palabra
-        wordDefinitionModel.setWord(wordModel);
-
-        return wordDefinitionModel;
-    }
 
     /**
      *

@@ -1,6 +1,6 @@
 package com.martingago.words.domain.service.batchInsertion;
 
-import com.martingago.words.POJO.WordListDefinitionsPojo;
+import com.martingago.words.context.WordListDefinitionsPojo;
 import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.WordQualificationRepository;
 import com.martingago.words.utils.BatchUtils;

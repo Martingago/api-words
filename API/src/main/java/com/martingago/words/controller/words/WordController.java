@@ -1,6 +1,6 @@
 package com.martingago.words.controller.words;
 
-import com.martingago.words.POJO.WordValidator;
+import com.martingago.words.context.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.ScrapWordRequestDTO;

@@ -1,6 +1,6 @@
 package com.martingago.words.utils;
 
-import com.martingago.words.POJO.WordListDefinitionsPojo;
+import com.martingago.words.context.WordListDefinitionsPojo;
 import com.martingago.words.dto.WordDefinitionDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.domain.model.WordModel;

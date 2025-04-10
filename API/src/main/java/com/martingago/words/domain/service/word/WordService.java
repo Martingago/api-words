@@ -1,6 +1,6 @@
 package com.martingago.words.domain.service.word;
 
-import com.martingago.words.POJO.WordValidator;
+import com.martingago.words.context.WordValidator;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.LanguageModel;
