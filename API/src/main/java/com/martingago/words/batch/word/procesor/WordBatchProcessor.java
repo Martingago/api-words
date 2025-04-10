@@ -1,6 +1,7 @@
 package com.martingago.words.batch.word.procesor;
 
 import com.martingago.words.domain.model.*;
+import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.WordDefinitionDTO;
@@ -23,6 +24,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel>, ItemStream {
+
+    private final CreateWordModelService createWordModelService;
 
     private final WordQualificationRepository wordQualificationRepository;
 
@@ -83,7 +86,10 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
             wordModel.setPlaceholder(false);
         } else {
             // Si no se encuentra en ninguno de los mapas, se crea un nuevo objeto
-            wordModel = createWordBatch(item);
+            LanguageModel language = languageMap.get(item.getLanguage());
+            if(language != null){
+                wordModel = createWordModelService.createWord(item,language);
+            }
             if (wordModel != null) {
                 // Almacenar en el mapa temporal de palabras nuevas (no persistidas)
                 newWordBatchMap.put(item.getWord(), wordModel);
@@ -96,24 +102,6 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         return wordModel;
     }
 
-    /**
-     * Crea la entidad que se va a persistir en la base de datos de WordModel
-     * @param dto información del objeto que se quiere persistir en la BBDD.
-     * @return objeto persistido en la BDDD.
-     */
-    private WordModel createWordBatch(WordBatchDTO dto) {
-        WordModel wordModel = new WordModel();
-        wordModel.setWord(dto.getWord());
-        wordModel.setLength(dto.getLength());
-        wordModel.setPlaceholder(false);
-
-        LanguageModel language = languageMap.get(dto.getLanguage());
-        if (language == null) {
-            return null;
-        }
-        wordModel.setLanguageModel(language);
-        return wordModel;
-    }
 
     /**
      * Procesa las creaciones de definiciones y coordina las relaciones con las otras palabras

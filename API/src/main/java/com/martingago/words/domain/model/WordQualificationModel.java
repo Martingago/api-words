@@ -21,4 +21,5 @@ public class WordQualificationModel implements Serializable {
 
     @Column(unique = true, nullable = false)
     private String qualification;
+    
 }
