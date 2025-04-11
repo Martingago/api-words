@@ -6,7 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,15 +20,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collection;
 
+@RequiredArgsConstructor
 public class JwtTokenValidator extends OncePerRequestFilter {
 
-
-    private JwtUtils jwtUtils;
-
-    public JwtTokenValidator(JwtUtils jwtUtils){
-        this.jwtUtils = jwtUtils;
-    }
-
+    private final JwtUtils jwtUtils;
 
     /**
      * Filtro que se encarga de verificar que el JWT introducido por el usuario en la validacion es correcto

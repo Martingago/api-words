@@ -2,6 +2,7 @@ package com.martingago.words.controller.words;
 
 import com.martingago.words.context.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
+import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.ScrapWordRequestDTO;
 import com.martingago.words.dto.word.request.BaseWordRequestDTO;
@@ -9,12 +10,11 @@ import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.dto.word.request.RelatedWordRequestDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
-import com.martingago.words.domain.service.word.WordInsertionService;
 import com.martingago.words.domain.service.word.WordService;
-import com.martingago.words.domain.service.word.WordValidationService;
 import com.martingago.words.utils.CsvValidation;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -23,14 +23,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 @Tag(   name ="Buscar palabras",
         description = "Operaciones relacionadas con la búsqueda de palabras en la API de WordRadar")
 @Slf4j
 public class WordController {
+
+    private final CreateWordModelService createWordModelService;
 
     @Autowired
     WordService wordService;
@@ -39,16 +43,11 @@ public class WordController {
     CsvValidation csvValidation;
 
     @Autowired
-    WordValidationService wordValidationService;
-
-    @Autowired
     MyScrapWordClient myScrapWordClient;
 
     @Autowired
     WordMapper wordMapper;
 
-    @Autowired
-    WordInsertionService wordInsertionService;
 
     /**
      * Recibe un fichero .csv con un listado de palabras a comprobar en la base de datos
@@ -63,7 +62,7 @@ public class WordController {
         //Procesa el fichero .csv y lo convierte a un set de Strings:
         Set<String> wordsToValidate = csvValidation.readWordsFromCsv(file);
         //Procesa mediante bath y obtiene un set que contiene la palabra y su estado en la BBDD.
-        Set<String[]> wordResultValidation = wordValidationService.processWordsInBatches(wordsToValidate);
+        Set<String[]> wordResultValidation = new HashSet<>();
         // Generar el archivo CSV de salida
         ByteArrayOutputStream outputStream = csvValidation.generateCsvResults(wordResultValidation);
 
@@ -115,7 +114,9 @@ public class WordController {
             );
         } else if (baseWordRequestDTO instanceof FullWordRequestDTO) {
             FullWordRequestDTO fullWordResponseDTO = (FullWordRequestDTO) baseWordRequestDTO;
-            WordModel wordModel = wordInsertionService.insertFullWord(fullWordResponseDTO);
+
+            WordModel wordModel = null;
+            //WordModel wordModel = createWordModelService.processWordDTOintoWordModel(fullWordResponseDTO);
 
 
             return ApiResponseDTO.build(

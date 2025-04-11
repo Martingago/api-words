@@ -20,8 +20,8 @@ public interface WordRelationRepository extends JpaRepository<WordRelationModel,
     AND lm.langCode = :langCode
     AND wrm.relationEnumType = :relationType
     """)
-    List<String> findSynonymsByWord(@Param("word") String word,
-                                    @Param("relationType")RelationEnumType relationType,
-                                    @Param("langCode")String langCode);
+    List<String> findWordsRelatedByWord(@Param("word") String word,
+                                        @Param("relationType")RelationEnumType relationType,
+                                        @Param("langCode")String langCode);
 
 }

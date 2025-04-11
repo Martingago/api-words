@@ -50,7 +50,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
 
         try{
             //Se llama a la función encargada de procesar los datos de una palabra en las diferentes entidades que la componen.
-            return createWordModelService.insertWordIntoDatabase(item,
+            return createWordModelService.processWordDTOintoWordModel(item,
                     languageMap,
                     qualificationMap,
                     newWordsModelToPersist,

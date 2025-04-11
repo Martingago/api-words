@@ -91,7 +91,7 @@ public class BatchConfig {
      */
     @Bean
     public Step getQualificationsListStep() {
-        return new StepBuilder("step1", jobRepository)
+        return new StepBuilder("getQualificationsMap", jobRepository)
                 .<WordQualificationModel, WordQualificationModel>chunk(100, transactionManager)
                 .reader(qualificationReader.read())
                 .writer(qualificationWriter)
@@ -104,7 +104,7 @@ public class BatchConfig {
      */
     @Bean
     public Step getLanguagesListStep() {
-        return new StepBuilder("step0", jobRepository)
+        return new StepBuilder("getLanguagesMap", jobRepository)
                 .<LanguageModel, LanguageModel>chunk(100, transactionManager)
                 .reader(languageReader.read())
                 .writer(languageWriter)
@@ -118,7 +118,7 @@ public class BatchConfig {
      */
     @Bean
     public Step addWordStep(CustomChunkItemReader customChunkItemReader) {
-        return new StepBuilder("wordBatchStep", jobRepository)
+        return new StepBuilder("insertWordsIntoDatabase", jobRepository)
                 .<WordBatchDTO, WordModel>chunk(100, transactionManager)
                 .reader(customChunkItemReader)
                 .processor(wordBatchProcessor)

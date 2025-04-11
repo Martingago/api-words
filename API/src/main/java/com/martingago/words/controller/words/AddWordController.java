@@ -10,10 +10,8 @@ import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
-import com.martingago.words.dto.word.request.FullWordRequestDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
-import com.martingago.words.domain.service.word.WordInsertionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,14 +44,13 @@ public class AddWordController {
     public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> insertWord(
             @RequestBody @Valid WordBatchDTO wordBatchDTO){
 
-        //Obtener map de idiomas de la base de datos:
-        Map<String, LanguageModel> languageModelMap = languageService.getAllLanguagesMappedByLangCode();
-        Map<String, WordQualificationModel> wordQualificationModelMap = wordQualificationService.getAllQualificationsMapped();
-        Map<String, WordModel> newWordsModelToPersist = new HashMap<>();
-        Map<String, WordBatchReferenceDTO> existingDBWordsMap = wordService.findReferencesFromWordDTO(wordBatchDTO);
+        Map<String, LanguageModel> languageModelMap = languageService.getAllLanguagesMappedByLangCode(); //Obtiene información de los idiomas de la base de datos.
+        Map<String, WordQualificationModel> wordQualificationModelMap = wordQualificationService.getAllQualificationsMapped(); //Obtiene información de las qualifications de la base de datos.
+        Map<String, WordModel> newWordsModelToPersist = new HashMap<>(); //Instancia un map de palabras relacionadas que van a ser persistidas
+        Map<String, WordBatchReferenceDTO> existingDBWordsMap = wordService.findReferencesFromWordDTO(wordBatchDTO); //Busca palabras relacionadas existentes en la Base de datos.
 
         //Obtiene el objeto WordModel procesado que contendrá la información de sus atributos.
-        WordModel wordModel = createWordModelService.insertWordIntoDatabase(wordBatchDTO,
+        WordModel wordModel = createWordModelService.processWordDTOintoWordModel(wordBatchDTO,
                 languageModelMap,
                 wordQualificationModelMap,
                 newWordsModelToPersist,

@@ -5,6 +5,7 @@ import com.martingago.words.dto.authentication.AuthResponseDTO;
 import com.martingago.words.domain.model.UserModel;
 import com.martingago.words.domain.repository.UserRepository;
 import com.martingago.words.utils.JwtUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,23 +22,19 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JwtUtils jwtUtils;
 
     /**
      * Funcion que busca en la base de datos un usuario por su username y devuelve un objeto UserDetails
-     * @param username
-     * @return
-     * @throws UsernameNotFoundException
+     * @param username nombre del usuario del que se quiere extraer la información en la base de datos.
+     * @return objeto UserDetails con la información del usuario encontrada en la base de datos.
+     * @throws UsernameNotFoundException excepción en caso de no encontrar al usuario en la base de datos.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -3,21 +3,20 @@ package com.martingago.words.domain.service.word;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class DailyWordService {
 
     private final WordRepository wordRepository;
     private Long dailyWordId;
 
-    public DailyWordService(WordRepository wordRepository) {
-        this.wordRepository = wordRepository;
-    }
 
     /**
-     * Obtiene la palabra del día en base al ID almacenado en memoria.
+     * Obtiene la palabra del día usando el ID almacenado en memoria.
      */
     public WordModel getDailyWord() {
         return wordRepository.findById(dailyWordId)
@@ -35,6 +34,10 @@ public class DailyWordService {
         System.out.println("GENERATED RANDOM DAILY WORD =========> " + this.dailyWordId);
     }
 
+    /**
+     * Obtiene el identificador de una palabra que fue obtenida de la base de datos de forma aleatoria
+     * @return Long identificador de la palabra que se obtuvo aleatoriamente de la base de datos.
+     */
     private Long generateNewDailyWordId() {
         return wordRepository.findRandomWordId(null);
     }

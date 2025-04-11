@@ -31,11 +31,11 @@ public class CreateWordModelService {
      * @param existingDBWordsMap map con la información de las palabras que ya existen en la base de datos.
      * @return WordModel que se va a persistir en la base de datos.
      */
-    public WordModel insertWordIntoDatabase(WordBatchDTO wordBatchDTO,
-                                            Map<String, LanguageModel> languageMap,
-                                            Map<String, WordQualificationModel> qualificationMap,
-                                            Map<String, WordModel> newWordsModelToPersist,
-                                            Map<String, WordBatchReferenceDTO> existingDBWordsMap
+    public WordModel processWordDTOintoWordModel(WordBatchDTO wordBatchDTO,
+                                                 Map<String, LanguageModel> languageMap,
+                                                 Map<String, WordQualificationModel> qualificationMap,
+                                                 Map<String, WordModel> newWordsModelToPersist,
+                                                 Map<String, WordBatchReferenceDTO> existingDBWordsMap
                                             ){
         WordModel wordModel;
 
@@ -80,9 +80,11 @@ public class CreateWordModelService {
     }
 
     /**
+     /**
      * Crea la entidad que se va a persistir en la base de datos de WordModel
      * @param dto información del objeto que se quiere persistir en la BBDD.
-     * @return objeto persistido en la BDDD.
+     * @param languageModel con el que se debe asociar la palabra a crear en la base de datos.
+     * @return objeto WordModel persistido en la BDDD.
      */
     public WordModel createWord(WordBatchDTO dto, LanguageModel languageModel) {
         WordModel wordModel = new WordModel();
@@ -96,8 +98,5 @@ public class CreateWordModelService {
         wordModel.setLanguageModel(languageModel);
         return wordModel;
     }
-
-
-
 
 }

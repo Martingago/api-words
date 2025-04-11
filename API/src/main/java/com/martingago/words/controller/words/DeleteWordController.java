@@ -1,5 +1,6 @@
 package com.martingago.words.controller.words;
 
+import com.martingago.words.domain.model.LanguageModel;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.request.DeleteWordRequestDTO;
 import com.martingago.words.domain.model.WordModel;
@@ -33,10 +34,10 @@ public class DeleteWordController {
     public ResponseEntity<ApiResponseDTO<Object>> deleteWordByString(
             @RequestBody @Valid DeleteWordRequestDTO deleteWordRequestDTO) {
         // Comprobar que el idioma sea válido
-        languageService.searchLanguageByLangCode(deleteWordRequestDTO.getLangCode());
+        LanguageModel languageModel = languageService.searchLanguageByLangCode(deleteWordRequestDTO.getLangCode());
 
         //Compobar que la palabra en el idioma indicado exista en la BBDD
-        WordModel wordToDelete = wordService.searchBasicWordWithLanguage(deleteWordRequestDTO.getWord(), deleteWordRequestDTO.getLangCode());
+        WordModel wordToDelete = wordService.searchBasicWordWithLanguage(deleteWordRequestDTO.getWord(), languageModel.getLangCode());
 
         //Eliminar la palabra de la base de datos
         wordService.deleteWordByWordModel(wordToDelete);

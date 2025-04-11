@@ -39,7 +39,7 @@ public class WordStatsController {
             })
     @GetMapping("/stats")
     public ResponseEntity<ApiResponseDTO<WordStatsDTO>> getWordsStatics(){
-        WordStatsDTO statics = wordsStaticsService.getWordsStatics();
+        WordStatsDTO statics = wordsStaticsService.getWordsStatics(); //Obtiene las estadisticas del API
         return ApiResponseDTO.build(
                 true,
                 "Stats successfully founded",
