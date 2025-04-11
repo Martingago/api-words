@@ -2,8 +2,10 @@ package com.martingago.words.batch.word.procesor;
 
 import com.martingago.words.context.DefinitionProcessedContext;
 import com.martingago.words.domain.model.*;
+import com.martingago.words.domain.service.definition.CreateDefinitionService;
+import com.martingago.words.domain.service.example.CreateExampleService;
 import com.martingago.words.domain.service.word.CreateWordModelService;
-import com.martingago.words.domain.service.word.CreateWordRelationsService;
+import com.martingago.words.domain.service.relation.CreateWordRelationsService;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.WordDefinitionDTO;
@@ -28,8 +30,7 @@ import java.util.*;
 public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel>, ItemStream {
 
     private final CreateWordModelService createWordModelService;
-    private final WordQualificationRepository wordQualificationRepository;
-    private final CreateWordRelationsService createWordRelationsService;
+    private final CreateDefinitionService createDefinitionService;
 
     //Memoria local para almacenar los idiomas existentes
     private Map<String, LanguageModel> languageMap = new HashMap<>();
@@ -72,7 +73,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
             // La palabra ya se ha creado en este lote como placeholder
             // Actualizamos para que ya no sea placeholder y añadimos datos completos
             wordModel.setPlaceholder(false);
-            processDefinitions(item, wordModel);
+            createDefinitionService.processDefinitions(item, wordModel, qualificationMap, newWordBatchMap, chunkWordMap);
             return wordModel;
         }
 
@@ -99,82 +100,9 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         }
 
         if (wordModel != null) {
-            processDefinitions(item, wordModel);
+            createDefinitionService.processDefinitions(item, wordModel, qualificationMap, newWordBatchMap, chunkWordMap);
         }
         return wordModel;
     }
 
-
-    /**
-     * Procesa las creaciones de definiciones y coordina las relaciones con las otras palabras
-     * @param dto DTO de entrada
-     * @param wordModel entidad principal sobre la que se procesarán las definiciones
-     */
-    private void processDefinitions(WordBatchDTO dto, WordModel wordModel) {
-        wordModel.getWordDefinitionModelSet().clear();
-
-        if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
-            for (WordDefinitionDTO defDto : dto.getDefinitions()) {
-
-                //Crea la definición de una palabra y devuelve su objeto model + Qualification creada (opcional)
-                DefinitionProcessedContext definitionProcessedContext = createWordModelService.createWordDefinition(defDto, wordModel,qualificationMap);
-
-                WordDefinitionModel wordDefinitionModel = definitionProcessedContext.definitionModel();
-
-                // Verificamos si se ha creado una nueva qualification y la añadimos al mapa
-                if (definitionProcessedContext.hasNewQualification()) {
-                    WordQualificationModel newQualification = definitionProcessedContext.newQualification().get();
-                    qualificationMap.put(newQualification.getQualification(), newQualification);
-                }
-
-                //Se añade la definición al wordModel
-                wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
-
-                //Se procesan los ejemplos relacionados con una definicion
-                createWordModelService.processExamples(defDto, wordDefinitionModel);
-                processSynonyms(defDto, wordDefinitionModel);
-                processAntonyms(defDto, wordDefinitionModel);
-            }
-        }
-    }
-
-
-    private void processSynonyms(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
-        if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
-            //Obtiene el listado de entidades con las que tiene relación de sinónimo.
-            Set<WordModel> synonymWords = createWordRelationsService.processRelatedWords(
-                    defDto.getSynonyms(),
-                    wordDefinitionModel.getWord().getLanguageModel(),
-                    newWordBatchMap,
-                    chunkWordMap);
-
-            Set<WordRelationModel> synonymRelations = createWordRelations(wordDefinitionModel, synonymWords, RelationEnumType.SINONIMA);
-            wordDefinitionModel.setWordRelationModelSet(synonymRelations);
-        }
-    }
-
-    private void processAntonyms(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
-        if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
-            Set<WordModel> antonymWords = createWordRelationsService.processRelatedWords(
-                    defDto.getSynonyms(),
-                    wordDefinitionModel.getWord().getLanguageModel(),
-                    newWordBatchMap,
-                    chunkWordMap);
-            Set<WordRelationModel> antonymRelations = createWordRelations(wordDefinitionModel, antonymWords, RelationEnumType.ANTONIMA);
-            wordDefinitionModel.setWordRelationModelSet(antonymRelations);
-        }
-    }
-
-
-    private Set<WordRelationModel> createWordRelations(WordDefinitionModel definition, Set<WordModel> relatedWords, RelationEnumType type) {
-        Set<WordRelationModel> relations = new HashSet<>();
-        for (WordModel relatedWord : relatedWords) {
-            WordRelationModel relation = new WordRelationModel();
-            relation.setWordDefinitionModel(definition);
-            relation.setWordRelated(relatedWord);
-            relation.setRelationEnumType(type);
-            relations.add(relation);
-        }
-        return relations;
-    }
 }
