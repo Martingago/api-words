@@ -3,6 +3,7 @@ package com.martingago.words.batch.word.procesor;
 import com.martingago.words.context.DefinitionProcessedContext;
 import com.martingago.words.domain.model.*;
 import com.martingago.words.domain.service.word.CreateWordModelService;
+import com.martingago.words.domain.service.word.CreateWordRelationsService;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.WordDefinitionDTO;
@@ -27,8 +28,8 @@ import java.util.*;
 public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel>, ItemStream {
 
     private final CreateWordModelService createWordModelService;
-
     private final WordQualificationRepository wordQualificationRepository;
+    private final CreateWordRelationsService createWordRelationsService;
 
     //Memoria local para almacenar los idiomas existentes
     private Map<String, LanguageModel> languageMap = new HashMap<>();
@@ -129,7 +130,8 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
                 //Se añade la definición al wordModel
                 wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
 
-                processExamples(defDto, wordDefinitionModel);
+                //Se procesan los ejemplos relacionados con una definicion
+                createWordModelService.processExamples(defDto, wordDefinitionModel);
                 processSynonyms(defDto, wordDefinitionModel);
                 processAntonyms(defDto, wordDefinitionModel);
             }
@@ -137,65 +139,32 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
     }
 
 
-    /**
-     *
-     * @param defDto
-     * @param wordDefinitionModel
-     */
-    private void processExamples(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
-        Set<WordExampleModel> examples = new HashSet<>();
-        if (defDto.getExamples() != null && !defDto.getExamples().isEmpty()) {
-            for (String ex : defDto.getExamples()) {
-                WordExampleModel example = new WordExampleModel();
-                example.setExample(ex);
-                example.setWordDefinitionModel(wordDefinitionModel);
-                examples.add(example);
-            }
-        }
-        wordDefinitionModel.setWordExampleModelSet(examples);
-    }
-
     private void processSynonyms(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
-            Set<WordModel> synonymWords = processRelatedWords(defDto.getSynonyms(), wordDefinitionModel.getWord().getLanguageModel());
+            //Obtiene el listado de entidades con las que tiene relación de sinónimo.
+            Set<WordModel> synonymWords = createWordRelationsService.processRelatedWords(
+                    defDto.getSynonyms(),
+                    wordDefinitionModel.getWord().getLanguageModel(),
+                    newWordBatchMap,
+                    chunkWordMap);
+
             Set<WordRelationModel> synonymRelations = createWordRelations(wordDefinitionModel, synonymWords, RelationEnumType.SINONIMA);
             wordDefinitionModel.setWordRelationModelSet(synonymRelations);
         }
     }
 
-    private void processAntonyms(WordDefinitionDTO defDto, WordDefinitionModel definitionBatch) {
+    private void processAntonyms(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
         if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
-            Set<WordModel> antonymWords = processRelatedWords(defDto.getAntonyms(), definitionBatch.getWord().getLanguageModel());
-            Set<WordRelationModel> antonymRelations = createWordRelations(definitionBatch, antonymWords, RelationEnumType.ANTONIMA);
-            definitionBatch.setWordRelationModelSet(antonymRelations);
+            Set<WordModel> antonymWords = createWordRelationsService.processRelatedWords(
+                    defDto.getSynonyms(),
+                    wordDefinitionModel.getWord().getLanguageModel(),
+                    newWordBatchMap,
+                    chunkWordMap);
+            Set<WordRelationModel> antonymRelations = createWordRelations(wordDefinitionModel, antonymWords, RelationEnumType.ANTONIMA);
+            wordDefinitionModel.setWordRelationModelSet(antonymRelations);
         }
     }
 
-    private Set<WordModel> processRelatedWords(Set<String> relatedWords, LanguageModel language) {
-        Set<WordModel> relatedWordEntities = new HashSet<>();
-
-        for (String related : relatedWords) {
-            WordModel relatedWord = Optional.ofNullable(newWordBatchMap.get(related))
-                    .orElseGet(() -> {
-                        WordBatchReferenceDTO ref = chunkWordMap.get(related);
-                        if (ref != null) {
-                            return entityManager.getReference(WordModel.class, ref.getId());
-                        } else {
-                            WordModel placeholder = new WordModel();
-                            placeholder.setWord(related);
-                            placeholder.setLength(related.length());
-                            placeholder.setLanguageModel(language);
-                            placeholder.setPlaceholder(true);
-                            newWordBatchMap.put(related, placeholder);
-                            return placeholder;
-                        }
-                    });
-
-            relatedWordEntities.add(relatedWord);
-        }
-
-        return relatedWordEntities;
-    }
 
     private Set<WordRelationModel> createWordRelations(WordDefinitionModel definition, Set<WordModel> relatedWords, RelationEnumType type) {
         Set<WordRelationModel> relations = new HashSet<>();

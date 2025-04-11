@@ -8,11 +8,11 @@ import com.martingago.words.dto.word.request.WordBatchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 @Service
@@ -48,8 +48,9 @@ public class CreateWordModelService {
     public DefinitionProcessedContext createWordDefinition(
             WordDefinitionDTO defDto,
             WordModel wordModel,
-            Map<String, WordQualificationModel> qualificationModelMap) {
-        WordQualificationModel newQualificationModelAdded = null; //En caso que se cree una nueva qualification
+            Map<String, WordQualificationModel> qualificationModelMap
+    ) {
+        WordQualificationModel newQualificationModelAdded = null; //En caso de que se cree una nueva qualification
         WordDefinitionModel wordDefinitionModel = new WordDefinitionModel();
         wordDefinitionModel.setWordDefinition(defDto.getDefinition());
 
@@ -77,44 +78,25 @@ public class CreateWordModelService {
     }
 
     /**
-     * Crea un Set de ejemplos a partir de una WordDefinitionDTO
-     * @param dto
-     * @param def
-     * @return
+     * Añade a la base de datos los ejemplos existentes en un wordDefinitionDTO asociados a una entidad WordDefinitionModel
+     * @param defDto WordDefinitionDTO sobre el que se van a extraer el listado de ejemplos para ser añadidos a la BBDD
+     * @param wordDefinitionModel al que están asociados los ejemplos que se van a añadir a la base de datos.
      */
-    public Set<WordExampleModel> createExamples(WordDefinitionDTO dto, WordDefinitionModel def) {
-        if (dto.getExamples() == null) return Set.of();
-        return dto.getExamples().stream().map(text -> {
-            WordExampleModel ex = new WordExampleModel();
-            ex.setExample(text);
-            ex.setWordDefinitionModel(def);
-            return ex;
-        }).collect(Collectors.toSet());
+    public void processExamples(WordDefinitionDTO defDto, WordDefinitionModel wordDefinitionModel) {
+        Set<WordExampleModel> examples = new HashSet<>();
+        if (defDto.getExamples() != null && !defDto.getExamples().isEmpty()) {
+            for (String ex : defDto.getExamples()) {
+                WordExampleModel example = new WordExampleModel();
+                example.setExample(ex);
+                example.setWordDefinitionModel(wordDefinitionModel);
+                examples.add(example);
+            }
+        }
+        wordDefinitionModel.setWordExampleModelSet(examples);
     }
 
-    /**
-     *
-     * @param relatedWords
-     * @param def
-     * @param type
-     * @param wordProvider
-     * @return
-     */
-    public Set<WordRelationModel> buildRelations(
-            Set<String> relatedWords,
-            WordDefinitionModel def,
-            RelationEnumType type,
-            Function<String, WordModel> wordProvider // dynamic supplier from batch or db
-    ) {
-        if (relatedWords == null) return Set.of();
-        return relatedWords.stream().map(word -> {
-            WordRelationModel rel = new WordRelationModel();
-            rel.setWordDefinitionModel(def);
-            rel.setRelationEnumType(type);
-            rel.setWordRelated(wordProvider.apply(word));
-            return rel;
-        }).collect(Collectors.toSet());
-    }
+
+
 
 
 
