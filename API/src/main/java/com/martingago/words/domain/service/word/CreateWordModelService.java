@@ -7,6 +7,7 @@ import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -53,6 +54,7 @@ public class CreateWordModelService {
         if (existingWordBatch != null) {
             // Si la palabra ya existe, comprobamos si no es un placeholder
             if (!existingWordBatch.isPlaceholder()) {
+                //throw new DuplicateKeyException("Word: " + wordBatchDTO.getWord() + " already exists on Database");
                 return null; // Ya existe como palabra completa, no placeholder
             }
             // Si existe y es un placeholder, trabajamos sobre ese objeto

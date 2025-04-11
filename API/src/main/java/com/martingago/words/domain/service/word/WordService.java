@@ -1,6 +1,8 @@
 package com.martingago.words.domain.service.word;
 
 import com.martingago.words.context.WordValidator;
+import com.martingago.words.dto.word.request.WordBatchDTO;
+import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.LanguageModel;
@@ -22,6 +24,15 @@ public class WordService {
     @Autowired
     WordMapper wordMapper;
 
+
+    /**
+     * Guarda un wordModel en la base de datos y devuelve el objeto persistido.
+     * @param wordModel
+     * @return
+     */
+    public WordModel saveWordModel(WordModel wordModel){
+        return wordRepository.save(wordModel);
+    }
 
     public WordResponseViewDTO getWordByName(String word){
         WordModel wordModel = wordRepository.findByWordWithRelations(word)
@@ -112,6 +123,33 @@ public class WordService {
                         .build()
         ).collect(Collectors.toSet());
         return new HashSet<>(wordRepository.saveAll(placeholdersToInsert));
+    }
+
+
+    /**
+     * Recibe un WordBatchDTO, extrae string de palabras con las que tiene relación, y las busca en la base de datos.
+     * Devuelve un map de WordBatchReferenceDTO con la información encontrada.
+     * @param wordBatchDTO objeto sobre el que se quiere realizar la búsqueda.
+     * @return
+     */
+    public Map<String, WordBatchReferenceDTO> findReferencesFromWordDTO(WordBatchDTO wordBatchDTO){
+        Map<String, WordBatchReferenceDTO> wordReferenceMap = new HashMap<>();
+        Set<String> wordsToFetch = new HashSet<>();
+
+        // Extraemos las palabras, sinónimos y antónimos
+        wordsToFetch.add(wordBatchDTO.getWord());
+        wordBatchDTO.getDefinitions().forEach(definition -> {
+            if (definition.getSynonyms() != null) wordsToFetch.addAll(definition.getSynonyms());
+            if (definition.getAntonyms() != null) wordsToFetch.addAll(definition.getAntonyms());
+        });
+
+        if (!wordsToFetch.isEmpty()) {
+            List<WordBatchReferenceDTO> existingBatchRefs = wordRepository.findReferencesByWordIn(wordsToFetch);
+
+            wordReferenceMap = existingBatchRefs.stream()
+                    .collect(Collectors.toMap(WordBatchReferenceDTO::getWord, ref -> ref));
+        }
+        return wordReferenceMap;
     }
 
 }

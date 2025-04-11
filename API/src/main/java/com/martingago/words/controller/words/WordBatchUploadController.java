@@ -2,7 +2,6 @@ package com.martingago.words.controller.words;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.global.batch.JobStatsDTO;
-import com.martingago.words.dto.global.batch.StepStatsDTO;
 import com.martingago.words.mapper.batch.JobStatsMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.*;
@@ -14,12 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/private")
 @RequiredArgsConstructor
-public class WordUploadController {
+public class WordBatchUploadController {
 
     private final Job job;
     private final JobLauncher jobLauncher;

@@ -22,7 +22,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(value = DuplicateKeyException.class)
     public ResponseEntity<ApiResponseDTO<Object>> handleDuplicateKey(DuplicateKeyException e){
-        return ApiResponseDTO.error(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value(), HttpStatus.UNPROCESSABLE_ENTITY);
+        return ApiResponseDTO.error(e.getMessage(), HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
