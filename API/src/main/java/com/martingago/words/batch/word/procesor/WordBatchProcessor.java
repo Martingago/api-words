@@ -11,6 +11,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -47,11 +48,15 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
         existingDBWordsMap = (Map<String, WordBatchReferenceDTO>) this.executionContext.get("wordBatchMap");
         newWordsModelToPersist = (Map<String, WordModel>) this.executionContext.get("newWordsToPersistMap");
 
-        //Se llama a la función encargada de procesar los datos de una palabra en las diferentes entidades que la componen.
-        return createWordModelService.insertWordIntoDatabase(item,
-                languageMap,
-                qualificationMap,
-                newWordsModelToPersist,
-                existingDBWordsMap);
+        try{
+            //Se llama a la función encargada de procesar los datos de una palabra en las diferentes entidades que la componen.
+            return createWordModelService.insertWordIntoDatabase(item,
+                    languageMap,
+                    qualificationMap,
+                    newWordsModelToPersist,
+                    existingDBWordsMap);
+        }catch (DuplicateKeyException e){
+            return null;
+        }
     }
 }
