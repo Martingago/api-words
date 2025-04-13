@@ -19,7 +19,7 @@ public class DailyWordService {
      * Obtiene la palabra del día usando el ID almacenado en memoria.
      */
     public WordModel getDailyWord() {
-        return wordRepository.findById(dailyWordId)
+        return wordRepository.findWordById(dailyWordId)
                 .orElseThrow(() -> new RuntimeException("No se encontró la palabra del día"));
     }
 

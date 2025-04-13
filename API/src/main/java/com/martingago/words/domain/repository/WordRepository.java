@@ -60,10 +60,17 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
             "LEFT JOIN FETCH wr.wordRelated " +
             "WHERE w.id = :idWord")
-    Optional<WordModel> findById(@Param("idWord")Long id);
+    Optional<WordModel> findWordById(@Param("idWord")Long id);
 
 
-    @Query("SELECT new com.martingago.words.dto.word.request.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder, w.languageModel.id) FROM WordModel w WHERE w.word IN :words")
+    @Query("SELECT new com.martingago.words.dto.word.request.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder) " +
+            "FROM WordModel w " +
+            "WHERE w.word IN :words")
     List<WordBatchReferenceDTO> findReferencesByWordIn(@Param("words") Set<String> words);
+
+
+    @Query("SELECT w FROM WordModel w " +
+            "WHERE w.word IN :words")
+    Set<WordModel> findWordAndLanguageIn(@Param("words") Set<String> words);
 
 }

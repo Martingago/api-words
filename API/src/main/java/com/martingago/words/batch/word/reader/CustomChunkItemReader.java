@@ -4,6 +4,7 @@ import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
+import com.martingago.words.mapper.models.WordMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ExecutionContext;
@@ -20,6 +21,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
     private final FlatFileItemReader<WordBatchDTO> delegate;
     private final WordRepository wordRepository;
+    private final WordMapper wordMapper;
 
     private List<WordBatchDTO> chunkBuffer = new ArrayList<>();
     private Set<String> wordsToFetch = new HashSet<>();
@@ -67,13 +69,17 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
         // Consultamos la base de datos solo al final del batch
         if (!wordsToFetch.isEmpty()) {
-            List<WordBatchReferenceDTO> existingBatchRefs = wordRepository.findReferencesByWordIn(wordsToFetch);
 
-            Map<String, WordBatchReferenceDTO> wordReferenceMap = existingBatchRefs.stream()
-                    .collect(Collectors.toMap(WordBatchReferenceDTO::getWord, ref -> ref));
+            Set<WordModel> existingWordModelRefs = wordRepository.findWordAndLanguageIn(wordsToFetch);
+
+            Map<String, WordBatchReferenceDTO> wordBatchReferenceDTOMap = existingWordModelRefs.stream()
+                    .collect(Collectors.toMap(
+                            WordModel::getWord,
+                            wordMapper::toWordBatchReferenceDTO
+                    ));
 
             // Guardamos las referencias en el ExecutionContext
-            executionContext.put("wordBatchMap", wordReferenceMap);
+            executionContext.put("wordBatchMap", wordBatchReferenceDTOMap);
             //Genera el map de palabras a persistir limpio
             executionContext.put("newWordsToPersistMap", newWordsToPersist);
         }

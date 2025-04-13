@@ -50,7 +50,7 @@ public class WordService {
      */
     public WordResponseViewDTO getRandomWord(Integer wordLength){
         Long id = wordRepository.findRandomWordId(wordLength);
-        WordModel wordModel = wordRepository.findById(id)
+        WordModel wordModel = wordRepository.findWordById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Couldn't find a word with those requirements"));
         return  wordMapper.toResponseDTO(wordModel);

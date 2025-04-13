@@ -14,6 +14,7 @@ import com.martingago.words.domain.model.LanguageModel;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.WordRepository;
+import com.martingago.words.mapper.models.WordMapper;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -67,8 +68,9 @@ public class BatchConfig {
     @Bean
     @StepScope
     public CustomChunkItemReader customChunkItemReader(FlatFileItemReader<WordBatchDTO> itemReader,
-                                                       WordRepository wordRepository) {
-        return new CustomChunkItemReader(itemReader, wordRepository);
+                                                       WordRepository wordRepository,
+                                                       WordMapper wordMapper) {
+        return new CustomChunkItemReader(itemReader, wordRepository, wordMapper);
     }
 
     @Bean

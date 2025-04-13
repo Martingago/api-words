@@ -56,7 +56,6 @@ public class CreateWordModelService {
             if (!existingWordBatch.isPlaceholder()) {
                 //En caso de que la palabra ya exista y no sea un placeholder se envía como una entidad duplicada.
                 throw new DuplicateKeyException("Word: " + wordBatchDTO.getWord() + " already exists on Database");
-                //return null;
             }
             // Si existe y es un placeholder, trabajamos sobre ese objeto
             wordModel = entityManager.getReference(WordModel.class, existingWordBatch.getId());

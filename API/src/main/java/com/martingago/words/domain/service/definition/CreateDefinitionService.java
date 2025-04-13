@@ -13,8 +13,10 @@ import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -41,6 +43,8 @@ public class CreateDefinitionService {
     ) {
         wordModel.getWordDefinitionModelSet().clear();
 
+        //Set<WordDefinitionModel> definitionModelSetToAdd = new HashSet<>();
+
         if (dto.getDefinitions() != null && !dto.getDefinitions().isEmpty()) {
             for (WordDefinitionDTO defDto : dto.getDefinitions()) {
 
@@ -58,6 +62,7 @@ public class CreateDefinitionService {
                 //Se añade la definición al wordModel
                 wordModel.getWordDefinitionModelSet().add(wordDefinitionModel);
 
+                //definitionModelSetToAdd.add(wordDefinitionModel);
                 //Se procesan los ejemplos relacionados con una definicion
                 createExampleService.processExamples(defDto, wordDefinitionModel);
                 //Procesa las relaciones de sinonimos.
@@ -65,6 +70,7 @@ public class CreateDefinitionService {
                 //Procesa las relaciones de antónimos.
                 createWordRelationsService.processAntonyms(defDto, wordDefinitionModel, newWordsModelToPersist, existingDBWordsMap);
             }
+            //wordModel.setWordDefinitionModelSet(definitionModelSetToAdd);
         }
     }
 

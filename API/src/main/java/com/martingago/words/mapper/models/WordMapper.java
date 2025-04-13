@@ -1,5 +1,6 @@
 package com.martingago.words.mapper.models;
 
+import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.domain.model.WordModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,21 @@ public class WordMapper {
                 .length(wordModel.getLength())
                 .definitions(wordDefinitionMapper.toDTOSet(
                         wordModel.getWordDefinitionModelSet()))
+                .build();
+    }
+
+    /**
+     * Convierte un WordModel en un objeto WordBatchReferenceDTO
+     * @param wordModel entidad de WordModel que se quiere procesar y convertir
+     * @return WordReferenceDTO objeto Serializable con la información principal de una palabra.
+     */
+    public WordBatchReferenceDTO toWordBatchReferenceDTO(WordModel wordModel){
+        if(wordModel == null) return null;
+        return WordBatchReferenceDTO.builder()
+                .id(wordModel.getId())
+                .word(wordModel.getWord())
+                .isPlaceholder(wordModel.isPlaceholder())
+                //.languageId(wordModel.getLanguageModel().getId())
                 .build();
     }
 
