@@ -3,17 +3,18 @@ package com.martingago.words.mapper.models;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.domain.model.WordModel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Component
 public class WordMapper {
 
-    @Autowired
-    WordDefinitionMapper wordDefinitionMapper;
+    private final WordDefinitionMapper wordDefinitionMapper;
 
     /**
      * Genera un WordDTO a partir de un WordModel
@@ -44,7 +45,6 @@ public class WordMapper {
                 .id(wordModel.getId())
                 .word(wordModel.getWord())
                 .isPlaceholder(wordModel.isPlaceholder())
-                //.languageId(wordModel.getLanguageModel().getId())
                 .build();
     }
 
