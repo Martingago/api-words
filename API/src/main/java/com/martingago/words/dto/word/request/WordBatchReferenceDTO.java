@@ -17,6 +17,4 @@ public class WordBatchReferenceDTO implements Serializable {
     private long id;
     private String word;
     private boolean isPlaceholder;
-    //private long languageId;
-
 }

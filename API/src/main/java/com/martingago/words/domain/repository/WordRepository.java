@@ -14,10 +14,13 @@ import java.util.Set;
 @Repository
 public interface WordRepository extends JpaRepository<WordModel, Long> {
 
-    Optional<WordModel> findByWord(String word);
-
     Set<WordModel> findByWordIn(Set<String> wordStringSet);
 
+    /**
+     * Busca en la base de datos los detalles de una palabra específicada.
+     * @param word string de la palabra que se quiere buscar.
+     * @return optional de WordModel con la información de la palabra encontrada.
+     */
     @Query("SELECT DISTINCT w FROM WordModel w " +
             "JOIN FETCH w.languageModel " +
             "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
@@ -29,6 +32,12 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
     Optional<WordModel> findByWordWithRelations(@Param("word") String word);
 
 
+    /**
+     * Obtiene el WordModel encontrado de una palabra que tiene un idioma especificado
+     * @param word palabra que se quiere buscar
+     * @param lang código de idioma que debe tener la palabra
+     * @return Optional WordModel con la palabra encontrada.
+     */
     @Query("SELECT DISTINCT w FROM WordModel w " +
             "JOIN FETCH w.languageModel wl " +
             "WHERE w.word = :word and wl.langCode = :lang")
@@ -48,6 +57,11 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
     Long findRandomWordId(@Param("wordLength") Integer wordLength);
 
 
+    /**
+     * Obtiene la información global de una palabra bajo una única consulta SQL
+     * @param id identificador de la palabra de la que se quieren extraer los datos
+     * @return WordModel con toda la información existente de una palabra.
+     */
     @Query("SELECT DISTINCT w FROM WordModel w " +
             "JOIN FETCH w.languageModel " +
             "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
@@ -57,16 +71,5 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "LEFT JOIN FETCH wr.wordRelated " +
             "WHERE w.id = :idWord")
     Optional<WordModel> findWordById(@Param("idWord")Long id);
-
-
-    @Query("SELECT new com.martingago.words.dto.word.request.WordBatchReferenceDTO(w.id, w.word, w.isPlaceholder) " +
-            "FROM WordModel w " +
-            "WHERE w.word IN :words")
-    List<WordBatchReferenceDTO> findReferencesByWordIn(@Param("words") Set<String> words);
-
-
-    @Query("SELECT w FROM WordModel w " +
-            "WHERE w.word IN :words")
-    Set<WordModel> findWordAndLanguageIn(@Param("words") Set<String> words);
 
 }

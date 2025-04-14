@@ -101,23 +101,31 @@ public class WordService {
      * @return
      */
     public Map<String, WordBatchReferenceDTO> findReferencesFromWordDTO(WordBatchDTO wordBatchDTO){
-        Map<String, WordBatchReferenceDTO> wordReferenceMap = new HashMap<>();
-        Set<String> wordsToFetch = new HashSet<>();
-
         // Extraemos las palabras, sinónimos y antónimos
+        Set<String> wordsToFetch = new HashSet<>();
         wordsToFetch.add(wordBatchDTO.getWord());
+
         wordBatchDTO.getDefinitions().forEach(definition -> {
             if (definition.getSynonyms() != null) wordsToFetch.addAll(definition.getSynonyms());
             if (definition.getAntonyms() != null) wordsToFetch.addAll(definition.getAntonyms());
         });
 
+        // Si hay palabras, las buscamos y las convertimos a Map<String, WordBatchReferenceDTO>
         if (!wordsToFetch.isEmpty()) {
-            List<WordBatchReferenceDTO> existingBatchRefs = wordRepository.findReferencesByWordIn(wordsToFetch);
+            Set<WordModel> existingWordModels = wordRepository.findByWordIn(wordsToFetch);
 
-            wordReferenceMap = existingBatchRefs.stream()
-                    .collect(Collectors.toMap(WordBatchReferenceDTO::getWord, ref -> ref));
+            return existingWordModels.stream()
+                    .collect(Collectors.toMap(
+                            WordModel::getWord, // clave → el string de la palabra
+                            word -> WordBatchReferenceDTO.builder()
+                                    .id(word.getId())
+                                    .word(word.getWord())
+                                    .isPlaceholder(word.isPlaceholder())
+                                    .build()
+                    ));
+
         }
-        return wordReferenceMap;
+        return Collections.emptyMap();
     }
 
 }
