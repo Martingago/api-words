@@ -9,8 +9,4 @@ import org.springframework.data.repository.query.Param;
 
 public interface WordDefinitionRepository  extends JpaRepository<WordDefinitionModel, Long> {
 
-    @Modifying
-    @Query("DELETE FROM WordDefinitionModel wd WHERE wd.word = :word")
-    void deleteByWord(@Param("word") WordModel word);
-
 }

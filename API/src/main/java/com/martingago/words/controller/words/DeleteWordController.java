@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Hidden
 public class DeleteWordController {
 
-    private final LanguageService languageService;
     private final WordService wordService;
 
     /**
@@ -33,11 +32,9 @@ public class DeleteWordController {
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponseDTO<Object>> deleteWordByString(
             @RequestBody @Valid DeleteWordRequestDTO deleteWordRequestDTO) {
-        // Comprobar que el idioma sea válido
-        LanguageModel languageModel = languageService.searchLanguageByLangCode(deleteWordRequestDTO.getLangCode());
 
         //Compobar que la palabra en el idioma indicado exista en la BBDD
-        WordModel wordToDelete = wordService.searchBasicWordWithLanguage(deleteWordRequestDTO.getWord(), languageModel.getLangCode());
+        WordModel wordToDelete = wordService.searchBasicWordWithLanguage(deleteWordRequestDTO.getWord(), deleteWordRequestDTO.getLangCode());
 
         //Eliminar la palabra de la base de datos
         wordService.deleteWordByWordModel(wordToDelete);

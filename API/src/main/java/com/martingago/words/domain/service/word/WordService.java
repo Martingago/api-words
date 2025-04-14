@@ -1,7 +1,6 @@
 package com.martingago.words.domain.service.word;
 
 import com.martingago.words.context.WordValidator;
-import com.martingago.words.domain.repository.WordDefinitionRepository;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
@@ -9,7 +8,6 @@ import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +64,7 @@ public class WordService {
      * @return WordModel
      */
     public WordModel searchBasicWordWithLanguage(String word, String langCode){
-        return wordRepository.findByWordWithRelationsByLanguage(word, langCode).orElseThrow(() ->
+        return wordRepository.findByWordAndLanguage(word, langCode).orElseThrow(() ->
                 new EntityNotFoundException("Word '" + word + "' with language: '" + langCode + "' was not founded on database"));
     }
 
@@ -95,8 +93,6 @@ public class WordService {
     public void deleteWordByWordModel(WordModel wordModel){
         wordRepository.delete(wordModel);
     }
-
-
 
     /**
      * Recibe un WordBatchDTO, extrae string de palabras con las que tiene relación, y las busca en la base de datos.
