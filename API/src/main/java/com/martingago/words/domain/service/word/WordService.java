@@ -1,6 +1,7 @@
 package com.martingago.words.domain.service.word;
 
 import com.martingago.words.context.WordValidator;
+import com.martingago.words.domain.repository.WordDefinitionRepository;
 import com.martingago.words.dto.word.request.WordBatchDTO;
 import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
@@ -8,6 +9,7 @@ import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -91,7 +93,6 @@ public class WordService {
      * @param wordModel
      */
     public void deleteWordByWordModel(WordModel wordModel){
-
         wordRepository.delete(wordModel);
     }
 

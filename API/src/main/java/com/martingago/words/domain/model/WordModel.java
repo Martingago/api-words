@@ -30,8 +30,8 @@ public class WordModel implements Serializable{
 
     private int length; //Longitud de la palabra
 
-    @OneToMany(mappedBy = "word", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Set<WordDefinitionModel> wordDefinitionModelSet = new HashSet<>(); //Listado de definiciones que puede tener una palabra
+    @OneToMany(mappedBy = "word", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private Set<WordDefinitionModel> wordDefinitionModelSet; //Listado de definiciones que puede tener una palabra
 
     private boolean isPlaceholder;
 }
