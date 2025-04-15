@@ -112,7 +112,7 @@ public class WordService {
 
         // Si hay palabras, las buscamos y las convertimos a Map<String, WordBatchReferenceDTO>
         if (!wordsToFetch.isEmpty()) {
-            Set<WordModel> existingWordModels = wordRepository.findByWordIn(wordsToFetch);
+            Set<WordModel> existingWordModels = wordRepository.findWordModelIn(wordsToFetch);
 
             return existingWordModels.stream()
                     .collect(Collectors.toMap(

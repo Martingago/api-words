@@ -70,7 +70,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
         // Consultamos la base de datos solo al final del batch
         if (!wordsToFetch.isEmpty()) {
 
-            Set<WordModel> existingWordModelRefs = wordRepository.findByWordIn(wordsToFetch);
+            Set<WordModel> existingWordModelRefs = wordRepository.findWordModelIn(wordsToFetch);
 
             Map<String, WordBatchReferenceDTO> wordBatchReferenceDTOMap = existingWordModelRefs.stream()
                     .collect(Collectors.toMap(

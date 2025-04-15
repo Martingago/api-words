@@ -1,4 +1,4 @@
-package com.martingago.words.controller.words;
+package com.martingago.words.controller.words.search;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.word.response.WordApiResponse;

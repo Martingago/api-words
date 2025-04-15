@@ -72,4 +72,10 @@ public interface WordRepository extends JpaRepository<WordModel, Long> {
             "WHERE w.id = :idWord")
     Optional<WordModel> findWordById(@Param("idWord")Long id);
 
+    @Query("SELECT w.word FROM WordModel w WHERE w.word IN :words")
+    Set<String> findWordsByWordIn(@Param("words") Set<String> words);
+
+    @Query("SELECT w from WordModel w WHERE w.word IN :words")
+    Set<WordModel> findWordModelIn(@Param("words") Set<String> words);
+
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 
 @RestController
 @ControllerAdvice
@@ -18,6 +20,11 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<ApiResponseDTO<Object>> handleNotFoundEntity(EntityNotFoundException e){
         return ApiResponseDTO.error(e.getMessage(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = IOException.class)
+    public ResponseEntity<ApiResponseDTO<Object>> handleIOException(IOException ex) {
+        return ApiResponseDTO.error(ex.getMessage(), 500, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = DuplicateKeyException.class)

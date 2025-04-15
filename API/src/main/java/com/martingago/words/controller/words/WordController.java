@@ -50,34 +50,6 @@ public class WordController {
 
 
     /**
-     * Recibe un fichero .csv con un listado de palabras a comprobar en la base de datos
-     *
-     * @param file fichero que contiene palabras a buscar en la base de datos
-     * @return fichero .csv con 2 columnas: word y status
-     * @throws IOException
-     */
-    @Hidden
-    @PostMapping(value = "/validate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> validateWords(@RequestParam("file") MultipartFile file) throws IOException {
-        //Procesa el fichero .csv y lo convierte a un set de Strings:
-        Set<String> wordsToValidate = csvValidation.readWordsFromCsv(file);
-        //Procesa mediante bath y obtiene un set que contiene la palabra y su estado en la BBDD.
-        Set<String[]> wordResultValidation = new HashSet<>();
-        // Generar el archivo CSV de salida
-        ByteArrayOutputStream outputStream = csvValidation.generateCsvResults(wordResultValidation);
-
-        // Preparar las cabeceras de la respuesta
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDisposition(ContentDisposition.attachment().filename("results.csv").build());
-
-        // Devolver el archivo como un array de bytes
-        return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
-
-    }
-
-
-    /**
      * Función que recibe una palabra > valida que no exista en la Base de datos > la scrapea > la sube a la BBDD
      *
      * @param scrapWordRequestDTO String de la palabra que se quiere validar y scrapear

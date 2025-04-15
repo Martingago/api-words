@@ -1,34 +1,70 @@
 package com.martingago.words.utils;
 
 import com.opencsv.CSVWriter;
+import org.hibernate.sql.ast.tree.predicate.BooleanExpressionPredicate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Component
 public class CsvValidation {
 
     /**
-     * Lee un archivo .csv y devuelve un set con las palabras que existen en el
-     * @param file
-     * @return
-     * @throws IOException
+     * Lee un archivo CSV de texto plano y devuelve un Set limpio de palabras válidas.
+     *
+     * @param file Fichero recibido desde el cliente.
+     * @return Set con las palabras leídas y normalizadas.
+     * @throws IOException si hay problemas leyendo el archivo.
      */
-    public Set<String> readWordsFromCsv(MultipartFile file) throws IOException{
-        Set<String> words = new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                words.add(line.trim());
-            }
-        }catch (IOException e){
-            throw new IOException("Error reading CSV file: " + e.getMessage());
+    public Set<String> readWordsFromCsv(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IOException("El archivo está vacío.");
         }
+
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.equals("text/csv") && !contentType.equals("text/plain"))) {
+            throw new IOException("Tipo de archivo no soportado: " + contentType);
+        }
+
+        Set<String> words = new HashSet<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            int maxWords = 40000;
+            int count = 0;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                // Saltar líneas vacías o inválidas
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                words.add(line.toLowerCase());
+
+                count++;
+                if (count > maxWords) {
+                    throw new IOException("El archivo supera el límite permitido de " + maxWords + " palabras.");
+                }
+            }
+
+            if (words.isEmpty()) {
+                throw new IOException("El archivo no contiene palabras válidas.");
+            }
+
+        } catch (IOException e) {
+            throw new IOException("Error leyendo el archivo CSV: " + e.getMessage(), e);
+        }
+
         return words;
     }
+
 
     /**
      * Funcion que recibe un set de String y genera un fichero .csv con los datos
@@ -36,7 +72,7 @@ public class CsvValidation {
      * @return
      * @throws IOException
      */
-    public ByteArrayOutputStream generateCsvResults(Set<String[]> results) throws IOException {
+    public ByteArrayOutputStream generateCsvResults(Map<String, Boolean> results) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try (OutputStreamWriter writer = new OutputStreamWriter(outputStream);
@@ -49,11 +85,12 @@ public class CsvValidation {
             // Escribir la cabecera del CSV
             csvWriter.writeNext(new String[]{"word", "status"});
 
-            // Escribir los resultados
-            for (String[] result : results) {
-                csvWriter.writeNext(result);
+            for (Map.Entry<String, Boolean> entry : results.entrySet()) {
+                String word = entry.getKey();
+                String exists = entry.getValue() ? "true" : "false";
+                csvWriter.writeNext(new String[]{word, exists});
             }
-            csvWriter.flush(); // Asegurarse de que todo se escriba al buffer
+            csvWriter.flush();
         }
         return outputStream;
     }
