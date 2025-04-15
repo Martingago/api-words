@@ -1,7 +1,7 @@
 package com.martingago.words.controller.words;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.word.response.WordApiResponse;
+import com.martingago.words.dto.docs.WordApiResponseExample;
 import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
@@ -34,7 +34,7 @@ public class DailyWordController {
                     @ApiResponse(responseCode = "200",
                             description = "Ok",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = WordApiResponse.class))),
+                                    schema = @Schema(implementation = WordApiResponseExample.class))),
                     @ApiResponse(responseCode = "400",
                             description = "Bad request"),
                     @ApiResponse(responseCode = "500",

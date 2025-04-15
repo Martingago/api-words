@@ -3,8 +3,7 @@ package com.martingago.words.controller.words.validation;
 
 import com.martingago.words.domain.service.word.CheckWordsInBatchesService;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.word.response.WordApiResponse;
-import com.martingago.words.dto.word.response.WordValidationResponse;
+import com.martingago.words.dto.docs.WordValidationResponseExample;
 import com.martingago.words.utils.CsvValidation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,7 +46,7 @@ public class ValidateWordsFromCSVToDataController {
                     @ApiResponse(responseCode = "200",
                             description = "Ok",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = WordValidationResponse.class))),
+                                    schema = @Schema(implementation = WordValidationResponseExample.class))),
                     @ApiResponse(responseCode = "500",
                             description = "Internal server error")
             })

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "Objeto que indica la relación de una palabra con otra palabra.")
 public class WordRelationDTO {
+
     @Schema(description = "Tipo de relación existente con otra palabra.")
     private RelationEnumType relationType; //Tipo de relación con la palabra.
 

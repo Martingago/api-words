@@ -1,6 +1,5 @@
 package com.martingago.words.dto.global;
 
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +19,7 @@ public class ApiResponseDTO<T> {
     @Schema(description = "Código de mensaje de la solicitud.")
     private Integer serverCode;
 
-    @Schema(description = "Objecto de respuesta de la petición.")
+    @Schema(description = "Objeto de respuesta de la petición.")
     private T responseObject;
 
     @Schema(description = "Momento en el que se ha procesado la petición.")

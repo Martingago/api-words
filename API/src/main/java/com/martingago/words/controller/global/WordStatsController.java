@@ -1,7 +1,7 @@
 package com.martingago.words.controller.global;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.global.stats.StatsApiResponse;
+import com.martingago.words.dto.docs.StatsApiResponseExample;
 import com.martingago.words.dto.global.stats.WordStatsDTO;
 import com.martingago.words.domain.service.global.WordsStaticsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ public class WordStatsController {
                     @ApiResponse(responseCode = "200",
                             description = "Ok",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = StatsApiResponse.class))),
+                                    schema = @Schema(implementation = StatsApiResponseExample.class))),
                     @ApiResponse(responseCode = "400",
                             description = "Bad request"),
                     @ApiResponse(responseCode = "500",

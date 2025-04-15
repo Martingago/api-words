@@ -1,7 +1,7 @@
 package com.martingago.words.controller.relations;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.global.ListStringApiResponse;
+import com.martingago.words.dto.docs.ListStringApiResponseExample;
 import com.martingago.words.domain.model.RelationEnumType;
 import com.martingago.words.domain.service.relation.WordRelationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,31 +20,42 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/v1")
-@Tag(   name = "Relaciones de palabras antónimas",
-        description = "Operaciones relacionadas con la búsqueda de relaciones antónimas de palabras con otras.")
+@Tag(   name = "Relaciones de palabras",
+        description = "Operaciones relacionadas con la búsqueda de relaciones antónimas/sinónimas de palabras con otras.")
 public class AntonymsSearchController {
 
     private final WordRelationService wordRelationService;
 
     /**
-     * Controller que recibe como parámetro una palabra y realiza una búsqueda de sus antónimos.
-     * @param word
-     * @return
+     * Controller que recibe como parámetro una palabra y un código de idioma y realiza una búsqueda de sus antónimos.
+     * @param word palabra sobre la que se quieren buscar los antónimos
+     * @param langCode código de idioma de la palabra, por defecto 'esp'
+     * @return ApiResponse que tien un listado con las palabras que mantiene relación de antónimos.
      */
-    @Operation(summary = "/antonyms/{word}",
-            description = "Método 'GET' que busca qué antónimos tiene una palabra.",
+    @Operation(
+            summary = "Obtener antónimos de una palabra",
+            description = "Método 'GET' que busca los antónimos de una palabra concreta en base de datos, permitiendo especificar un código de idioma opcional.",
             responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Ok",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Listado de antónimos encontrados.",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ListStringApiResponse.class))),
-                    @ApiResponse(responseCode = "400",
-                            description = "Bad request"),
-                    @ApiResponse(responseCode = "404",
-                            description = "Not found"),
-                    @ApiResponse(responseCode = "500",
-                            description = "Internal server error")
-            })
+                                    schema = @Schema(implementation = ListStringApiResponseExample.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Parámetro de búsqueda no válido."
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "No se encontraron antónimos para la palabra solicitada."
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Error interno del servidor al procesar la solicitud."
+                    )
+            }
+    )
     @GetMapping("/antonyms/{word}")
     public ResponseEntity<ApiResponseDTO<List<String>>> findAntonymsByWord(
             @Parameter(description = "Palabra de la que se quieren buscar los antónimos.",

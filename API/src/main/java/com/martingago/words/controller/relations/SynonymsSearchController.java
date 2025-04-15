@@ -1,7 +1,7 @@
 package com.martingago.words.controller.relations;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.global.ListStringApiResponse;
+import com.martingago.words.dto.docs.ListStringApiResponseExample;
 import com.martingago.words.domain.model.RelationEnumType;
 import com.martingago.words.domain.service.relation.WordRelationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,31 +21,42 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1")
 @Tag(   name = "Relaciones de palabras",
-        description = "Operaciones relacionadas con la búsqueda de relaciones de palabras con otras.")
+        description = "Operaciones relacionadas con la búsqueda de relaciones antónimas/sinónimas de palabras con otras.")
 public class SynonymsSearchController {
 
 
     private final WordRelationService wordRelationService;
 
     /**
-     * Controller que recibe como parámetro una palabra y realiza una búsqueda de sus sinónimos.
-     * @param word
-     * @return
+     * Controller que recibe como parámetro una palabra y un código de idioma y realiza una búsqueda de sus antónimos.
+     * @param word palabra sobre la que se quieren buscar los sinónimos
+     * @param langCode código de idioma de la palabra, por defecto 'esp'
+     * @return ApiResponse que tien un listado con las palabras que mantiene relación de sinónimos.
      */
-    @Operation(summary = "/synonyms/{word}",
-            description = "Método 'GET' que busca qué sinónimos tiene una palabra.",
+    @Operation(
+            summary = "Obtener sinónimos de una palabra",
+            description = "Método 'GET' que busca los sinónimos de una palabra concreta en base de datos, permitiendo especificar un código de idioma opcional.",
             responses = {
-                    @ApiResponse(responseCode = "200",
-                            description = "Ok",
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Listado de sinónimos encontrados.",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ListStringApiResponse.class))),
-                    @ApiResponse(responseCode = "400",
-                            description = "Bad request"),
-                    @ApiResponse(responseCode = "404",
-                            description = "Not found"),
-                    @ApiResponse(responseCode = "500",
-                            description = "Internal server error")
-            })
+                                    schema = @Schema(implementation = ListStringApiResponseExample.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Parámetro de búsqueda no válido."
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "No se encontraron sinónimos para la palabra solicitada."
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Error interno del servidor al procesar la solicitud."
+                    )
+            }
+    )
     @GetMapping("/synonyms/{word}")
     public ResponseEntity<ApiResponseDTO<List<String>>> findSynonymsByWord(
             @Parameter(description = "Palabra de la que se quieren buscar los sinónimos.",
