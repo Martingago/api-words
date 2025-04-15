@@ -1,13 +1,11 @@
 package com.martingago.words.domain.repository;
 
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
 import com.martingago.words.domain.model.WordModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

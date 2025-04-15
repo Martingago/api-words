@@ -29,7 +29,7 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 @Tag(   name ="Validar palabras",
         description = "Operaciones relacionadas con las validaciones de palabras en la API de WordRadar")
-public class ValidateWordsFromCSVToDataController {
+public class ValidateWordsFromFileToDataController {
 
     private final CsvValidation csvValidation;
     private final CheckWordsInBatchesService checkWordsInBatchesService;

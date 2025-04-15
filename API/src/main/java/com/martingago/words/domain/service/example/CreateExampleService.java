@@ -2,8 +2,7 @@ package com.martingago.words.domain.service.example;
 
 import com.martingago.words.domain.model.WordDefinitionModel;
 import com.martingago.words.domain.model.WordExampleModel;
-import com.martingago.words.dto.WordDefinitionDTO;
-import lombok.RequiredArgsConstructor;
+import com.martingago.words.dto.models.definition.WordDefinitionDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;

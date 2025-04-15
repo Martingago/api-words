@@ -2,8 +2,8 @@ package com.martingago.words.batch.word.procesor;
 
 import com.martingago.words.domain.model.*;
 import com.martingago.words.domain.service.word.CreateWordModelService;
-import com.martingago.words.dto.word.request.WordBatchDTO;
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

@@ -1,12 +1,12 @@
-package com.martingago.words.batch;
+package com.martingago.words.config;
 
-import com.martingago.words.dto.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
 import com.martingago.words.batch.language.reader.LanguageReader;
 import com.martingago.words.batch.language.writer.LanguageWriter;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
 import com.martingago.words.batch.qualification.writer.QualificationWriter;
-import com.martingago.words.batch.word.WordChunkListener;
-import com.martingago.words.batch.word.WordProcessingStepListener;
+import com.martingago.words.batch.word.listener.WordChunkListener;
+import com.martingago.words.batch.word.listener.WordProcessingStepListener;
 import com.martingago.words.batch.word.procesor.WordBatchProcessor;
 import com.martingago.words.batch.word.reader.CustomChunkItemReader;
 import com.martingago.words.batch.word.writer.FilteredWordBatchWriter;
@@ -15,6 +15,7 @@ import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.WordRepository;
 import com.martingago.words.mapper.models.WordMapper;
+import com.martingago.words.utils.JsonLineMapper;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

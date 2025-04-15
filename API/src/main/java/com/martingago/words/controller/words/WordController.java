@@ -4,10 +4,10 @@ import com.martingago.words.context.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.word.request.ScrapWordRequestDTO;
-import com.martingago.words.dto.word.request.BaseWordRequestDTO;
-import com.martingago.words.dto.word.request.FullWordRequestDTO;
-import com.martingago.words.dto.word.request.RelatedWordRequestDTO;
+import com.martingago.words.dto.models.word.request.ScrapWordRequestDTO;
+import com.martingago.words.dto.models.word.request.BaseWordRequestDTO;
+import com.martingago.words.dto.models.word.request.FullWordRequestDTO;
+import com.martingago.words.dto.models.word.request.RelatedWordRequestDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.service.word.WordService;
@@ -19,12 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController

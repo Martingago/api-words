@@ -1,10 +1,9 @@
 package com.martingago.words.mapper.models;
 
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
 import com.martingago.words.domain.model.WordModel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;

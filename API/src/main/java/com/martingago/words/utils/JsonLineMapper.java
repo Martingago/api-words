@@ -1,4 +1,4 @@
-package com.martingago.words.batch;
+package com.martingago.words.utils;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

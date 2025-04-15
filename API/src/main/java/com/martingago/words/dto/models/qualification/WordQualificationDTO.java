@@ -1,4 +1,4 @@
-package com.martingago.words.dto;
+package com.martingago.words.dto.models.qualification;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

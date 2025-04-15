@@ -7,9 +7,9 @@ import com.martingago.words.domain.service.qualification.WordQualificationServic
 import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.word.request.WordBatchDTO;
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import io.swagger.v3.oas.annotations.Hidden;

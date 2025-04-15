@@ -1,7 +1,7 @@
 package com.martingago.words.batch.word.reader;
 
-import com.martingago.words.dto.word.request.WordBatchDTO;
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
 import com.martingago.words.mapper.models.WordMapper;

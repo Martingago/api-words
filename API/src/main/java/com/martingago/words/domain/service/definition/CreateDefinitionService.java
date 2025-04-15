@@ -7,9 +7,9 @@ import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.WordQualificationRepository;
 import com.martingago.words.domain.service.example.CreateExampleService;
 import com.martingago.words.domain.service.relation.CreateWordRelationsService;
-import com.martingago.words.dto.WordDefinitionDTO;
-import com.martingago.words.dto.word.request.WordBatchDTO;
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.definition.WordDefinitionDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

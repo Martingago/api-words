@@ -24,7 +24,7 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 @Tag(   name ="Validar palabras",
         description = "Operaciones relacionadas con las validaciones de palabras en la API de WordRadar")
-public class ValidateWordsFromCSVToDownloadController {
+public class ValidateWordsFromFileToDownloadController {
 
     private final CsvValidation csvValidation;
     private final CheckWordsInBatchesService checkWordsInBatchesService;

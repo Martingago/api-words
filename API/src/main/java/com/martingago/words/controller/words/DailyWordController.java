@@ -2,7 +2,7 @@ package com.martingago.words.controller.words;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordApiResponseExample;
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.service.word.DailyWordService;

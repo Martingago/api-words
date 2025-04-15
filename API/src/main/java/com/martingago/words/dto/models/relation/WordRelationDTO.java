@@ -1,4 +1,4 @@
-package com.martingago.words.dto;
+package com.martingago.words.dto.models.relation;
 
 import com.martingago.words.domain.model.RelationEnumType;
 import io.swagger.v3.oas.annotations.media.Schema;

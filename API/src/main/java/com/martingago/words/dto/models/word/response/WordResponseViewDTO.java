@@ -1,6 +1,6 @@
-package com.martingago.words.dto.word.response;
+package com.martingago.words.dto.models.word.response;
 
-import com.martingago.words.dto.WordDefinitionDTO;
+import com.martingago.words.dto.models.definition.WordDefinitionDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 

@@ -1,6 +1,6 @@
-package com.martingago.words.dto.word.request;
+package com.martingago.words.dto.models.word.request;
 
-import com.martingago.words.dto.WordDefinitionDTO;
+import com.martingago.words.dto.models.definition.WordDefinitionDTO;
 import lombok.*;
 
 import java.util.Set;

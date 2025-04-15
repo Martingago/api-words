@@ -1,9 +1,9 @@
 package com.martingago.words.domain.service.word;
 
 import com.martingago.words.context.WordValidator;
-import com.martingago.words.dto.word.request.WordBatchDTO;
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;

@@ -2,7 +2,7 @@ package com.martingago.words.controller.words.search;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordApiResponseExample;
-import com.martingago.words.dto.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
 import com.martingago.words.domain.service.word.WordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

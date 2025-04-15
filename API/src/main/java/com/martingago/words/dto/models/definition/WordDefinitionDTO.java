@@ -1,11 +1,10 @@
-package com.martingago.words.dto;
+package com.martingago.words.dto.models.definition;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.Set;
 
 @Data

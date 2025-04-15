@@ -2,8 +2,8 @@ package com.martingago.words.domain.service.word;
 
 import com.martingago.words.domain.model.*;
 import com.martingago.words.domain.service.definition.CreateDefinitionService;
-import com.martingago.words.dto.word.request.WordBatchDTO;
-import com.martingago.words.dto.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.WordBatchDTO;
+import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
