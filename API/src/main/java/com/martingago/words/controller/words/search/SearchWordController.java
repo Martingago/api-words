@@ -3,7 +3,7 @@ package com.martingago.words.controller.words.search;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordApiResponseExample;
-import com.martingago.words.dto.models.word.response.WordDTO;
+import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;

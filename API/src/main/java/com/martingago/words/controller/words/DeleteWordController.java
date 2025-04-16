@@ -1,7 +1,7 @@
 package com.martingago.words.controller.words;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.models.word.request.DeleteWordRequestDTO;
+import com.martingago.words.dto.models.word.DeleteWordRequestDTO;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.service.word.WordService;
 import io.swagger.v3.oas.annotations.Hidden;

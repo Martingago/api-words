@@ -1,8 +1,7 @@
 package com.martingago.words.client;
 
 import com.martingago.words.config.FeignConfig;
-import com.martingago.words.dto.models.word.request.ScrapWordRequestDTO;
-import com.martingago.words.dto.models.word.request.BaseWordRequestDTO;
+import com.martingago.words.dto.microservices.word.external.ExternalBaseWordDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,9 +13,9 @@ public interface MyScrapWordClient {
 
     /**
      * Emplea el microservicio para manejar una palabra
-     * @param scrapWordRequestDTO
+     * @param word palabra a procesar
      * @return
      */
     @PostMapping("/procesar-palabra")
-    BaseWordRequestDTO procesarPalabra(@RequestBody ScrapWordRequestDTO scrapWordRequestDTO);
+    ExternalBaseWordDTO procesarPalabra(@RequestBody String word);
 }

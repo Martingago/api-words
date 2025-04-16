@@ -8,8 +8,8 @@ import com.martingago.words.domain.repository.WordQualificationRepository;
 import com.martingago.words.domain.service.example.CreateExampleService;
 import com.martingago.words.domain.service.relation.CreateWordRelationsService;
 import com.martingago.words.dto.models.definition.WordDefinitionDTO;
-import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
-import com.martingago.words.dto.models.word.response.WordDTO;
+import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.WordDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -13,7 +13,7 @@ import com.martingago.words.domain.model.LanguageModel;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.WordRepository;
-import com.martingago.words.dto.models.word.response.WordDTO;
+import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.utils.JsonLineMapper;
 import jakarta.persistence.EntityManagerFactory;

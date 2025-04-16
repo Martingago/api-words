@@ -1,6 +1,6 @@
 package com.martingago.words.batch.word.listener;
 
-import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
 import com.martingago.words.domain.model.WordModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.ExitStatus;

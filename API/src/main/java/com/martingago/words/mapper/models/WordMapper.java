@@ -1,7 +1,7 @@
 package com.martingago.words.mapper.models;
 
-import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
-import com.martingago.words.dto.models.word.response.WordDTO;
+import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.domain.model.WordModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

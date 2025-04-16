@@ -1,7 +1,7 @@
 package com.martingago.words.dto.docs;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.models.word.response.WordDTO;
+import com.martingago.words.dto.models.word.WordDTO;
 
 /**
  * Clase que se usa como objeto de la documentación para devolver una palabra completa (palabra + definiciones).

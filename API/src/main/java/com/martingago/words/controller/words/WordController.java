@@ -4,10 +4,9 @@ import com.martingago.words.context.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.models.word.request.ScrapWordRequestDTO;
-import com.martingago.words.dto.models.word.request.BaseWordRequestDTO;
-import com.martingago.words.dto.models.word.request.FullWordRequestDTO;
-import com.martingago.words.dto.models.word.request.RelatedWordRequestDTO;
+import com.martingago.words.dto.microservices.word.external.ExternalBaseWordDTO;
+import com.martingago.words.dto.microservices.word.external.WordDTOExternal;
+import com.martingago.words.dto.microservices.word.external.RelatedWordDTOExternal;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.service.word.WordService;
@@ -51,10 +50,10 @@ public class WordController {
      */
     @Hidden
     @PostMapping("/scrap-word")
-    public ResponseEntity<ApiResponseDTO<Object>> scrapWord(@RequestBody ScrapWordRequestDTO scrapWordRequestDTO) {
-        String baseWord = scrapWordRequestDTO.getWord();
+    public ResponseEntity<ApiResponseDTO<Object>> scrapWord(@RequestBody String word) {
+
         //Antes de iniciar el proceso de scrapping comprueba que la palabra no exista y si existe que sea un placeholder:
-        WordValidator wordValidator = wordService.isWordLocatedAndNotPlaceholder(baseWord);
+        WordValidator wordValidator = wordService.isWordLocatedAndNotPlaceholder(word);
 
         if (wordValidator.isExists()) {
             return ApiResponseDTO.build(
@@ -67,19 +66,19 @@ public class WordController {
         }
 
         //Si no encuentra la palabra usa el micro-servicio > procesa > sube palabra
-        BaseWordRequestDTO baseWordRequestDTO = myScrapWordClient.procesarPalabra(scrapWordRequestDTO);
+        ExternalBaseWordDTO externalBaseWordDTO = myScrapWordClient.procesarPalabra(word);
         // Comprueba si lo que recibe del microservicio es una full o related word
-        if (baseWordRequestDTO instanceof RelatedWordRequestDTO) {
-            RelatedWordRequestDTO relatedWordResponse = (RelatedWordRequestDTO) baseWordRequestDTO;
+        if (externalBaseWordDTO instanceof RelatedWordDTOExternal) {
+            RelatedWordDTOExternal relatedWordResponse = (RelatedWordDTOExternal) externalBaseWordDTO;
             return ApiResponseDTO.build(
                     false,
-                    "Couldn't add word '" + baseWord + "', did you mean: '" + relatedWordResponse.getRelatedWord() + "'?",
+                    "Couldn't add word '" + word + "', did you mean: '" + relatedWordResponse.getRelatedWord() + "'?",
                     HttpStatus.UNPROCESSABLE_ENTITY.value(),
                     relatedWordResponse,
                     HttpStatus.UNPROCESSABLE_ENTITY
             );
-        } else if (baseWordRequestDTO instanceof FullWordRequestDTO) {
-            FullWordRequestDTO fullWordResponseDTO = (FullWordRequestDTO) baseWordRequestDTO;
+        } else if (externalBaseWordDTO instanceof WordDTOExternal) {
+            WordDTOExternal fullWordResponseDTO = (WordDTOExternal) externalBaseWordDTO;
 
             WordModel wordModel = null;
             //WordModel wordModel = createWordModelService.processWordDTOintoWordModel(fullWordResponseDTO);
@@ -96,7 +95,7 @@ public class WordController {
                 false,
                 "Invalid Object to upload on database",
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                baseWordRequestDTO,
+                externalBaseWordDTO,
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }

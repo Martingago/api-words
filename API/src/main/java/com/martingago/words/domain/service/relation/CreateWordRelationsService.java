@@ -2,7 +2,7 @@ package com.martingago.words.domain.service.relation;
 
 import com.martingago.words.domain.model.*;
 import com.martingago.words.dto.models.definition.WordDefinitionDTO;
-import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
