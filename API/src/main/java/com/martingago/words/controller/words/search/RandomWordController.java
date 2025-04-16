@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -26,22 +26,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 @Tag(   name ="Buscar palabras",
         description = "Operaciones relacionadas con la búsqueda de palabras en la API de WordRadar")
-public class SearchWordController {
+public class RandomWordController {
 
     private final WordService wordService;
 
     /**
-     * Busca en la base de datos una palabra
-     * @param word string de la palabra que se quiere buscar en la base de datos
-     * @return Objeto ApiResponseDTO que contiene la información de la palabra encontrada.
+     * Obtiene una palabra aleatoria de toda la base de datos de palabras
+     *
+     * @param wordLength tamaño de la palabra que se quiere obtener aleatoriamente
+     * @return Objeto ApiResponseDTO que contiene la información de la palabra aleatoria obtenida.
      */
     @Operation(
-            summary = "Buscar una palabra en base de datos",
-            description = "Método 'GET' que busca una palabra específica en la base de datos de WordRadar y devuelve su información completa si está registrada.",
+            summary = "Obtener una palabra aleatoria",
+            description = "Método 'GET' que obtiene una palabra aleatoria de la base de datos de la API de WordRadar. El tamaño de la palabra se puede especificar (opcionalmente).",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Palabra encontrada con éxito.",
+                            description = "Palabra aleatoria obtenida correctamente.",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = WordApiResponseExample.class)
@@ -49,7 +50,7 @@ public class SearchWordController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "Parámetro de búsqueda no válido.",
+                            description = "Petición mal formada.",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = WordErrorApiResponseExample.class),
@@ -60,20 +61,8 @@ public class SearchWordController {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "No se encontró la palabra solicitada.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = WordErrorApiResponseExample.class),
-                                    examples = @ExampleObject(
-                                            name = "Error 404",
-                                            value = ApiErrorExamples.ERROR_404
-                                    )
-                            )
-                    ),
-                    @ApiResponse(
                             responseCode = "500",
-                            description = "Error interno del servidor.",
+                            description = "Error interno del servidor al procesar la solicitud.",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = WordErrorApiResponseExample.class),
@@ -85,19 +74,18 @@ public class SearchWordController {
                     )
             }
     )
-    @GetMapping("/search/{word}")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> findWordByName(
-            @Parameter(description = "Palabra que se desea buscar en la base de datos de WordRadar.",
-                    required = true,
-                    example = "piedra")
-            @PathVariable String word
+    @GetMapping("/word")
+    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getRandomWord(
+            @Parameter(description = "Longitud de la palabra aleatoria",
+                    required = false,
+                    example = "5")
+            @RequestParam(value = "length", required = false) Integer wordLength
     ) {
-        WordResponseViewDTO wordResponseViewDTO = wordService.getWordByName(word);
+        WordResponseViewDTO wordResponseViewDTO = wordService.getRandomWord(wordLength);
         return ApiResponseDTO.build(true,
                 "Word successfully founded",
                 HttpStatus.OK.value(),
                 wordResponseViewDTO,
                 HttpStatus.OK);
     }
-
 }

@@ -25,7 +25,7 @@ public class ApiErrorExamples {
     public static final String ERROR_500 = """
         {
           "status": false,
-          "message": "Example internal error 400",
+          "message": "Example internal error 500",
           "serverCode": 500,
           "responseObject": null,
           "timeStamp": "2025-04-15T12:00:00Z"
