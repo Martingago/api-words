@@ -6,6 +6,7 @@ import com.martingago.words.domain.service.language.LanguageService;
 import com.martingago.words.domain.service.qualification.WordQualificationService;
 import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.domain.service.word.WordService;
+import com.martingago.words.dto.docs.WordApiResponseExample;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
@@ -57,7 +58,7 @@ public class AddWordController {
                             description = "Palabra añadida correctamente.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = WordDTO.class)
+                                    schema = @Schema(implementation = WordApiResponseExample.class)
                             )
                     ),
                     @ApiResponse(
