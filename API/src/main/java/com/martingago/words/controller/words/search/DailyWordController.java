@@ -3,7 +3,7 @@ package com.martingago.words.controller.words.search;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordApiResponseExample;
-import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.service.word.DailyWordService;
@@ -72,13 +72,13 @@ public class DailyWordController {
     )
 
     @GetMapping("/daily")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getDailyWord() {
+    public ResponseEntity<ApiResponseDTO<WordDTO>> getDailyWord() {
         WordModel wordModel = dailyWordService.getDailyWord();
-        WordResponseViewDTO wordResponseViewDTO = wordMapper.toResponseDTO(wordModel);
+        WordDTO wordDTO = wordMapper.toResponseDTO(wordModel);
         return ApiResponseDTO.build(true,
                 "Daily word founded",
                 HttpStatus.OK.value(),
-                wordResponseViewDTO,
+                wordDTO,
                 HttpStatus.OK);
     }
 }

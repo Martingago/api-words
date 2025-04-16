@@ -1,6 +1,6 @@
 package com.martingago.words.batch.word.listener;
 
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
 import com.martingago.words.domain.model.WordModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.ExitStatus;
@@ -19,7 +19,7 @@ public class WordProcessingStepListener implements StepExecutionListener {
     @Override
     public void beforeStep(StepExecution stepExecution) {
         ExecutionContext context = stepExecution.getExecutionContext();
-        context.put("wordBatchMap", new HashMap<String, WordBatchReferenceDTO>());
+        context.put("wordBatchMap", new HashMap<String, SimpleWordSerializableDTO>());
         context.put("newWordsToPersistMap", new HashMap<String, WordModel>());
     }
 

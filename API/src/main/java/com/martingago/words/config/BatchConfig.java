@@ -1,6 +1,5 @@
 package com.martingago.words.config;
 
-import com.martingago.words.dto.models.word.request.WordBatchDTO;
 import com.martingago.words.batch.language.reader.LanguageReader;
 import com.martingago.words.batch.language.writer.LanguageWriter;
 import com.martingago.words.batch.qualification.reader.QualificationReader;
@@ -14,6 +13,7 @@ import com.martingago.words.domain.model.LanguageModel;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.WordRepository;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.utils.JsonLineMapper;
 import jakarta.persistence.EntityManagerFactory;
@@ -53,22 +53,22 @@ public class BatchConfig {
 
     @Bean
     @StepScope
-    public FlatFileItemReader<WordBatchDTO> itemReader(
+    public FlatFileItemReader<WordDTO> itemReader(
             @Value("#{jobParameters['filePath']}") String filePath
     ) {
-        FlatFileItemReader<WordBatchDTO> reader = new FlatFileItemReader<>();
+        FlatFileItemReader<WordDTO> reader = new FlatFileItemReader<>();
         if(filePath != null){
             reader.setResource(new FileSystemResource(filePath));
         }else{
             return  null;
         }
-        reader.setLineMapper(new JsonLineMapper<>(WordBatchDTO.class));
+        reader.setLineMapper(new JsonLineMapper<>(WordDTO.class));
         return reader;
     }
 
     @Bean
     @StepScope
-    public CustomChunkItemReader customChunkItemReader(FlatFileItemReader<WordBatchDTO> itemReader,
+    public CustomChunkItemReader customChunkItemReader(FlatFileItemReader<WordDTO> itemReader,
                                                        WordRepository wordRepository,
                                                        WordMapper wordMapper) {
         return new CustomChunkItemReader(itemReader, wordRepository, wordMapper);
@@ -122,7 +122,7 @@ public class BatchConfig {
     @Bean
     public Step addWordStep(CustomChunkItemReader customChunkItemReader) {
         return new StepBuilder("insertWordsIntoDatabase", jobRepository)
-                .<WordBatchDTO, WordModel>chunk(100, transactionManager)
+                .<WordDTO, WordModel>chunk(100, transactionManager)
                 .reader(customChunkItemReader)
                 .processor(wordBatchProcessor)
                 .writer(filteredWordWriter())

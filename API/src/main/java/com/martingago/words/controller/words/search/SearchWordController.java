@@ -3,7 +3,7 @@ package com.martingago.words.controller.words.search;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordApiResponseExample;
-import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,17 +86,17 @@ public class SearchWordController {
             }
     )
     @GetMapping("/search/{word}")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> findWordByName(
+    public ResponseEntity<ApiResponseDTO<WordDTO>> findWordByName(
             @Parameter(description = "Palabra que se desea buscar en la base de datos de WordRadar.",
                     required = true,
                     example = "piedra")
             @PathVariable String word
     ) {
-        WordResponseViewDTO wordResponseViewDTO = wordService.getWordByName(word);
+        WordDTO wordDTO = wordService.getWordByName(word);
         return ApiResponseDTO.build(true,
                 "Word successfully founded",
                 HttpStatus.OK.value(),
-                wordResponseViewDTO,
+                wordDTO,
                 HttpStatus.OK);
     }
 

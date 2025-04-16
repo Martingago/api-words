@@ -1,9 +1,8 @@
 package com.martingago.words.domain.service.word;
 
 import com.martingago.words.context.WordValidator;
-import com.martingago.words.dto.models.word.request.WordBatchDTO;
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
-import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
@@ -35,9 +34,9 @@ public class WordService {
     /**
      * Busca una palabra en la base de datos.
      * @param word palabra que se quiere buscar
-     * @return WordResponseViewDTO
+     * @return WordDTO
      */
-    public WordResponseViewDTO getWordByName(String word){
+    public WordDTO getWordByName(String word){
         WordModel wordModel = wordRepository.findByWordWithRelations(word)
                 .orElseThrow( () ->
                         new EntityNotFoundException("Word " + word + " was not founded on database"));
@@ -48,7 +47,7 @@ public class WordService {
      * Obtiene una palabra aleatoria de la base de datos bajo un código de idioma establecido.
      * @return
      */
-    public WordResponseViewDTO getRandomWord(Integer wordLength){
+    public WordDTO getRandomWord(Integer wordLength){
         Long id = wordRepository.findRandomWordId(wordLength);
         WordModel wordModel = wordRepository.findWordById(id)
                 .orElseThrow(() ->
@@ -96,28 +95,29 @@ public class WordService {
 
     /**
      * Recibe un WordBatchDTO, extrae string de palabras con las que tiene relación, y las busca en la base de datos.
-     * Devuelve un map de WordBatchReferenceDTO con la información encontrada.
-     * @param wordBatchDTO objeto sobre el que se quiere realizar la búsqueda.
+     * Devuelve un map de SimpleWordSerializableDTO con la información encontrada.
+     *
+     * @param wordDTO objeto sobre el que se quiere realizar la búsqueda.
      * @return
      */
-    public Map<String, WordBatchReferenceDTO> findReferencesFromWordDTO(WordBatchDTO wordBatchDTO){
+    public Map<String, SimpleWordSerializableDTO> findReferencesFromWordDTO(WordDTO wordDTO){
         // Extraemos las palabras, sinónimos y antónimos
         Set<String> wordsToFetch = new HashSet<>();
-        wordsToFetch.add(wordBatchDTO.getWord());
+        wordsToFetch.add(wordDTO.getWord());
 
-        wordBatchDTO.getDefinitions().forEach(definition -> {
+        wordDTO.getDefinitions().forEach(definition -> {
             if (definition.getSynonyms() != null) wordsToFetch.addAll(definition.getSynonyms());
             if (definition.getAntonyms() != null) wordsToFetch.addAll(definition.getAntonyms());
         });
 
-        // Si hay palabras, las buscamos y las convertimos a Map<String, WordBatchReferenceDTO>
+        // Si hay palabras, las buscamos y las convertimos a Map<String, SimpleWordSerializableDTO>
         if (!wordsToFetch.isEmpty()) {
             Set<WordModel> existingWordModels = wordRepository.findWordModelIn(wordsToFetch);
 
             return existingWordModels.stream()
                     .collect(Collectors.toMap(
                             WordModel::getWord, // clave → el string de la palabra
-                            word -> WordBatchReferenceDTO.builder()
+                            word -> SimpleWordSerializableDTO.builder()
                                     .id(word.getId())
                                     .word(word.getWord())
                                     .isPlaceholder(word.isPlaceholder())

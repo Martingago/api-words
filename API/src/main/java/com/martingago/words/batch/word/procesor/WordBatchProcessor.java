@@ -2,8 +2,8 @@ package com.martingago.words.batch.word.procesor;
 
 import com.martingago.words.domain.model.*;
 import com.martingago.words.domain.service.word.CreateWordModelService;
-import com.martingago.words.dto.models.word.request.WordBatchDTO;
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel>, ItemStream {
+public class WordBatchProcessor implements ItemProcessor<WordDTO, WordModel>, ItemStream {
 
     private final CreateWordModelService createWordModelService;
 
@@ -28,7 +28,7 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
     private Map<String, LanguageModel> languageMap = new HashMap<>(); //Memoria local idiomas existentes.
     private Map<String, WordQualificationModel> qualificationMap = new HashMap<>(); //Memoria local qualifications existentes
     private Map<String, WordModel> newWordsModelToPersist = new HashMap<>(); //Memoria local palabras relacionadas a persistir
-    private Map<String, WordBatchReferenceDTO> existingDBWordsMap = new HashMap<>(); //Memoria local palabras existentes
+    private Map<String, SimpleWordSerializableDTO> existingDBWordsMap = new HashMap<>(); //Memoria local palabras existentes
 
     private ExecutionContext executionContext;
 
@@ -43,9 +43,9 @@ public class WordBatchProcessor implements ItemProcessor<WordBatchDTO, WordModel
     }
 
     @Override
-    public WordModel process(WordBatchDTO item) throws Exception {
+    public WordModel process(WordDTO item) throws Exception {
         // Recuperamos el mapa previamente almacenado en el ExecutionContext
-        existingDBWordsMap = (Map<String, WordBatchReferenceDTO>) this.executionContext.get("wordBatchMap");
+        existingDBWordsMap = (Map<String, SimpleWordSerializableDTO>) this.executionContext.get("wordBatchMap");
         newWordsModelToPersist = (Map<String, WordModel>) this.executionContext.get("newWordsToPersistMap");
 
         try{

@@ -8,13 +8,11 @@ import com.martingago.words.domain.service.word.CreateWordModelService;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.models.word.request.WordBatchDTO;
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
-import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -46,8 +44,9 @@ public class AddWordController {
 
     /**
      * Añade una palabra a la base de datos
-     * @param wordBatchDTO objeto DTO que se quiere añadir a la base de datos.
-     * @return ApiResponseDTO que contiene un WordResponseViewDTO con la información que se ha añadido en la base de datos.
+     *
+     * @param wordDTO objeto DTO que se quiere añadir a la base de datos.
+     * @return ApiResponseDTO que contiene un WordDTO con la información que se ha añadido en la base de datos.
      */
     @Operation(
             summary = "Añadir una nueva palabra",
@@ -58,7 +57,7 @@ public class AddWordController {
                             description = "Palabra añadida correctamente.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = WordResponseViewDTO.class)
+                                    schema = @Schema(implementation = WordDTO.class)
                             )
                     ),
                     @ApiResponse(
@@ -88,16 +87,16 @@ public class AddWordController {
             }
     )
     @PostMapping("/add-word")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> insertWord(
-            @RequestBody @Valid WordBatchDTO wordBatchDTO){
+    public ResponseEntity<ApiResponseDTO<WordDTO>> insertWord(
+            @RequestBody @Valid WordDTO wordDTO){
 
         Map<String, LanguageModel> languageModelMap = languageService.getAllLanguagesMappedByLangCode(); //Obtiene información de los idiomas de la base de datos.
         Map<String, WordQualificationModel> wordQualificationModelMap = wordQualificationService.getAllQualificationsMapped(); //Obtiene información de las qualifications de la base de datos.
         Map<String, WordModel> newWordsModelToPersist = new HashMap<>(); //Instancia un map de palabras relacionadas que van a ser persistidas
-        Map<String, WordBatchReferenceDTO> existingDBWordsMap = wordService.findReferencesFromWordDTO(wordBatchDTO); //Busca palabras relacionadas existentes en la Base de datos.
+        Map<String, SimpleWordSerializableDTO> existingDBWordsMap = wordService.findReferencesFromWordDTO(wordDTO); //Busca palabras relacionadas existentes en la Base de datos.
 
         //Obtiene el objeto WordModel procesado que contendrá la información de sus atributos.
-        WordModel wordModel = createWordModelService.processWordDTOintoWordModel(wordBatchDTO,
+        WordModel wordModel = createWordModelService.processWordDTOintoWordModel(wordDTO,
                 languageModelMap,
                 wordQualificationModelMap,
                 newWordsModelToPersist,
@@ -108,11 +107,11 @@ public class AddWordController {
         WordModel insertedWord = wordService.saveWordModel(wordModel);
 
         //Devuelve el objeto procesado al usuario.
-        WordResponseViewDTO updatedWordResponseViewDTO = wordMapper.toResponseDTO(insertedWord);
+        WordDTO updatedWordDTO = wordMapper.toResponseDTO(insertedWord);
         return ApiResponseDTO.build(true,
                 "Word successfully created",
                 HttpStatus.CREATED.value(),
-                updatedWordResponseViewDTO,
+                updatedWordDTO,
                 HttpStatus.CREATED);
     }
 

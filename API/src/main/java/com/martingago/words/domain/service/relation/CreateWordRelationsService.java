@@ -2,7 +2,7 @@ package com.martingago.words.domain.service.relation;
 
 import com.martingago.words.domain.model.*;
 import com.martingago.words.dto.models.definition.WordDefinitionDTO;
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class CreateWordRelationsService {
     public void processSynonyms(WordDefinitionDTO defDto,
                                  WordDefinitionModel wordDefinitionModel,
                                  Map<String, WordModel> newWordsModelToPersist,
-                                 Map<String, WordBatchReferenceDTO> existingDBWordsMap
+                                 Map<String, SimpleWordSerializableDTO> existingDBWordsMap
                                  ) {
         if (defDto.getSynonyms() != null && !defDto.getSynonyms().isEmpty()) {
             //Obtiene el listado de entidades con las que tiene relación de sinónimo.
@@ -56,7 +56,7 @@ public class CreateWordRelationsService {
     public void processAntonyms(WordDefinitionDTO defDto,
                                  WordDefinitionModel wordDefinitionModel,
                                  Map<String, WordModel> newWordsModelToPersist,
-                                 Map<String, WordBatchReferenceDTO> existingDBWordsMap
+                                 Map<String, SimpleWordSerializableDTO> existingDBWordsMap
     ) {
         if (defDto.getAntonyms() != null && !defDto.getAntonyms().isEmpty()) {
             Set<WordModel> antonymWords = processRelatedWords(
@@ -83,7 +83,7 @@ public class CreateWordRelationsService {
     private Set<WordModel> processRelatedWords(Set<String> relatedWords,
                                                LanguageModel language,
                                                Map<String, WordModel> newWordsModelToPersist,
-                                               Map<String, WordBatchReferenceDTO> existingDBWordsMap) {
+                                               Map<String, SimpleWordSerializableDTO> existingDBWordsMap) {
 
         Set<WordModel> relatedWordEntities = new HashSet<>();
 
@@ -92,7 +92,7 @@ public class CreateWordRelationsService {
             WordModel relatedWord = Optional.ofNullable(newWordsModelToPersist.get(related))
                     .orElseGet(() -> {
                         //Si la entiad existe en la base de datos, se obtiene su referencia
-                        WordBatchReferenceDTO ref = existingDBWordsMap.get(related);
+                        SimpleWordSerializableDTO ref = existingDBWordsMap.get(related);
                         if (ref != null) {
                             return entityManager.getReference(WordModel.class, ref.getId());
                         } else {

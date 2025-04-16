@@ -1,9 +1,9 @@
 package com.martingago.words.batch.word.reader;
 
-import com.martingago.words.dto.models.word.request.WordBatchDTO;
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.repository.WordRepository;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -17,16 +17,16 @@ import java.util.stream.Collectors;
 
 @StepScope
 @RequiredArgsConstructor
-public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
+public class CustomChunkItemReader implements ItemStreamReader<WordDTO> {
 
-    private final FlatFileItemReader<WordBatchDTO> delegate;
+    private final FlatFileItemReader<WordDTO> delegate;
     private final WordRepository wordRepository;
     private final WordMapper wordMapper;
 
-    private List<WordBatchDTO> chunkBuffer = new ArrayList<>();
+    private List<WordDTO> chunkBuffer = new ArrayList<>();
     private Set<String> wordsToFetch = new HashSet<>();
     private Map<String, WordModel> newWordsToPersist = new HashMap<>();
-    private Iterator<WordBatchDTO> currentChunkIterator;
+    private Iterator<WordDTO> currentChunkIterator;
 
     private ExecutionContext executionContext;
 
@@ -37,7 +37,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
     }
 
     @Override
-    public WordBatchDTO read() throws Exception {
+    public WordDTO read() throws Exception {
         // Si aún quedan elementos en el chunk, retornamos el siguiente
         if (currentChunkIterator != null && currentChunkIterator.hasNext()) {
             return currentChunkIterator.next();
@@ -48,7 +48,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
         wordsToFetch.clear();
 
         // Cargamos hasta 100 elementos en el buffer
-        WordBatchDTO item;
+        WordDTO item;
 
 
         while (chunkBuffer.size() < 100 && (item = delegate.read()) != null) {
@@ -72,7 +72,7 @@ public class CustomChunkItemReader implements ItemStreamReader<WordBatchDTO> {
 
             Set<WordModel> existingWordModelRefs = wordRepository.findWordModelIn(wordsToFetch);
 
-            Map<String, WordBatchReferenceDTO> wordBatchReferenceDTOMap = existingWordModelRefs.stream()
+            Map<String, SimpleWordSerializableDTO> wordBatchReferenceDTOMap = existingWordModelRefs.stream()
                     .collect(Collectors.toMap(
                             WordModel::getWord,
                             wordMapper::toWordBatchReferenceDTO

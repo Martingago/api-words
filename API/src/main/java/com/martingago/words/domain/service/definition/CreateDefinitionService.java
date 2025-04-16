@@ -8,8 +8,8 @@ import com.martingago.words.domain.repository.WordQualificationRepository;
 import com.martingago.words.domain.service.example.CreateExampleService;
 import com.martingago.words.domain.service.relation.CreateWordRelationsService;
 import com.martingago.words.dto.models.definition.WordDefinitionDTO;
-import com.martingago.words.dto.models.word.request.WordBatchDTO;
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,11 +35,11 @@ public class CreateDefinitionService {
      * @param newWordsModelToPersist Palabras relacionadas acumuladas (placeholders) que van a ser persistidas en la inserción.
      * @param existingDBWordsMap Referencias de las palabras que ya existen en la base de datos
      */
-    public void processDefinitions(WordBatchDTO dto,
-                                    WordModel wordModel,
-                                    Map<String, WordQualificationModel> qualificationMap,
-                                    Map<String, WordModel> newWordsModelToPersist,
-                                    Map<String, WordBatchReferenceDTO> existingDBWordsMap
+    public void processDefinitions(WordDTO dto,
+                                   WordModel wordModel,
+                                   Map<String, WordQualificationModel> qualificationMap,
+                                   Map<String, WordModel> newWordsModelToPersist,
+                                   Map<String, SimpleWordSerializableDTO> existingDBWordsMap
     ) {
         //wordModel.getWordDefinitionModelSet().clear();
 

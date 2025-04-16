@@ -12,10 +12,10 @@ import java.util.Set;
 @Builder
 
 /**
- * Clase que contiene los datos de una palabra que se envían al front-end
+ * Clase que contiene la información de una palabra
  */
 @Schema(description = "Objeto que contiene la información de una palabra")
-public class WordResponseViewDTO {
+public class WordDTO {
 
     @Schema(description = "String con el código de idioma de la palabra")
     private String language;
@@ -26,6 +26,6 @@ public class WordResponseViewDTO {
     @Schema(description = "Integer con la longitud de carácteres de la palabra")
     private int length;
 
-    @Schema(description = "Listado de objetos 'WordDefinitionDTO' de definiciones de una palabra")
+    @Schema(description = "Listado de objetos de definiciones de una palabra")
     private Set<WordDefinitionDTO> definitions;
 }

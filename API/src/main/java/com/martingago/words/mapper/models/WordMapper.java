@@ -1,7 +1,7 @@
 package com.martingago.words.mapper.models;
 
-import com.martingago.words.dto.models.word.request.WordBatchReferenceDTO;
-import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.request.SimpleWordSerializableDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.domain.model.WordModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,9 +22,9 @@ public class WordMapper {
      * @param wordModel
      * @return
      */
-    public WordResponseViewDTO toResponseDTO(WordModel wordModel){
+    public WordDTO toResponseDTO(WordModel wordModel){
         if(wordModel == null) return null;
-        return WordResponseViewDTO.builder()
+        return WordDTO.builder()
                 .language(wordModel.getLanguageModel().getLangCode())
                 .word(wordModel.getWord())
                 .length(wordModel.getLength())
@@ -34,13 +34,13 @@ public class WordMapper {
     }
 
     /**
-     * Convierte un WordModel en un objeto WordBatchReferenceDTO
+     * Convierte un WordModel en un objeto SimpleWordSerializableDTO
      * @param wordModel entidad de WordModel que se quiere procesar y convertir
      * @return WordReferenceDTO objeto Serializable con la información principal de una palabra.
      */
-    public WordBatchReferenceDTO toWordBatchReferenceDTO(WordModel wordModel){
+    public SimpleWordSerializableDTO toWordBatchReferenceDTO(WordModel wordModel){
         if(wordModel == null) return null;
-        return WordBatchReferenceDTO.builder()
+        return SimpleWordSerializableDTO.builder()
                 .id(wordModel.getId())
                 .word(wordModel.getWord())
                 .isPlaceholder(wordModel.isPlaceholder())
@@ -52,7 +52,7 @@ public class WordMapper {
      * @param wordModelList
      * @return
      */
-    public Set<WordResponseViewDTO> toDTOList(Set<WordModel> wordModelList){
+    public Set<WordDTO> toDTOList(Set<WordModel> wordModelList){
         if(wordModelList == null) return Set.of();
         return wordModelList.stream()
                 .map(this::toResponseDTO)

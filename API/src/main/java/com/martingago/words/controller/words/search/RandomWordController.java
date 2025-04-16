@@ -3,7 +3,7 @@ package com.martingago.words.controller.words.search;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordApiResponseExample;
-import com.martingago.words.dto.models.word.response.WordResponseViewDTO;
+import com.martingago.words.dto.models.word.response.WordDTO;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,17 +75,17 @@ public class RandomWordController {
             }
     )
     @GetMapping("/word")
-    public ResponseEntity<ApiResponseDTO<WordResponseViewDTO>> getRandomWord(
+    public ResponseEntity<ApiResponseDTO<WordDTO>> getRandomWord(
             @Parameter(description = "Longitud de la palabra aleatoria",
                     required = false,
                     example = "5")
             @RequestParam(value = "length", required = false) Integer wordLength
     ) {
-        WordResponseViewDTO wordResponseViewDTO = wordService.getRandomWord(wordLength);
+        WordDTO wordDTO = wordService.getRandomWord(wordLength);
         return ApiResponseDTO.build(true,
                 "Word successfully founded",
                 HttpStatus.OK.value(),
-                wordResponseViewDTO,
+                wordDTO,
                 HttpStatus.OK);
     }
 }
