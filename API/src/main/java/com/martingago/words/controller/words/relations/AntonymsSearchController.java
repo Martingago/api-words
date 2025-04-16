@@ -51,8 +51,7 @@ public class AntonymsSearchController {
                             description = "Parámetro de búsqueda no válido.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = WordErrorApiResponseExample.class),
-                                    examples =
-                                    @ExampleObject(
+                                    examples = @ExampleObject(
                                             name = "Error 400",
                                             value = ApiErrorExamples.ERROR_400
                                     ))
@@ -62,8 +61,7 @@ public class AntonymsSearchController {
                             description = "No se encontraron antónimos para la palabra solicitada.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = WordErrorApiResponseExample.class),
-                                    examples =
-                                    @ExampleObject(
+                                    examples = @ExampleObject(
                                             name = "Error 404",
                                             value = ApiErrorExamples.ERROR_404
                                     ))
@@ -73,8 +71,7 @@ public class AntonymsSearchController {
                             description = "Error interno del servidor al procesar la solicitud.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = WordErrorApiResponseExample.class),
-                                    examples =
-                                    @ExampleObject(
+                                    examples = @ExampleObject(
                                             name = "Error 500",
                                             value = ApiErrorExamples.ERROR_500
                                     ))

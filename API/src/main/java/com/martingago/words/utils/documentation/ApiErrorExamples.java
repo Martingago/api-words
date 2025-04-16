@@ -12,6 +12,16 @@ public class ApiErrorExamples {
         }
         """;
 
+    public static final String ERROR_401 = """
+        {
+          "status": false,
+          "message": "Example error 401, invalid credentials",
+          "serverCode": 401,
+          "responseObject": null,
+          "timeStamp": "2025-04-15T12:00:00Z"
+        }
+        """;
+
     public static final String ERROR_404 = """
         {
           "status": false,

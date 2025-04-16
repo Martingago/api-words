@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Estadísticas del API", description = "Operaciones relacionadas con obtener las estadísticas del API.")
+@Tag(name = "Estadísticas del API",
+        description = "Operaciones relacionadas con obtener las estadísticas del API.")
 public class WordStatsController {
 
     private final WordsStaticsService wordsStaticsService;
