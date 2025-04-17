@@ -24,7 +24,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(value = IOException.class)
     public ResponseEntity<ApiResponseDTO<Object>> handleIOException(IOException ex) {
-        return ApiResponseDTO.error(ex.getMessage(), 500, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ApiResponseDTO.error(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = DuplicateKeyException.class)

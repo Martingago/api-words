@@ -1,9 +1,13 @@
 package com.martingago.words.controller.words.validation;
 
 import com.martingago.words.domain.service.word.CheckWordsInBatchesService;
+import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.utils.CsvValidation;
+import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotEmpty;
@@ -32,16 +36,49 @@ public class ValidateWordsFromJsonToDownloadController {
 
     @Operation(
             summary = "Validar palabras desde un body JSON y devolver resultado en CSV",
-            description = "Recibe un body application/json con un listado de palabras, valida su existencia en base de datos y devuelve un fichero CSV con el resultado. El archivo resultante contiene dos columnas: 'word' y 'exists', indicando si cada palabra existe en base de datos.",
+            description = """
+        Recibe un body application/json con un array de palabras, valida su existencia en base de datos y devuelve un fichero CSV descargable con los resultados.
+
+        📥 Formato de entrada:
+        - Content-Type: application/json
+        - Estructura: array de strings
+ 
+        📑 Formato de archivo de salida:
+        - CSV con dos columnas: 'word' y 'status'
+        - 'word': palabra original
+        - 'status': true o false según exista o no en la base de datos
+        """,
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Archivo CSV generado correctamente con los resultados de la validación.",
-                            content = @Content(mediaType = "application/octet-stream")
+                            content = @Content(
+                                    mediaType = "application/octet-stream"
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Body inválido. Array vacío, mal formateado o inexistente.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WordErrorApiResponseExample.class),
+                                    examples = @ExampleObject(
+                                            name = "Error 400",
+                                            value = ApiErrorExamples.ERROR_400
+                                    )
+                            )
                     ),
                     @ApiResponse(
                             responseCode = "500",
-                            description = "Error interno del servidor al procesar la solicitud."
+                            description = "Error interno del servidor al procesar la solicitud.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WordErrorApiResponseExample.class),
+                                    examples = @ExampleObject(
+                                            name = "Error 500",
+                                            value = ApiErrorExamples.ERROR_500
+                                    )
+                            )
                     )
             }
     )

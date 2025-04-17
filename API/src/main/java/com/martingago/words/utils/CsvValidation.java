@@ -1,7 +1,7 @@
 package com.martingago.words.utils;
 
+import com.martingago.words.exceptions.CustomExceptions;
 import com.opencsv.CSVWriter;
-import org.hibernate.sql.ast.tree.predicate.BooleanExpressionPredicate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,12 +23,12 @@ public class CsvValidation {
      */
     public Set<String> readWordsFromCsv(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
-            throw new IOException("El archivo está vacío.");
+            throw new CustomExceptions.FileEmptyException("El archivo está vacío.");
         }
 
         String contentType = file.getContentType();
         if (contentType == null || (!contentType.equals("text/csv") && !contentType.equals("text/plain"))) {
-            throw new IOException("Tipo de archivo no soportado: " + contentType);
+            throw new CustomExceptions.UnsupportedFileTypeException("Tipo de archivo no soportado: " + contentType);
         }
 
         Set<String> words = new HashSet<>();
@@ -50,12 +50,12 @@ public class CsvValidation {
 
                 count++;
                 if (count > maxWords) {
-                    throw new IOException("El archivo supera el límite permitido de " + maxWords + " palabras.");
+                    throw new CustomExceptions.WordLimitExceededException("El archivo supera el límite permitido de " + maxWords + " palabras.");
                 }
             }
 
             if (words.isEmpty()) {
-                throw new IOException("El archivo no contiene palabras válidas.");
+                throw new CustomExceptions.NoValidWordsException("El archivo no contiene palabras válidas.");
             }
 
         } catch (IOException e) {
