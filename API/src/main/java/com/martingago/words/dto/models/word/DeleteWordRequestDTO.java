@@ -14,9 +14,9 @@ import lombok.NonNull;
 @Schema(description = "Objeto utilizado para eliminar palabras correctamente de la base de datos asociadas a un idioma.")
 public class DeleteWordRequestDTO {
     @NonNull
-    @Schema(description = "String con el código de idioma de la palabra")
+    @Schema(description = "String con el código de idioma de la palabra", example = "esp")
     private String langCode;
     @NonNull
-    @Schema(description = "String con el texto de la palabra a eliminar")
+    @Schema(description = "String con el texto de la palabra a eliminar", example = "duro")
     private String word;
 }
