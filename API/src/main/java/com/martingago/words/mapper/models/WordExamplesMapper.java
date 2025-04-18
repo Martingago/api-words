@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class WordExamplesMapper {
 
     /**
