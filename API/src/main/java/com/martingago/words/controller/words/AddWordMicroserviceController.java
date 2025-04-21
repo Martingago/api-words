@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 @Tag(   name = "Gestionar palabras",
         description = "Operaciones privadas relacionadas con la gestión de palabras en la API de WordRadar")
-public class WordController {
+public class AddWordMicroserviceController {
 
     private final ProcessWordModelService processWordModelService;
     private final WordService wordService;
