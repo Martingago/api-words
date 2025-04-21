@@ -1,5 +1,6 @@
 package com.martingago.words.mapper.models;
 
+import com.martingago.words.dto.microservices.word.external.WordDTOExternal;
 import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
 import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.domain.model.WordModel;
@@ -48,15 +49,17 @@ public class WordMapper {
     }
 
     /**
-     * Devuelve un listado de WordDTO
-     * @param wordModelList
-     * @return
+     * Transforma un wordDTOExternal recibido en un microservicio, en un wordDTO usable dentro de la aplicación.
+     * @param wordDTOExternal objeto recibido desde el microservicio y que se quiere convertir en un wordDTO usable dentro de la aplicación
+     * @return WordDTO usable dentro de la aplicación.
      */
-    public Set<WordDTO> toDTOList(Set<WordModel> wordModelList){
-        if(wordModelList == null) return Set.of();
-        return wordModelList.stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toSet());
+    public WordDTO toInternalDTO(WordDTOExternal wordDTOExternal){
+        return WordDTO.builder()
+                .word(wordDTOExternal.getWord())
+                .length(wordDTOExternal.getLength())
+                .language(wordDTOExternal.getLanguage())
+                .definitions(wordDTOExternal.getDefinitions())
+                .build();
     }
 
 }

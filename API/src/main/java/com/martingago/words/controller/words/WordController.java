@@ -2,49 +2,41 @@ package com.martingago.words.controller.words;
 
 import com.martingago.words.context.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
-import com.martingago.words.domain.model.LanguageModel;
-import com.martingago.words.domain.model.WordQualificationModel;
-import com.martingago.words.domain.service.language.LanguageService;
-import com.martingago.words.domain.service.qualification.WordQualificationService;
-import com.martingago.words.domain.service.word.CreateWordModelService;
+import com.martingago.words.domain.service.batch.ProcessWordModelService;
+import com.martingago.words.dto.docs.WordApiResponseExample;
+import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.microservices.word.external.ExternalBaseWordDTO;
 import com.martingago.words.dto.microservices.word.external.WordDTOExternal;
 import com.martingago.words.dto.microservices.word.external.RelatedWordDTOExternal;
-import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
+import com.martingago.words.dto.microservices.word.external.WordToScrapDTOExternal;
 import com.martingago.words.dto.models.word.WordDTO;
-import com.martingago.words.mapper.microservices.ExternalWordMapper;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.service.word.WordService;
-import com.martingago.words.utils.CsvValidation;
-import io.swagger.v3.oas.annotations.Hidden;
+import com.martingago.words.utils.documentation.ApiErrorExamples;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
-@Tag(   name ="Buscar palabras",
-        description = "Operaciones relacionadas con la búsqueda de palabras en la API de WordRadar")
+@Tag(   name = "Gestionar palabras",
+        description = "Operaciones privadas relacionadas con la gestión de palabras en la API de WordRadar")
 public class WordController {
 
-    private final CreateWordModelService createWordModelService;
+    private final ProcessWordModelService processWordModelService;
     private final WordService wordService;
-    private final LanguageService languageService;
-    private final WordQualificationService wordQualificationService;
     private final MyScrapWordClient myScrapWordClient;
     private final WordMapper wordMapper;
-    private final ExternalWordMapper externalWordMapper;
-
-
 
     /**
      *  Scrapea una palabra recibida por el usuario, la añade a la base de datos, y se la muestra al usuario
@@ -53,12 +45,72 @@ public class WordController {
      * @param word string de la palabra que se quiere añadir en la base de datos.
      * @return
      */
-    @Hidden
+
+    @Operation(
+            summary = "Scrapear y añadir una palabra desde microservicio externo",
+            description = """
+        Recibe una palabra desde el cliente, comprueba si ya existe en base de datos y, si no existe, la obtiene desde un microservicio de scraping.
+        Posteriormente, la procesa y la añade a la base de datos.
+
+        📥 Formato de entrada:
+        - Content-Type: application/json
+        - Estructura:  
+        {"word": "palabra_a_añadir"}
+        """,
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Palabra scrapeada y añadida correctamente.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WordApiResponseExample.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "La palabra ya existe en base de datos.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WordErrorApiResponseExample.class),
+                                    examples = @ExampleObject(
+                                            name = "Error 409",
+                                            value = ApiErrorExamples.ERROR_409
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "422",
+                            description = "Palabra no encontrada/procesada, pero se sugiere una similar.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation =  WordErrorApiResponseExample.class),
+                                    examples = @ExampleObject(
+                                            name = "Error 422",
+                                            value = ApiErrorExamples.ERROR_422
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Error interno al procesar la solicitud o respuesta inválida del microservicio.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WordErrorApiResponseExample.class),
+                                    examples = @ExampleObject(
+                                            name = "Error 500",
+                                            value = ApiErrorExamples.ERROR_500
+                                    )
+
+                            )
+                    )
+            }
+    )
+
     @PostMapping("/scrap-word")
-    public ResponseEntity<ApiResponseDTO<Object>> scrapWord(@RequestBody String word) {
+    public ResponseEntity<ApiResponseDTO<Object>> scrapWord(@RequestBody WordToScrapDTOExternal word) {
 
         //Antes de iniciar el proceso de scrapping comprueba que la palabra no exista y si existe que sea un placeholder:
-        WordValidator wordValidator = wordService.isWordLocatedAndNotPlaceholder(word);
+        WordValidator wordValidator = wordService.isWordLocatedAndNotPlaceholder(word.getWord());
 
         if (wordValidator.isExists()) {
             return ApiResponseDTO.build(
@@ -76,27 +128,18 @@ public class WordController {
         if (externalBaseWordDTO instanceof RelatedWordDTOExternal relatedWordResponse) {
             return ApiResponseDTO.build(
                     false,
-                    "Couldn't add word '" + word + "', did you mean: '" + relatedWordResponse.getRelatedWord() + "'?",
+                    "Couldn't add word '" + word.getWord() + "', did you mean: '" + relatedWordResponse.getRelatedWord() + "'?",
                     HttpStatus.UNPROCESSABLE_ENTITY.value(),
                     relatedWordResponse,
                     HttpStatus.UNPROCESSABLE_ENTITY
             );
         } else if (externalBaseWordDTO instanceof WordDTOExternal) {
             WordDTOExternal fullWordResponseDTO = (WordDTOExternal) externalBaseWordDTO;
-            WordDTO wordDTO = externalWordMapper.toInternalDTO(fullWordResponseDTO);
+            WordDTO wordDTO = wordMapper.toInternalDTO(fullWordResponseDTO);
+            WordModel wordModel = processWordModelService.processWordDTO(wordDTO);
 
-            Map<String, LanguageModel> languageModelMap = languageService.getAllLanguagesMappedByLangCode(); //Obtiene información de los idiomas de la base de datos.
-            Map<String, WordQualificationModel> wordQualificationModelMap = wordQualificationService.getAllQualificationsMapped(); //Obtiene información de las qualifications de la base de datos.
-            Map<String, WordModel> newWordsModelToPersist = new HashMap<>(); //Instancia un map de palabras relacionadas que van a ser persistidas
-            Map<String, SimpleWordSerializableDTO> existingDBWordsMap = wordService.findReferencesFromWordDTO(wordDTO); //Busca palabras relacionadas existentes en la Base de datos.
-
-
-            WordModel wordModel = createWordModelService.processWordDTOintoWordModel(wordDTO,
-                    languageModelMap,
-                    wordQualificationModelMap,
-                    newWordsModelToPersist,
-                    existingDBWordsMap);
-
+            //Guarda la entidad en la base de datos.
+            wordService.saveWordModel(wordModel);
 
             return ApiResponseDTO.build(
                     true,

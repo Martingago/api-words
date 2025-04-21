@@ -1,15 +1,10 @@
 package com.martingago.words.controller.words;
 
-import com.martingago.words.domain.model.LanguageModel;
-import com.martingago.words.domain.model.WordQualificationModel;
-import com.martingago.words.domain.service.language.LanguageService;
-import com.martingago.words.domain.service.qualification.WordQualificationService;
-import com.martingago.words.domain.service.word.CreateWordModelService;
+import com.martingago.words.domain.service.batch.ProcessWordModelService;
 import com.martingago.words.domain.service.word.WordService;
 import com.martingago.words.dto.docs.WordApiResponseExample;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
 import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.domain.model.WordModel;
@@ -26,9 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/private")
@@ -36,9 +28,7 @@ import java.util.Map;
         description = "Operaciones privadas relacionadas con la gestión de palabras en la API de WordRadar")
 public class AddWordController {
 
-    private final LanguageService languageService;
-    private final WordQualificationService wordQualificationService;
-    private final CreateWordModelService createWordModelService;
+    private final ProcessWordModelService processWordModelService;
     private final WordService wordService;
     private final WordMapper wordMapper;
 
@@ -74,6 +64,18 @@ public class AddWordController {
                             )
                     ),
                     @ApiResponse(
+                            responseCode = "409",
+                            description = "La palabra ya existe en base de datos.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = WordErrorApiResponseExample.class),
+                                    examples = @ExampleObject(
+                                            name = "Error 409",
+                                            value = ApiErrorExamples.ERROR_409
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "500",
                             description = "Error interno del servidor al procesar la solicitud.",
                             content = @Content(
@@ -91,18 +93,8 @@ public class AddWordController {
     public ResponseEntity<ApiResponseDTO<WordDTO>> insertWord(
             @RequestBody @Valid WordDTO wordDTO){
 
-        Map<String, LanguageModel> languageModelMap = languageService.getAllLanguagesMappedByLangCode(); //Obtiene información de los idiomas de la base de datos.
-        Map<String, WordQualificationModel> wordQualificationModelMap = wordQualificationService.getAllQualificationsMapped(); //Obtiene información de las qualifications de la base de datos.
-        Map<String, WordModel> newWordsModelToPersist = new HashMap<>(); //Instancia un map de palabras relacionadas que van a ser persistidas
-        Map<String, SimpleWordSerializableDTO> existingDBWordsMap = wordService.findReferencesFromWordDTO(wordDTO); //Busca palabras relacionadas existentes en la Base de datos.
-
-        //Obtiene el objeto WordModel procesado que contendrá la información de sus atributos.
-        WordModel wordModel = createWordModelService.processWordDTOintoWordModel(wordDTO,
-                languageModelMap,
-                wordQualificationModelMap,
-                newWordsModelToPersist,
-                existingDBWordsMap
-                );
+        //Valida y crea el objeto WordModel en la base de datos
+        WordModel wordModel = processWordModelService.processWordDTO(wordDTO);
 
         //Persiste la entidad en la base de datos.
         WordModel insertedWord = wordService.saveWordModel(wordModel);

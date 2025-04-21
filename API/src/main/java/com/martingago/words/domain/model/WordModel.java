@@ -33,5 +33,8 @@ public class WordModel implements Serializable{
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<WordDefinitionModel> wordDefinitionModelSet; //Listado de definiciones que puede tener una palabra
 
+    @OneToMany(mappedBy = "wordRelated", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<WordRelationModel> wordRelationModelSet = new HashSet<>();
+
     private boolean isPlaceholder;
 }

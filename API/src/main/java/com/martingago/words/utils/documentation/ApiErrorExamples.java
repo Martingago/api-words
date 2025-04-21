@@ -32,6 +32,26 @@ public class ApiErrorExamples {
         }
         """;
 
+    public static final String ERROR_409 = """
+        {
+          "status": false,
+          "message": "Example error 409, duplicate entity on database",
+          "serverCode": 409,
+          "responseObject": null,
+          "timeStamp": "2025-04-15T12:00:00Z"
+        }
+        """;
+
+    public static final String ERROR_422 = """
+        {
+          "status": false,
+          "message": "Example error 422, suggested entity",
+          "serverCode": 422,
+          "responseObject": null,
+          "timeStamp": "2025-04-15T12:00:00Z"
+        }
+        """;
+
     public static final String ERROR_500 = """
         {
           "status": false,

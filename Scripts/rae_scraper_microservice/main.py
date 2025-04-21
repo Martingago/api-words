@@ -11,7 +11,7 @@ import os
 
 
 EUREKA_SERVER = os.getenv('EUREKA_SERVER', 'http://localhost:8761/eureka')
-SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8091))
+SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8090))
 INSTANCE_HOST = socket.gethostname()
 
 @asynccontextmanager
