@@ -1,7 +1,7 @@
 package com.martingago.words.batch.qualification.reader;
 
 import com.martingago.words.domain.model.WordQualificationModel;
-import com.martingago.words.domain.repository.WordQualificationRepository;
+import com.martingago.words.domain.repository.models.WordQualificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;

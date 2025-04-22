@@ -2,13 +2,11 @@ package com.martingago.words.batch.word.writer;
 
 import com.martingago.words.domain.model.WordModel;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @AllArgsConstructor
 public class FilteredWordBatchWriter implements ItemWriter<WordModel> {

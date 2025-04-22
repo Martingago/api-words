@@ -1,7 +1,7 @@
 package com.martingago.words.domain.service.relation;
 
 import com.martingago.words.domain.model.*;
-import com.martingago.words.domain.repository.WordRelationRepository;
+import com.martingago.words.domain.repository.models.WordRelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

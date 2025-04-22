@@ -2,7 +2,7 @@ package com.martingago.words.batch.word.reader;
 
 import com.martingago.words.dto.models.word.SimpleWordSerializableDTO;
 import com.martingago.words.domain.model.WordModel;
-import com.martingago.words.domain.repository.WordRepository;
+import com.martingago.words.domain.repository.models.WordRepository;
 import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;
 import lombok.RequiredArgsConstructor;

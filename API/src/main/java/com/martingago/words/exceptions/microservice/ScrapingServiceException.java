@@ -1,4 +1,4 @@
-package com.martingago.words.exceptions;
+package com.martingago.words.exceptions.microservice;
 
 public class ScrapingServiceException extends RuntimeException {
     private final int statusCode;

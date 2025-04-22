@@ -1,7 +1,7 @@
 package com.martingago.words.domain.service.qualification;
 
 import com.martingago.words.domain.model.WordQualificationModel;
-import com.martingago.words.domain.repository.WordQualificationRepository;
+import com.martingago.words.domain.repository.models.WordQualificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

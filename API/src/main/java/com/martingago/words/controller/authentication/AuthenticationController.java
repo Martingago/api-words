@@ -1,6 +1,5 @@
 package com.martingago.words.controller.authentication;
 
-import com.martingago.words.dto.docs.ListStringApiResponseExample;
 import com.martingago.words.dto.docs.UserAuthenticacionApiResponseExample;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
@@ -8,7 +7,6 @@ import com.martingago.words.dto.authentication.AuthLoginRequestDTO;
 import com.martingago.words.dto.authentication.AuthResponseDTO;
 import com.martingago.words.domain.service.user.UserDetailServiceImpl;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

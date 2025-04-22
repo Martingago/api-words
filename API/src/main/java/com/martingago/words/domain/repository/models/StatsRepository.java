@@ -1,4 +1,4 @@
-package com.martingago.words.domain.repository;
+package com.martingago.words.domain.repository.models;
 
 import com.martingago.words.dto.global.stats.WordStatsDTO;
 import com.martingago.words.domain.model.WordModel;

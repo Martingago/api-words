@@ -12,18 +12,6 @@ import java.util.stream.Collectors;
 public class WordRelationMapper {
 
     /**
-     * Genera un WordRelationDTO a partir de un WordRelationModel
-     * @param wordRelationModel
-     * @return
-     */
-    public WordRelationDTO toDTO(WordRelationModel wordRelationModel) {
-        if (wordRelationModel == null) return null;
-        return new WordRelationDTO
-                (wordRelationModel.getRelationEnumType(),
-                wordRelationModel.getWordRelated().getWord());
-    }
-
-    /**
      * Mappea desde una lista de WordRelationModels y genera una lista de <Strings> que son palabras sinónimas.
      * @param wordRelationModelSet
      * @return

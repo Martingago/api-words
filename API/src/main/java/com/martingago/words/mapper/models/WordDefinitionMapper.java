@@ -2,20 +2,18 @@ package com.martingago.words.mapper.models;
 
 import com.martingago.words.dto.models.definition.WordDefinitionDTO;
 import com.martingago.words.domain.model.WordDefinitionModel;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class WordDefinitionMapper {
 
-    @Autowired
-    WordExamplesMapper wordExamplesMapper;
-
-    @Autowired
-    WordRelationMapper wordRelationMapper;
+    private final WordExamplesMapper wordExamplesMapper;
+    private final WordRelationMapper wordRelationMapper;
 
     /**
      * Convierte un WordDefinitionModel en un WordDefinitionDTO. Para ello se desestructura la siguiente información:

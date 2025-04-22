@@ -5,7 +5,7 @@ import com.martingago.words.domain.service.word.CheckWordsInBatchesService;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.docs.WordValidationResponseExample;
-import com.martingago.words.utils.CsvValidation;
+import com.martingago.words.utils.validations.CsvValidation;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

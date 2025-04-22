@@ -1,11 +1,11 @@
-package com.martingago.words.controller.words;
+package com.martingago.words.controller.words.handle;
 
 import com.martingago.words.dto.docs.JobStatsWordsApiResponseExample;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.dto.global.batch.JobStatsDTO;
 import com.martingago.words.mapper.batch.JobStatsMapper;
-import com.martingago.words.utils.JsonValidation;
+import com.martingago.words.utils.validations.JsonValidation;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

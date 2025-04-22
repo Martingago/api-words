@@ -1,7 +1,7 @@
 package com.martingago.words.config.filter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.martingago.words.utils.JwtUtils;
+import com.martingago.words.utils.authentication.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

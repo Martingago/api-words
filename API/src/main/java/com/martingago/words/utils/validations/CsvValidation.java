@@ -1,6 +1,6 @@
-package com.martingago.words.utils;
+package com.martingago.words.utils.validations;
 
-import com.martingago.words.exceptions.CustomExceptions;
+import com.martingago.words.exceptions.domain.CustomExceptions;
 import com.opencsv.CSVWriter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

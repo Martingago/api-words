@@ -1,4 +1,4 @@
-package com.martingago.words.utils;
+package com.martingago.words.utils.validations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 
 @Component
 public class JsonValidation {
-
 
     /**
      * Función que se encarga de validar la estructura de datos de un fichero .json

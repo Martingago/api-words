@@ -1,7 +1,7 @@
 package com.martingago.words.domain.service.language;
 
 import com.martingago.words.domain.model.LanguageModel;
-import com.martingago.words.domain.repository.LanguageRepository;
+import com.martingago.words.domain.repository.models.LanguageRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

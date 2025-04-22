@@ -1,15 +1,11 @@
-package com.martingago.words.controller.words;
+package com.martingago.words.controller.words.handle;
 
 import com.martingago.words.context.WordValidator;
-import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.domain.service.batch.ProcessWordModelService;
 import com.martingago.words.domain.service.microservice.WordMicroserviceService;
 import com.martingago.words.dto.docs.WordApiResponseExample;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
-import com.martingago.words.dto.microservices.word.external.ExternalBaseWordDTO;
-import com.martingago.words.dto.microservices.word.external.WordDTOExternal;
-import com.martingago.words.dto.microservices.word.external.RelatedWordDTOExternal;
 import com.martingago.words.dto.microservices.word.external.WordToScrapDTOExternal;
 import com.martingago.words.dto.models.word.WordDTO;
 import com.martingago.words.mapper.models.WordMapper;

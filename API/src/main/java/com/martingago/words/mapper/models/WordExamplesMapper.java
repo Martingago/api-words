@@ -12,30 +12,6 @@ import java.util.stream.Collectors;
 public class WordExamplesMapper {
 
     /**
-     * Genera un WordExampleDTO a partir del WordExampleModel
-     * @param wordExampleModel
-     * @return
-     */
-    public WordExampleDTO toDTO(WordExampleModel wordExampleModel){
-        if(wordExampleModel == null) return null;
-        return new WordExampleDTO(
-                wordExampleModel.getExample()
-        );
-    }
-
-    /**
-     * Mapea una lista de WordExampleModel y lo convierte en una lista de WordExampleDTO (Strings)
-     * @param wordExampleModelSet
-     * @return
-     */
-    public Set<WordExampleDTO> toDTOSet(Set<WordExampleModel> wordExampleModelSet){
-        if(wordExampleModelSet == null) return Set.of();
-        return wordExampleModelSet.
-                stream().map(this::toDTO)
-                .collect(Collectors.toSet());
-    }
-
-    /**
      * Mapea una lista de WordExampleModel y lo convierte en una lista de Strings
      * @param wordExampleModelSet
      * @return
@@ -47,14 +23,4 @@ public class WordExamplesMapper {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Genera un WordExampleModel desde un WordExampleDTO simple
-     * @param wordExampleDTO
-     * @return
-     */
-    public WordExampleModel toEntity(WordExampleDTO wordExampleDTO){
-        return WordExampleModel.builder()
-                .example(wordExampleDTO.getExample())
-                .build();
-    }
 }

@@ -1,4 +1,4 @@
-package com.martingago.words.utils;
+package com.martingago.words.utils.authentication;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

@@ -1,4 +1,4 @@
-package com.martingago.words.exceptions;
+package com.martingago.words.exceptions.domain;
 
 public class CustomExceptions {
 

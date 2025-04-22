@@ -1,7 +1,7 @@
 package com.martingago.words.domain.service.word;
 
 import com.martingago.words.domain.model.WordModel;
-import com.martingago.words.domain.repository.WordRepository;
+import com.martingago.words.domain.repository.models.WordRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,9 +1,8 @@
 package com.martingago.words.domain.service.global;
 
 import com.martingago.words.dto.global.stats.WordStatsDTO;
-import com.martingago.words.domain.repository.StatsRepository;
+import com.martingago.words.domain.repository.models.StatsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor

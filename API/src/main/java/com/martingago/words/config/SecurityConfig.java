@@ -2,7 +2,7 @@ package com.martingago.words.config;
 
 import com.martingago.words.config.filter.JwtTokenValidator;
 import com.martingago.words.domain.service.user.UserDetailServiceImpl;
-import com.martingago.words.utils.JwtUtils;
+import com.martingago.words.utils.authentication.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

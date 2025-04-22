@@ -1,4 +1,4 @@
-package com.martingago.words.exceptions;
+package com.martingago.words.exceptions.microservice;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

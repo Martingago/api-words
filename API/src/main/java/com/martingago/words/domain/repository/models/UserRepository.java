@@ -1,4 +1,4 @@
-package com.martingago.words.domain.repository;
+package com.martingago.words.domain.repository.models;
 
 import com.martingago.words.domain.model.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package com.martingago.words.batch.language.reader;
 
 import com.martingago.words.domain.model.LanguageModel;
-import com.martingago.words.domain.repository.LanguageRepository;
+import com.martingago.words.domain.repository.models.LanguageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;

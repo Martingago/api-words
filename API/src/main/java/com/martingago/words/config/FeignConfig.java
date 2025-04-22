@@ -1,6 +1,6 @@
 package com.martingago.words.config;
 
-import com.martingago.words.exceptions.ScrapingErrorDecoder;
+import com.martingago.words.exceptions.microservice.ScrapingErrorDecoder;
 import feign.codec.ErrorDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

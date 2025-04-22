@@ -4,7 +4,7 @@ import com.martingago.words.context.DefinitionProcessedContext;
 import com.martingago.words.domain.model.WordDefinitionModel;
 import com.martingago.words.domain.model.WordModel;
 import com.martingago.words.domain.model.WordQualificationModel;
-import com.martingago.words.domain.repository.WordQualificationRepository;
+import com.martingago.words.domain.repository.models.WordQualificationRepository;
 import com.martingago.words.domain.service.example.CreateExampleService;
 import com.martingago.words.domain.service.relation.CreateWordRelationsService;
 import com.martingago.words.dto.models.definition.WordDefinitionDTO;

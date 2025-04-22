@@ -1,4 +1,4 @@
-package com.martingago.words.exceptions;
+package com.martingago.words.exceptions.domain;
 
 import com.martingago.words.dto.global.ApiResponseDTO;
 import com.martingago.words.exceptions.microservice.WordGeneratedRelatedException;
