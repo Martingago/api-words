@@ -20,6 +20,6 @@ import lombok.Setter;
 public class RelatedWordDTOExternal extends ExternalBaseWordDTO {
 
     @NonNull
-    @Schema(description = "Palabra relacionada devuelta por el microservicio")
+    @Schema(description = "Palabra relacionada devuelta por el microservicio", example = "peinar")
     private String relatedWord;
 }

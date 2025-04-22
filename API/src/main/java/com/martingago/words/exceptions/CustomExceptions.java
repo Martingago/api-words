@@ -26,7 +26,4 @@ public class CustomExceptions {
         }
     }
 
-    public static class WordRelatedGeneratedException extends RuntimeException {
-        public WordRelatedGeneratedException(String message) {super(message);}
-    }
 }

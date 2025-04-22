@@ -3,6 +3,7 @@ package com.martingago.words.controller.words;
 import com.martingago.words.context.WordValidator;
 import com.martingago.words.client.MyScrapWordClient;
 import com.martingago.words.domain.service.batch.ProcessWordModelService;
+import com.martingago.words.domain.service.microservice.WordMicroserviceService;
 import com.martingago.words.dto.docs.WordApiResponseExample;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
@@ -35,7 +36,7 @@ public class AddWordMicroserviceController {
 
     private final ProcessWordModelService processWordModelService;
     private final WordService wordService;
-    private final MyScrapWordClient myScrapWordClient;
+    private final WordMicroserviceService wordMicroserviceService;
     private final WordMapper wordMapper;
 
     /**
@@ -114,7 +115,7 @@ public class AddWordMicroserviceController {
 
         if (wordValidator.isExists()) {
             return ApiResponseDTO.build(
-                    true,
+                    false,
                     "Word already exists on database",
                     HttpStatus.CONFLICT.value(),
                     wordMapper.toResponseDTO(wordValidator.getWordModel()),
@@ -122,38 +123,22 @@ public class AddWordMicroserviceController {
             );
         }
 
-        //Si no encuentra la palabra usa el micro-servicio > procesa > sube palabra
-        ExternalBaseWordDTO externalBaseWordDTO = myScrapWordClient.procesarPalabra(word);
-        // Comprueba si lo que recibe del microservicio es una full o related word
-        if (externalBaseWordDTO instanceof RelatedWordDTOExternal relatedWordResponse) {
-            return ApiResponseDTO.build(
-                    false,
-                    "Couldn't add word '" + word.getWord() + "', did you mean: '" + relatedWordResponse.getRelatedWord() + "'?",
-                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                    relatedWordResponse,
-                    HttpStatus.UNPROCESSABLE_ENTITY
-            );
-        } else if (externalBaseWordDTO instanceof WordDTOExternal) {
-            WordDTOExternal fullWordResponseDTO = (WordDTOExternal) externalBaseWordDTO;
-            WordDTO wordDTO = wordMapper.toInternalDTO(fullWordResponseDTO);
-            WordModel wordModel = processWordModelService.processWordDTO(wordDTO);
+        //Si no encuentra la palabra usa el micro-servicio y obtiene el objeto WordDTO para subir.
+        WordDTO wordDTO = wordMicroserviceService.findWordInMicroservice(word.getWord());
 
-            //Guarda la entidad en la base de datos.
-            wordService.saveWordModel(wordModel);
+        //Procesa el DTO y lo convierte en una entidad para persistir en la base de datos.
+        WordModel wordModel = processWordModelService.processWordDTO(wordDTO);
 
-            return ApiResponseDTO.build(
-                    true,
-                    "Word successfully validate and added",
-                    HttpStatus.CREATED.value(),
-                    wordMapper.toResponseDTO(wordModel),
-                    HttpStatus.CREATED);
-        }
+        //Guarda la entidad en la base de datos.
+        wordService.saveWordModel(wordModel);
+
         return ApiResponseDTO.build(
-                false,
-                "Invalid Object to upload on database",
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                externalBaseWordDTO,
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+                true,
+                "Word successfully validate and added",
+                HttpStatus.CREATED.value(),
+                wordMapper.toResponseDTO(wordModel),
+                HttpStatus.CREATED);
     }
+
+
 }

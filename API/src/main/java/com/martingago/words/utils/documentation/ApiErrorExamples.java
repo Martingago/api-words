@@ -51,6 +51,19 @@ public class ApiErrorExamples {
           "timeStamp": "2025-04-15T12:00:00Z"
         }
         """;
+    public static final String ERROR_422_RELATED_WORD = """
+        {
+          "status": false,
+          "message": "Error, couldn't find: peinándome, did you mean: peinar?",
+          "serverCode": 422,
+          "responseObject": 
+            {
+                "type": "related",
+                "relatedWord": "peinar"
+            },
+          "timeStamp": "2025-04-15T12:00:00Z"
+        }
+        """;
 
     public static final String ERROR_500 = """
         {
