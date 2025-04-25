@@ -6,6 +6,8 @@ import com.martingago.words.domain.service.word.FilterWordsService;
 import com.martingago.words.dto.docs.WordErrorApiResponseExample;
 import com.martingago.words.dto.docs.WordPageStringApiResponseExample;
 import com.martingago.words.dto.global.ApiResponseDTO;
+import com.martingago.words.dto.models.word.WordDTO;
+import com.martingago.words.mapper.models.WordMapper;
 import com.martingago.words.utils.documentation.ApiErrorExamples;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,10 +30,11 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1")
 @Tag(name = "Buscar palabras paginadas", description = "Buscar palabras filtradas con paginación incluida.")
-public class SearchWordFilterPagedController {
+public class SearchComplexWordPagedController {
 
     private final FilterWordsService filterWordsService;
     private final PaginationProperties paginationProperties;
+    private final WordMapper wordMapper;
 
     @Operation(
             summary = "Buscar palabras paginadas con filtros personalizados",
@@ -73,8 +76,8 @@ public class SearchWordFilterPagedController {
             }
     )
 
-    @GetMapping("/words/filter/paged")
-    public ResponseEntity<ApiResponseDTO<Page<String>>> getFilteredWordsPaged(
+    @GetMapping("/words-complex/filter/paged")
+    public ResponseEntity<ApiResponseDTO<Page<WordDTO>>> getFilteredWordsPaged(
             @Parameter(description = "Prefijo por el que debe comenzar la palabra.") @RequestParam(required = false) String startsWith,
             @Parameter(description = "Sufijo por el que debe terminar la palabra.") @RequestParam(required = false) String endsWith,
             @Parameter(description = "Longitud exacta de la palabra.") @RequestParam(required = false) Integer length,
@@ -83,14 +86,14 @@ public class SearchWordFilterPagedController {
             @Parameter(description = "Número de página (por defecto 0).") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Tamaño de página (por defecto 2500). Máximo 5000") @RequestParam(defaultValue = "2500") int size
     ) {
-        int maxSize = paginationProperties.getMaxBasicWords();
+        int maxSize = paginationProperties.getMaxComplexWords();
         int safeSize = Math.min(size, maxSize); //Limita de forma segura el tamaño máximo de consulta
 
         Pageable pageable = PageRequest.of(page, safeSize);
-        Page<WordModel> filteredPage = filterWordsService.getPaginatedFilteredWords(
+        Page<WordModel> filteredPage = filterWordsService.getPaginatedFilteredComplexWords(
                 startsWith, endsWith, length, langCode, qualifications, pageable);
 
-        Page<String> wordPage = filteredPage.map(WordModel::getWord);
+        Page<WordDTO> wordPage = filteredPage.map(wordMapper::toResponseDTO);
 
         return ApiResponseDTO.build(true,
                 "Filtered paginated words found successfully",
@@ -100,4 +103,5 @@ public class SearchWordFilterPagedController {
     }
 
 }
+
 

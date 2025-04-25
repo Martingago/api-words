@@ -12,5 +12,7 @@ public interface WordFilterRepositoryCustom {
     List<WordModel> getWordsWithExtendFilters(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications);
 
     Page<WordModel> getWordsWithPagination(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications, Pageable pageable);
+
+    Page<WordModel> getComplexWordsWithPagination(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications, Pageable pageable);
 }
 

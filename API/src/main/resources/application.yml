@@ -1,7 +1,7 @@
 wordradar:
   pagination:
     max-basic-words: 5000
-    max-complex-words: 2500
+    max-complex-words: 1000
 
 spring:
   application:
