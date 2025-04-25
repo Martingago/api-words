@@ -2,6 +2,7 @@ package com.martingago.words.domain.service.qualification;
 
 import com.martingago.words.domain.model.WordQualificationModel;
 import com.martingago.words.domain.repository.models.WordQualificationRepository;
+import com.martingago.words.dto.models.qualification.WordQualificationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,14 @@ import java.util.stream.Collectors;
 public class WordQualificationService {
 
     private final WordQualificationRepository wordQualificationRepository;
+
+    /**
+     * Devuelve un listado de WordQualificationModel encontrados en la base de datos.
+     * @return Lista de WordQualificationModel
+     */
+    public List<WordQualificationModel> getAllQualificationsModel(){
+        return wordQualificationRepository.findAll();
+    }
 
     /**
      * Función que obtiene la información de todas las Qualification existentes en la Base de datos y lo devuelve

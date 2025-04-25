@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Objeto que contiene la clasificación de una palabra.")
 public class WordQualificationDTO {
 
-    @Schema(description = "Clasificación de la palabra.")
+    @Schema(description = "Clasificación de la palabra.", example = "sustantivo masculino")
     private String qualification;
 }

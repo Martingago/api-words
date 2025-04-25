@@ -3,18 +3,28 @@ package com.martingago.words.domain.service.language;
 import com.martingago.words.domain.model.LanguageModel;
 import com.martingago.words.domain.repository.models.LanguageRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class LanguageService {
 
-    @Autowired
-    LanguageRepository languageRepository;
+    private final LanguageRepository languageRepository;
+
+    /**
+     * Obtiene un listado con todos los idiomas existentes en la base de datos.
+     * @return List con los LanguageModel encontrados
+     */
+    public List<LanguageModel> getLanguagesFromDatabase(){
+        return  languageRepository.findAll();
+    }
 
     public LanguageModel searchLanguageByLangCode(String langCode){
         return languageRepository.findByLangCode(langCode)

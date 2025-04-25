@@ -1,15 +1,17 @@
 package com.martingago.words.dto.models.language;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 @Data
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class LanguageDTO {
-    private String lang; //esp
-    private String language; //Español
+    @Schema(description = "Código del idioma, siempre en minúsculas", example = "esp")
+    private String lang;
+
+    @Schema(description = "Cadena de texto con el idioma", example = "Español")
+    private String language;
 }
