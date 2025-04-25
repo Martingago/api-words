@@ -5,6 +5,8 @@ import com.martingago.words.domain.repository.custom.WordFilterRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -108,5 +110,71 @@ public class WordRepositoryImpl implements WordFilterRepositoryCustom {
         return query.getResultList();
 
     }
+
+    @Override
+    public Page<WordModel> getWordsWithPagination(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications, Pageable pageable) {
+        StringBuilder baseQuery = new StringBuilder("FROM WordModel w " +
+                "JOIN w.languageModel lang " +
+                "LEFT JOIN w.wordDefinitionModelSet wd " +
+                "LEFT JOIN wd.wordQualificationModel wq " +
+                "WHERE w.isPlaceholder = false ");
+        StringBuilder filterQuery = new StringBuilder();
+
+        if (startsWith != null) {
+            filterQuery.append("AND w.word LIKE :startsWith ");
+        }
+        if (endsWith != null) {
+            filterQuery.append("AND w.word LIKE :endsWith ");
+        }
+        if (length != null) {
+            filterQuery.append("AND LENGTH(w.word) = :length ");
+        }
+        if (langCode != null) {
+            filterQuery.append("AND lang.langCode = :langCode ");
+        }
+        if (qualifications != null && !qualifications.isEmpty()) {
+            filterQuery.append("AND wq.qualification IN :qualifications ");
+        }
+
+        // Consulta principal paginada
+        String fullQueryStr = "SELECT DISTINCT w " + baseQuery + filterQuery + "ORDER BY w.word ASC";
+        TypedQuery<WordModel> query = entityManager.createQuery(fullQueryStr, WordModel.class);
+
+        // Consulta de conteo
+        String countQueryStr = "SELECT COUNT(DISTINCT w) " + baseQuery + filterQuery;
+        TypedQuery<Long> countQuery = entityManager.createQuery(countQueryStr, Long.class);
+
+        // Parámetros compartidos
+        if (startsWith != null) {
+            query.setParameter("startsWith", startsWith + "%");
+            countQuery.setParameter("startsWith", startsWith + "%");
+        }
+        if (endsWith != null) {
+            query.setParameter("endsWith", "%" + endsWith);
+            countQuery.setParameter("endsWith", "%" + endsWith);
+        }
+        if (length != null) {
+            query.setParameter("length", length);
+            countQuery.setParameter("length", length);
+        }
+        if (langCode != null) {
+            query.setParameter("langCode", langCode);
+            countQuery.setParameter("langCode", langCode);
+        }
+        if (qualifications != null && !qualifications.isEmpty()) {
+            query.setParameter("qualifications", qualifications);
+            countQuery.setParameter("qualifications", qualifications);
+        }
+
+        // Paginación real
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        List<WordModel> results = query.getResultList();
+        Long total = countQuery.getSingleResult();
+
+        return new org.springframework.data.domain.PageImpl<>(results, pageable, total);
+    }
+
 }
 
