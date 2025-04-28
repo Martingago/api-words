@@ -186,17 +186,12 @@ public class WordRepositoryImpl implements WordFilterRepositoryCustom {
         return new org.springframework.data.domain.PageImpl<>(results, pageable, total);
     }
 
+
     @Override
     public Page<WordModel> getComplexWordsWithPagination(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications, Pageable pageable) {
-        // Consulta base para la consulta de conteo (sin FETCH)
-        StringBuilder baseQuery = new StringBuilder("FROM WordModel w " +
-                "JOIN w.languageModel lang " +
-                "LEFT JOIN w.wordDefinitionModelSet wd " +
-                "LEFT JOIN wd.wordQualificationModel wq " +
-                "LEFT JOIN wd.wordExampleModelSet we " +
-                "LEFT JOIN wd.wordRelationModelSet wr " +
-                "LEFT JOIN wr.wordRelated wrd " +
-                "WHERE w.isPlaceholder = false ");
+
+        // --- Consulta principal SOLO WordModel, sin FETCH ---
+        StringBuilder baseQuery = new StringBuilder("FROM WordModel w JOIN w.languageModel lang WHERE w.isPlaceholder = false ");
         StringBuilder filterQuery = new StringBuilder();
 
         if (startsWith != null) {
@@ -212,25 +207,18 @@ public class WordRepositoryImpl implements WordFilterRepositoryCustom {
             filterQuery.append("AND lang.langCode = :langCode ");
         }
         if (qualifications != null && !qualifications.isEmpty()) {
-            filterQuery.append("AND wq.qualification IN :qualifications ");
+            filterQuery.append("AND EXISTS (SELECT 1 FROM WordDefinitionModel wd JOIN wd.wordQualificationModel wq WHERE wd.wordModel = w AND wq.qualification IN :qualifications) ");
         }
 
-        // Consulta principal con FETCH para todas las asociaciones
-        String fullQueryStr = "SELECT DISTINCT w FROM WordModel w " +
-                "JOIN FETCH w.languageModel lang " +
-                "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
-                "LEFT JOIN FETCH wd.wordQualificationModel wq " +
-                "LEFT JOIN FETCH wd.wordExampleModelSet we " +
-                "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
-                "LEFT JOIN FETCH wr.wordRelated wrd " +
-                "WHERE w.isPlaceholder = false " + filterQuery + "ORDER BY w.word ASC";
+        // Consulta paginada principal
+        String fullQueryStr = "SELECT w " + baseQuery + filterQuery + "ORDER BY w.word ASC";
         TypedQuery<WordModel> query = entityManager.createQuery(fullQueryStr, WordModel.class);
 
-        // Consulta de conteo (sin FETCH)
-        String countQueryStr = "SELECT COUNT(DISTINCT w) " + baseQuery + filterQuery;
+        // Consulta para contar total
+        String countQueryStr = "SELECT COUNT(w) " + baseQuery + filterQuery;
         TypedQuery<Long> countQuery = entityManager.createQuery(countQueryStr, Long.class);
 
-        // Parámetros compartidos
+        // Parámetros
         if (startsWith != null) {
             query.setParameter("startsWith", startsWith + "%");
             countQuery.setParameter("startsWith", startsWith + "%");
@@ -252,14 +240,30 @@ public class WordRepositoryImpl implements WordFilterRepositoryCustom {
             countQuery.setParameter("qualifications", qualifications);
         }
 
-        // Paginación
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
-        List<WordModel> results = query.getResultList();
+        List<WordModel> words = query.getResultList();
         Long total = countQuery.getSingleResult();
 
-        return new org.springframework.data.domain.PageImpl<>(results, pageable, total);
+        // --- Opcional: cargar relaciones extra solo para resultados paginados ---
+        if (!words.isEmpty()) {
+            List<Long> wordIds = words.stream().map(WordModel::getId).toList();
+
+            // Cargar definiciones, ejemplos, relaciones, etc en batch
+            entityManager.createQuery(
+                            "SELECT DISTINCT w FROM WordModel w " +
+                                    "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
+                                    "LEFT JOIN FETCH wd.wordQualificationModel wq " +
+                                    "LEFT JOIN FETCH wd.wordExampleModelSet we " +
+                                    "LEFT JOIN FETCH wd.wordRelationModelSet wr " +
+                                    "LEFT JOIN FETCH wr.wordRelated wrd " +
+                                    "WHERE w.id IN :ids", WordModel.class)
+                    .setParameter("ids", wordIds)
+                    .getResultList();
+        }
+
+        return new org.springframework.data.domain.PageImpl<>(words, pageable, total);
     }
 
 }
