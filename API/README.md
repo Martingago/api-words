@@ -6,7 +6,7 @@
 
 ## ⚙️ Requisitos del sistema
 
-- Java 17+
+- Java 21+
 - Maven 3.8+
 - Docker (para despliegue opcional)
 - PostgreSQL (base de datos principal)
