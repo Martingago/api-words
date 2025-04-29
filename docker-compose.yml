@@ -24,11 +24,9 @@ services:
       eureka-server:
         condition: service_healthy
     environment:
-      - EUREKA_SERVER=http://rae-eureka-server:8761/
+      - EUREKA_SERVER=http://rae-eureka-server:8761/eureka
       - SERVICE_PORT=8090
-    ports:
-      - "8090:8090"
-
+    
   api-words:
     image: rae-api-words
     container_name: rae-api-words
@@ -42,6 +40,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_URL=${DB_URL}
       - EUREKA_CLIENT_SERVICE=${EUREKA_CLIENT_SERVICE}
+      - EUREKA_SERVER=http://rae-eureka-server:8761/eureka
       - JWT_KEY=${JWT_KEY}
       - JWT_USER=${JWT_USER}
     ports:

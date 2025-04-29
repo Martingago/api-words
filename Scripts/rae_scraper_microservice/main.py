@@ -14,6 +14,7 @@ EUREKA_SERVER = os.getenv('EUREKA_SERVER', 'http://localhost:8761/eureka')
 SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8090))
 INSTANCE_HOST = socket.gethostname()
 
+print(f"Host: {INSTANCE_HOST}")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Código que se ejecuta al inicio
