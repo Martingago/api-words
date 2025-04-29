@@ -81,7 +81,7 @@ public class SynonymsSearchController {
             }
     )
 
-    @GetMapping("/synonyms/{word}")
+    @GetMapping("words/{word}/synonyms")
     public ResponseEntity<ApiResponseDTO<List<String>>> findSynonymsByWord(
             @Parameter(description = "Palabra de la que se quieren buscar los sinónimos.",
                     required = true,

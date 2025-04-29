@@ -109,7 +109,7 @@ public class SearchWordMicroserviceController {
             }
     )
 
-    @GetMapping("/deep-search/{word}")
+    @GetMapping("/words/{word}/deep")
     public ResponseEntity<ApiResponseDTO<Object>> findWordByName(
             @Parameter(description = "Palabra que se desea buscar en la base de datos de WordRadar.",
                     required = true,

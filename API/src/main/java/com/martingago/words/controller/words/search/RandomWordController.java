@@ -74,7 +74,7 @@ public class RandomWordController {
                     )
             }
     )
-    @GetMapping("/word")
+    @GetMapping("/words/random")
     public ResponseEntity<ApiResponseDTO<WordDTO>> getRandomWord(
             @Parameter(description = "Longitud de la palabra aleatoria",
                     required = false,

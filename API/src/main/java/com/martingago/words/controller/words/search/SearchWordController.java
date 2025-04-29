@@ -85,7 +85,7 @@ public class SearchWordController {
                     )
             }
     )
-    @GetMapping("/search/{word}")
+    @GetMapping("/words/{word}")
     public ResponseEntity<ApiResponseDTO<WordDTO>> findWordByName(
             @Parameter(description = "Palabra que se desea buscar en la base de datos de WordRadar.",
                     required = true,

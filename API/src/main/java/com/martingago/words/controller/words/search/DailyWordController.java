@@ -71,7 +71,7 @@ public class DailyWordController {
             }
     )
 
-    @GetMapping("/daily")
+    @GetMapping("/words/daily")
     public ResponseEntity<ApiResponseDTO<WordDTO>> getDailyWord() {
         WordModel wordModel = dailyWordService.getDailyWord();
         WordDTO wordDTO = wordMapper.toResponseDTO(wordModel);

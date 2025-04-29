@@ -76,7 +76,7 @@ public class SearchComplexWordPagedController {
             }
     )
 
-    @GetMapping("/words-complex/filter/paged")
+    @GetMapping("/words/details")
     public ResponseEntity<ApiResponseDTO<Page<WordDTO>>> getFilteredWordsPaged(
             @Parameter(description = "Prefijo por el que debe comenzar la palabra.") @RequestParam(required = false) String startsWith,
             @Parameter(description = "Sufijo por el que debe terminar la palabra.") @RequestParam(required = false) String endsWith,

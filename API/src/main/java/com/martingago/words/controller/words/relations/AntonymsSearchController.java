@@ -78,7 +78,7 @@ public class AntonymsSearchController {
                     )
             }
     )
-    @GetMapping("/antonyms/{word}")
+    @GetMapping("/words/{word}/antonyms")
     public ResponseEntity<ApiResponseDTO<List<String>>> findAntonymsByWord(
             @Parameter(description = "Palabra de la que se quieren buscar los antónimos.",
                     required = true,
