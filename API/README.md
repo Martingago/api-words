@@ -35,8 +35,8 @@ JWT_USER=USER_JWT
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/rae-api-words.git
-cd rae-api-words
+git clone https://github.com/Martingago/api-words.git
+cd api-words/API
 ```
 
 ### 2. Iniciar Eureka Server
@@ -59,8 +59,6 @@ Puedes construir y ejecutar el servicio con Docker:
 docker build -t rae-api-words .
 docker run -d -P --name rae-api-words rae-api-words
 ```
-
-> Asegúrate de que las variables de entorno estén bien definidas o montadas vía `--env-file`.
 
 ---
 
@@ -141,5 +139,22 @@ Inspirado en la necesidad de un diccionario español accesible, potente y docume
 
 ## 📄 Licencia
 
-MIT License o la que decidas usar.
+### MIT License
+
+Copyright © 2025 [martingago.dev](https://martingago.dev/)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+associated documentation files (the “Software”), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial 
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
