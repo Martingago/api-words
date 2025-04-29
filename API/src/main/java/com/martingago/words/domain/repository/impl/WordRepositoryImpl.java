@@ -113,144 +113,88 @@ public class WordRepositoryImpl implements WordFilterRepositoryCustom {
 
     /**
      * Realiza una consulta de palabras con paginacion a la base de datos sin sobrecargar la consulta.
-     * @param startsWith
-     * @param endsWith
-     * @param length
-     * @param langCode
-     * @param qualifications
-     * @param pageable
-     * @return
+     * Esta función devolverá únicamente objetos WordModel sin las relaciones cargadas.
+     * @param startsWith cadena por la que empieza la palabra a filtrar
+     * @param endsWith cadena por la que termina la palabra a filtrar
+     * @param length tamaño que debe tener la palabra a buscar
+     * @param langCode código de idioma de la palabra a buscar
+     * @param qualifications listado de clasificaciones que debe contener una palabra
+     * @param pageable objeto de paginación que contiene información sobre la página y número de elementos a mostrar por página
+     * @return Page con objetos WordModel con la información correspondiente filtrada por los parámetros del usuario
      */
     @Override
     public Page<WordModel> getWordsWithPagination(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications, Pageable pageable) {
-        StringBuilder baseQuery = new StringBuilder("FROM WordModel " +
-                "w JOIN w.languageModel lang " +
-                "LEFT JOIN w.wordDefinitionModelSet wd " +
-                "LEFT JOIN wd.wordQualificationModel wq " +
-                "WHERE w.isPlaceholder = false ");
-        StringBuilder filterQuery = new StringBuilder();
 
-        if (startsWith != null) {
-            filterQuery.append("AND w.word LIKE :startsWith ");
-        }
-        if (endsWith != null) {
-            filterQuery.append("AND w.word LIKE :endsWith ");
-        }
-        if (length != null) {
-            filterQuery.append("AND LENGTH(w.word) = :length ");
-        }
-        if (langCode != null) {
-            filterQuery.append("AND lang.langCode = :langCode ");
-        }
+        String baseQuery = "FROM WordModel w JOIN w.languageModel lang WHERE w.isPlaceholder = false";
+        String countQuery = "SELECT COUNT(w) " + baseQuery;
+        String selectQuery = "SELECT w " + baseQuery;
+
+        StringBuilder filters = new StringBuilder();
+        if (startsWith != null) filters.append(" AND w.word LIKE :startsWith");
+        if (endsWith != null) filters.append(" AND w.word LIKE :endsWith");
+        if (length != null) filters.append(" AND LENGTH(w.word) = :length");
+        if (langCode != null) filters.append(" AND lang.langCode = :langCode");
         if (qualifications != null && !qualifications.isEmpty()) {
-            filterQuery.append("AND wq.qualification IN :qualifications ");
+            filters.append(" AND EXISTS (SELECT 1 FROM WordDefinitionModel wd JOIN wd.wordQualificationModel wq WHERE wd.word = w AND wq.qualification IN :qualifications)");
         }
 
-        // Consulta principal paginada
-        String fullQueryStr = "SELECT DISTINCT w " + baseQuery + filterQuery + "ORDER BY w.word ASC";
-        TypedQuery<WordModel> query = entityManager.createQuery(fullQueryStr, WordModel.class);
+        TypedQuery<WordModel> query = entityManager.createQuery(selectQuery + filters + " ORDER BY w.word ASC", WordModel.class);
+        TypedQuery<Long> count = entityManager.createQuery(countQuery + filters, Long.class);
 
-        // Consulta de conteo
-        String countQueryStr = "SELECT COUNT(DISTINCT w) " + baseQuery + filterQuery;
-        TypedQuery<Long> countQuery = entityManager.createQuery(countQueryStr, Long.class);
+        applyParameters(query, startsWith, endsWith, length, langCode, qualifications);
+        applyParameters(count, startsWith, endsWith, length, langCode, qualifications);
 
-        // Parámetros compartidos
-        if (startsWith != null) {
-            query.setParameter("startsWith", startsWith + "%");
-            countQuery.setParameter("startsWith", startsWith + "%");
-        }
-        if (endsWith != null) {
-            query.setParameter("endsWith", "%" + endsWith);
-            countQuery.setParameter("endsWith", "%" + endsWith);
-        }
-        if (length != null) {
-            query.setParameter("length", length);
-            countQuery.setParameter("length", length);
-        }
-        if (langCode != null) {
-            query.setParameter("langCode", langCode);
-            countQuery.setParameter("langCode", langCode);
-        }
-        if (qualifications != null && !qualifications.isEmpty()) {
-            query.setParameter("qualifications", qualifications);
-            countQuery.setParameter("qualifications", qualifications);
-        }
-
-        // Paginación real
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
         List<WordModel> results = query.getResultList();
-        Long total = countQuery.getSingleResult();
+        long total = count.getSingleResult();
 
         return new org.springframework.data.domain.PageImpl<>(results, pageable, total);
     }
 
 
+    /**
+     * Consulta paginada eficiente de palabras con filtros y carga posterior de relaciones.
+     * @param startsWith cadena por la que empieza la palabra a filtrar
+     * @param endsWith cadena por la que termina la palabra a filtrar
+     * @param length tamaño que debe tener la palabra a buscar
+     * @param langCode código de idioma de la palabra a buscar
+     * @param qualifications listado de clasificaciones que debe contener una palabra
+     * @param pageable objeto de paginación que contiene información sobre la página y número de elementos a mostrar por página
+     * @return Page con objetos WordModel con la información correspondiente filtrada por los parámetros del usuario
+     */
     @Override
     public Page<WordModel> getComplexWordsWithPagination(String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications, Pageable pageable) {
 
-        // --- Consulta principal SOLO WordModel, sin FETCH ---
-        StringBuilder baseQuery = new StringBuilder("FROM WordModel w JOIN w.languageModel lang WHERE w.isPlaceholder = false ");
-        StringBuilder filterQuery = new StringBuilder();
+        String baseQuery = "FROM WordModel w JOIN w.languageModel lang WHERE w.isPlaceholder = false";
+        String countQuery = "SELECT COUNT(w) " + baseQuery;
+        String selectQuery = "SELECT w " + baseQuery;
 
-        if (startsWith != null) {
-            filterQuery.append("AND w.word LIKE :startsWith ");
-        }
-        if (endsWith != null) {
-            filterQuery.append("AND w.word LIKE :endsWith ");
-        }
-        if (length != null) {
-            filterQuery.append("AND LENGTH(w.word) = :length ");
-        }
-        if (langCode != null) {
-            filterQuery.append("AND lang.langCode = :langCode ");
-        }
+        StringBuilder filters = new StringBuilder();
+        if (startsWith != null) filters.append(" AND w.word LIKE :startsWith");
+        if (endsWith != null) filters.append(" AND w.word LIKE :endsWith");
+        if (length != null) filters.append(" AND LENGTH(w.word) = :length");
+        if (langCode != null) filters.append(" AND lang.langCode = :langCode");
         if (qualifications != null && !qualifications.isEmpty()) {
-            filterQuery.append("AND EXISTS (SELECT 1 FROM WordDefinitionModel wd JOIN wd.wordQualificationModel wq WHERE wd.wordModel = w AND wq.qualification IN :qualifications) ");
+            filters.append(" AND EXISTS (SELECT 1 FROM WordDefinitionModel wd JOIN wd.wordQualificationModel wq WHERE wd.word = w AND wq.qualification IN :qualifications)");
         }
 
-        // Consulta paginada principal
-        String fullQueryStr = "SELECT w " + baseQuery + filterQuery + "ORDER BY w.word ASC";
-        TypedQuery<WordModel> query = entityManager.createQuery(fullQueryStr, WordModel.class);
+        TypedQuery<WordModel> query = entityManager.createQuery(selectQuery + filters + " ORDER BY w.word ASC", WordModel.class);
+        TypedQuery<Long> count = entityManager.createQuery(countQuery + filters, Long.class);
 
-        // Consulta para contar total
-        String countQueryStr = "SELECT COUNT(w) " + baseQuery + filterQuery;
-        TypedQuery<Long> countQuery = entityManager.createQuery(countQueryStr, Long.class);
-
-        // Parámetros
-        if (startsWith != null) {
-            query.setParameter("startsWith", startsWith + "%");
-            countQuery.setParameter("startsWith", startsWith + "%");
-        }
-        if (endsWith != null) {
-            query.setParameter("endsWith", "%" + endsWith);
-            countQuery.setParameter("endsWith", "%" + endsWith);
-        }
-        if (length != null) {
-            query.setParameter("length", length);
-            countQuery.setParameter("length", length);
-        }
-        if (langCode != null) {
-            query.setParameter("langCode", langCode);
-            countQuery.setParameter("langCode", langCode);
-        }
-        if (qualifications != null && !qualifications.isEmpty()) {
-            query.setParameter("qualifications", qualifications);
-            countQuery.setParameter("qualifications", qualifications);
-        }
+        applyParameters(query, startsWith, endsWith, length, langCode, qualifications);
+        applyParameters(count, startsWith, endsWith, length, langCode, qualifications);
 
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 
         List<WordModel> words = query.getResultList();
-        Long total = countQuery.getSingleResult();
+        long total = count.getSingleResult();
 
-        // --- Opcional: cargar relaciones extra solo para resultados paginados ---
+        // Carga secundaria de relaciones solo si hay resultados
         if (!words.isEmpty()) {
             List<Long> wordIds = words.stream().map(WordModel::getId).toList();
-
-            // Cargar definiciones, ejemplos, relaciones, etc en batch
             entityManager.createQuery(
                             "SELECT DISTINCT w FROM WordModel w " +
                                     "LEFT JOIN FETCH w.wordDefinitionModelSet wd " +
@@ -264,6 +208,23 @@ public class WordRepositoryImpl implements WordFilterRepositoryCustom {
         }
 
         return new org.springframework.data.domain.PageImpl<>(words, pageable, total);
+    }
+
+    /**
+     * Función que se encarga de aplicar los filtros a una consutla SQL
+     * @param query query realizada por el usuario
+     * @param startsWith cadena por la que empieza la palabra a filtrar
+     * @param endsWith cadena por la que termina la palabra a filtrar
+     * @param length tamaño que debe tener la palabra a buscar
+     * @param langCode código de idioma de la palabra a buscar
+     * @param qualifications listado de clasificaciones que debe contener una palabra
+     */
+    private void applyParameters(TypedQuery<?> query, String startsWith, String endsWith, Integer length, String langCode, List<String> qualifications) {
+        if (startsWith != null) query.setParameter("startsWith", startsWith + "%");
+        if (endsWith != null) query.setParameter("endsWith", "%" + endsWith);
+        if (length != null) query.setParameter("length", length);
+        if (langCode != null) query.setParameter("langCode", langCode);
+        if (qualifications != null && !qualifications.isEmpty()) query.setParameter("qualifications", qualifications);
     }
 
 }
