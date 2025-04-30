@@ -1,4 +1,4 @@
-# api.py
+# main.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from scraper import procesar_palabra
@@ -7,11 +7,13 @@ import uvicorn
 import uuid
 import socket
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 
-EUREKA_SERVER = os.getenv('EUREKA_SERVER', 'http://localhost:8761/eureka')
-SERVICE_PORT= int(os.getenv('SERVICE_PORT', 8090))
+EUREKA_CLIENT_SERVICE = os.getenv('EUREKA_CLIENT_SERVICE')
+SERVICE_PORT= int(os.getenv('SERVICE_PORT'))
 INSTANCE_HOST = socket.gethostname()
 
 print(f"Host: {INSTANCE_HOST}")
@@ -26,7 +28,7 @@ app = FastAPI(lifespan=lifespan)
 # Configuración del cliente Eureka
 async def register_with_eureka():
     await eureka_client.init_async(
-        eureka_server=EUREKA_SERVER,
+        eureka_server=EUREKA_CLIENT_SERVICE,
         app_name="scraping-microservice",
         instance_port=SERVICE_PORT, 
         instance_host=INSTANCE_HOST,
