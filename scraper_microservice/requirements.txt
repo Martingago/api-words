@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+beautifulsoup4
+fake-useragent
+urllib3
+cloudscraper
+py_eureka_client
+load_dotenv

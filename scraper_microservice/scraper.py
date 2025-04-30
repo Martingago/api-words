@@ -5,7 +5,7 @@ from fake_useragent import UserAgent
 from utils import limpiar_palabra, formatear_palabra
 import requests
 
-def obtener_datos(palabra, session):
+def obtener_datos(palabra):
     base_url = "https://dle.rae.es/{}"
     url = base_url.format(palabra)
 
@@ -49,7 +49,8 @@ def obtener_datos(palabra, session):
                 print(f"Se ha encontrado palabra relacionada: {relacionada}")
                 return {
                     "type": "related",
-                    "relatedWord": relacionada}  # Devuelve la palabra relacionada
+                    "relatedWord": relacionada
+                    }  # Devuelve la palabra relacionada
             
             return None
         # Comprueba cuál es la palabra raíz que conforma la palabra y la devuelve
