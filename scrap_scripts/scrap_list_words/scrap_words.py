@@ -32,7 +32,7 @@ def save_words(words, length):
 
     with open(output_path, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
-        writer.writerow(["Palabras"])
+        writer.writerow(["word"])
         for word in words:
             writer.writerow([word])
 
@@ -58,6 +58,6 @@ if __name__ == "__main__":
     parser.add_argument("paginas", type=int, help="Número total de páginas a scrapear (mínimo 1)")
     args = parser.parse_args()
 
-    main(args.longitud, args.paginas)
+    main(args.word_length, args.paginas)
     # Ejemplo de uso: python scrap_words.py 8 10
     # Esto generará un archivo CSV con las palabras de 8 letras de las primeras 10 páginas.

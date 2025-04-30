@@ -68,8 +68,7 @@ def limpiar_csv(input_file, output_file):
                         'word': palabra_limpia,
                         'status': 'false'
                     })
-                    palabras_procesadas.add(palabra_limpia)
-                    print(f"Procesado: {palabra_original} -> {palabra_limpia}")
+                    palabras_procesadas.add(palabra_limpia)          
         
         # Si todo sale bien, reemplazar el archivo original con el temporal
         if os.path.exists(output_file):
@@ -86,7 +85,7 @@ def limpiar_csv(input_file, output_file):
 
 if __name__ == "__main__":
     # Archivos de entrada y salida
-    input_file = "../palabras_relacionadas_save.csv"  # Cambia esto al nombre de tu archivo de entrada
-    output_file = "palabras_relacionadas_limpias.csv"
+    input_file = "../scrap_list_words/output/result-words-length5-20250430-142948.csv"  # Cambia esto al nombre de tu archivo de entrada
+    output_file = "../scrap_list_words/output/clean-result-words-length5-20250430-142948-limpio.csv"  # Cambia esto al nombre de tu archivo de salida
     
     limpiar_csv(input_file, output_file)
