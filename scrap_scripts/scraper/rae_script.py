@@ -6,6 +6,8 @@ import json
 from fake_useragent import UserAgent
 import urllib3
 import shutil
+import argparse
+from datetime import datetime
 
 class RetrySession(requests.Session):
     def __init__(self, retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504)):
@@ -43,13 +45,11 @@ def obtener_datos(palabra, session):
 
         section_definitions = soup.find('ol', class_='c-definitions')
         if not section_definitions:
-            print(f"{palabra} no fue encontrada en RAE")
-
+            
             # Si la palabra no fue encontrada, entonces busca una palabra relacionada:
             palabra_relacionada = soup.find('a', attrs={'data-acc': 'LISTA APROX'})
             if palabra_relacionada:
                 relacionada = palabra_relacionada.get_text(strip=True)
-                print(f"Se ha encontrado palabra relacionada: {relacionada}")
                 # Guardar la palabra relacionada en el archivo de palabras similares
                 guardar_palabra_relacionada(relacionada)
 
@@ -57,10 +57,10 @@ def obtener_datos(palabra, session):
             return None
 
         # Comprueba cual es la palabra raiz que conforma la palabra y la devuelve
-        base_word = palabra
-        base_word_element = soup.find('h1', class_='c-page-header__title') 
-        if(base_word_element):
-            base_word = limpiar_palabra(base_word_element.get_text(strip=True))
+        
+        base_word = soup.find('h1', class_='c-page-header__title') 
+        if(base_word):
+            base_word = limpiar_palabra(base_word.get_text(strip=True))
 
         definitions = []
         for li in section_definitions.find_all('li', recursive=False):
@@ -164,7 +164,7 @@ def obtener_datos(palabra, session):
         }
 
     except requests.exceptions.RequestException as e:
-        print(f"Error al procesar '{palabra}': {e}")
+        print(f"[ERROR] Error al procesar '{palabra}': {e}")
         return False
 
 def formatear_palabra(palabra):
@@ -182,10 +182,11 @@ def limpiar_palabra(palabra):
     palabra_limpia = palabra_sin_numeros.strip()
 
     # Convertir a mayúsculas manteniendo acentos
-    return palabra_limpia.upper()
+    return palabra_limpia.lower()
 
 # Guarda las palabras relacionadas en un nuevo fichero .csv
 def guardar_palabra_relacionada(palabra):
+    
     output_file = related_path
     fieldnames = ['word', 'status']
 
@@ -194,7 +195,7 @@ def guardar_palabra_relacionada(palabra):
 
     # Verificar si el archivo existe
     file_exists = os.path.exists(output_file)
-
+    
     # Verificar si la palabra ya existe en el archivo
     palabra_existe = False
     if file_exists:
@@ -213,7 +214,12 @@ def guardar_palabra_relacionada(palabra):
                 'word': palabra,
                 'status': 'false'
             })
-            print(f"Palabra relacionada '{palabra}' guardada en {output_file}")
+        print(f"[INFO] Palabra relacionada '{palabra}' guardada.")
+        
+        
+    
+            
+            
 
 def actualizar_csv_original(input_path, processed_words):
     temp_file_path = input_path + ".tmp"
@@ -247,10 +253,11 @@ def escribir_a_jsonl(data, file):
         json.dump(item, file, ensure_ascii=False)
         file.write('\n')  # Añadir un salto de línea después de cada objeto JSON
 
-def procesar_archivo(input_path, output_jsonl, batch_size=100):
+def procesar_archivo(input_path, output_jsonl, batch_size):
     session = RetrySession()
     all_words = []
     processed_words = []
+    batch_size = batch_size
 
     # Abrir el archivo JSONL una sola vez en modo de añadir
     with open(output_jsonl, 'a', encoding='utf-8') as jsonl_file:
@@ -266,20 +273,17 @@ def procesar_archivo(input_path, output_jsonl, batch_size=100):
                     continue
 
                 try:
-                    print(f"Procesando palabra: {palabra}")
                     word_data = obtener_datos(palabra, session)
-
+                    # Si la palabra no fue encontrada, guardar como 'null' y continuar
                     if word_data is None:
                         new_status = 'null'
                         processed_words.append({
                             'word': palabra,
                             'status': new_status
                         })
-                        print(f"Estado actualizado para la palabra: {palabra} -> {new_status}")
-                    elif word_data is False:
-                        print(f"Error en el procesamiento de la palabra: {palabra}, manteniendo status 'false'")
-                        continue
+                    
                     else:
+                        print(f"[INFO] Procesando palabra: {palabra}")
                         new_status = 'true'
                         processed_words.append({
                             'word': palabra,
@@ -287,17 +291,17 @@ def procesar_archivo(input_path, output_jsonl, batch_size=100):
                         })
                         all_words.append(word_data)
 
-                    # Escribir en lotes
-                    if len(all_words) >= batch_size:
-                        escribir_a_jsonl(all_words, jsonl_file)
-                        print(f"Procesadas {len(all_words)} palabras, JSONL actualizado.")
-                        all_words.clear()  # Limpiar el lote
+                        # Escribir en lotes
+                        if len(all_words) >= batch_size:
+                            escribir_a_jsonl(all_words, jsonl_file)
+                            print(f"[INFO] JSONL actualizado después de registrar {len(all_words)} palabras.")
+                            all_words.clear()  # Limpiar el lote
 
-                    # Actualizar el CSV en lotes
-                    if len(processed_words) >= batch_size:
-                        actualizar_csv_original(input_path, processed_words)
-                        print(f"CSV actualizado después de procesar {len(processed_words)} palabras.")
-                        processed_words.clear()  # Limpiar el lote
+                        # Actualizar el CSV en lotes
+                        if len(processed_words) >= batch_size:
+                            actualizar_csv_original(input_path, processed_words)
+                            print(f"[INFO] CSV actualizado después de procesar {len(processed_words)} palabras.")
+                            processed_words.clear()  # Limpiar el lote
 
                 except Exception as e:
                     print(f"Error procesando palabra '{palabra}': {e}")
@@ -306,13 +310,44 @@ def procesar_archivo(input_path, output_jsonl, batch_size=100):
             # Escribir los datos restantes
             if all_words:
                 escribir_a_jsonl(all_words, jsonl_file)
-                print(f"JSONL actualizado con las palabras restantes.")
+                print(f"[INFO] JSONL actualizado con las palabras restantes.")
             if processed_words:
                 actualizar_csv_original(input_path, processed_words)
-                print(f"CSV actualizado con los datos restantes.")
+                print(f"[INFO] CSV actualizado con los datos restantes.")
+
+def generar_nombre_jsonl():
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return f"rae_output_{timestamp}.jsonl"
+
+def main():
+    # Valores por defecto (para uso manual desde IDLE o ejecución directa)
+    default_input_path = "./words_realated_5.csv"
+    default_output_jsonl = generar_nombre_jsonl()
+    default_related_path = "./words_realated_5.csv"
+    default_batch_size = 25
+
+    parser = argparse.ArgumentParser(description="Scraper de definiciones de la RAE")
+    parser.add_argument('--input', help="Ruta al archivo CSV de entrada con las palabras.")
+    parser.add_argument('--output', help="Ruta al archivo JSONL de salida.")
+    parser.add_argument('--related', help="Ruta al archivo CSV para guardar palabras relacionadas.")
+    parser.add_argument('--batch_size', type=int, help="Número de palabras por lote.")
+
+    args = parser.parse_args()
+
+    input_path = args.input or default_input_path
+    output_jsonl = args.output or default_output_jsonl
+    batch_size = args.batch_size or default_batch_size
+
+    # Asignamos related_path como global para que funcione con la función existente
+    global related_path
+    related_path = args.related or default_related_path
+
+    print(f"[INFO] Ejecutando con los siguientes parámetros:")
+    print(f"  📥 Entrada CSV: {input_path}")
+    print(f"  📤 Salida JSONL: {output_jsonl}")
+    print(f"  🔁 Archivo de palabras relacionadas: {related_path}")
+    print(f"  📦 Tamaño de lote: {batch_size}")
+    procesar_archivo(input_path, output_jsonl, batch_size)
 
 if __name__ == "__main__":
-    input_path = "../scrap_list_words/output/result-words-length5-20250430-142005.csv"
-    output_jsonl = "./words_definitions_8_letters_2.jsonl" 
-    related_path = "./words_related_words_8_letters.csv"
-    procesar_archivo(input_path, output_jsonl, batch_size=100)
+    main()

@@ -85,7 +85,7 @@ def limpiar_csv(input_file, output_file):
 
 if __name__ == "__main__":
     # Archivos de entrada y salida
-    input_file = "../scrap_list_words/output/result-words-length5-20250430-142948.csv"  # Cambia esto al nombre de tu archivo de entrada
-    output_file = "../scrap_list_words/output/clean-result-words-length5-20250430-142948-limpio.csv"  # Cambia esto al nombre de tu archivo de salida
+    input_file = "../scrap_list_words/output/result-words-length5-20250502-133904.csv"  # Cambia esto al nombre de tu archivo de entrada
+    output_file = "../scraper/words_test.csv"  # Cambia esto al nombre de tu archivo de salida
     
     limpiar_csv(input_file, output_file)
