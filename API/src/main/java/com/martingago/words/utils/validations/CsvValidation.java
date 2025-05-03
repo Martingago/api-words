@@ -35,7 +35,7 @@ public class CsvValidation {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            int maxWords = 40000;
+            int maxWords = 100000;
             int count = 0;
 
             while ((line = reader.readLine()) != null) {

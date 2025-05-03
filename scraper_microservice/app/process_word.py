@@ -1,6 +1,6 @@
 import sys
 import json
-from scraper import procesar_palabra
+from app import procesar_palabra
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

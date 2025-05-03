@@ -34,3 +34,18 @@ docker-compose up
 docker-compose down
 docker-compose up --build
 ```
+
+## 🏠 Variables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+DB_USER=root                      # Nombre de usuario de PostgreSQL
+DB_PASSWORD=root                  # Contraseña del usuario
+DB_URL=jdbc:postgresql://host.docker.internal:5432/api_words
+EUREKA_CLIENT_SERVICE=http://eureka-server:8761/eureka/
+SERVICE_PORT=8090                 # Puerto para el microservicio de scrapping
+JWT_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+JWT_USER=USER_JWT
+```
+

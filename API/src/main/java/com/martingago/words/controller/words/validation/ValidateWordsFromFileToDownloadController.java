@@ -50,7 +50,7 @@ public class ValidateWordsFromFileToDownloadController {
         - Extensiones permitidas: .csv, .txt
         - Una palabra por línea
         - Sin título de cabecera
-        - Máximo: 10.000 palabras
+        - Máximo: 100.000 palabras
 
         📑 Formato de archivo de salida:
         - CSV con dos columnas: 'word' y 'status'

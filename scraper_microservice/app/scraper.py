@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
 import cloudscraper
-from session_manager import RetrySession
+from .session_manager import RetrySession
 from fake_useragent import UserAgent
-from utils import limpiar_palabra, formatear_palabra
+from .utils import limpiar_palabra, formatear_palabra
 import requests
 
 def obtener_datos(palabra, session):
