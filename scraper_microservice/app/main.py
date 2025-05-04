@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from app import procesar_palabra
-from app.config import EUREKA_CLIENT_SERVICE, SERVICE_PORT, INSTANCE_HOST
+from app.config import EUREKA_CLIENT_SERVICE, SERVICE_PORT
 import py_eureka_client.eureka_client as eureka_client
 import uuid
 from contextlib import asynccontextmanager
@@ -17,6 +17,7 @@ INSTANCE_ID = f"scraping-microservice:{uuid.uuid1()}"
 INSTANCE_HOSTNAME = socket.gethostname()
 
 logger.info(f"🛰️ Eureka Client Service: {EUREKA_CLIENT_SERVICE}")
+logger.info(f"🛰️ Instance hostname: {INSTANCE_HOSTNAME}")
 
 # ---------------- Registro en Eureka ---------------- #
 async def register_with_eureka():
@@ -25,7 +26,7 @@ async def register_with_eureka():
             eureka_server=EUREKA_CLIENT_SERVICE,
             app_name="scraping-microservice",
             instance_port=SERVICE_PORT,
-            instance_host=INSTANCE_HOST,
+            instance_host=INSTANCE_HOSTNAME,
             instance_id=INSTANCE_ID,
         )
         logger.info(f"✅ Registrado en Eureka como {INSTANCE_ID}")
