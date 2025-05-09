@@ -1,18 +1,9 @@
 import csv
 import os
 import re
+import argparse
 
 def limpiar_palabra(palabra):
-    """
-    Limpia la palabra de números, sufijos de género y caracteres especiales.
-    También maneja palabras con comillas.
-    
-    Args:
-        palabra (str): Palabra a limpiar
-    
-    Returns:
-        str: Palabra limpia en mayúsculas
-    """
     # Eliminar comillas si existen
     palabra = palabra.strip('"')
     
@@ -36,10 +27,6 @@ def limpiar_palabra(palabra):
 def limpiar_csv(input_file, output_file):
     """
     Lee un archivo CSV, limpia las palabras y guarda en un nuevo archivo.
-    
-    Args:
-        input_file (str): Ruta del archivo CSV de entrada
-        output_file (str): Ruta del archivo CSV de salida
     """
     # Crear un archivo temporal para guardar los resultados
     temp_file = output_file + '.tmp'
@@ -74,8 +61,8 @@ def limpiar_csv(input_file, output_file):
         if os.path.exists(output_file):
             os.remove(output_file)
         os.rename(temp_file, output_file)
-        print(f"\nProceso completado. Archivo guardado como: {output_file}")
-        print(f"Total de palabras únicas procesadas: {len(palabras_procesadas)}")
+        print(f"\n✅ Proceso completado. Archivo guardado como: {output_file}")
+        print(f"📊 Total de palabras únicas procesadas: {len(palabras_procesadas)}")
         
     except Exception as e:
         print(f"Error durante el procesamiento: {e}")
@@ -84,8 +71,14 @@ def limpiar_csv(input_file, output_file):
             os.remove(temp_file)
 
 if __name__ == "__main__":
-    # Archivos de entrada y salida
-    input_file = "../scrap_list_words/output/result-words-length5-20250502-133904.csv"  # Cambia esto al nombre de tu archivo de entrada
-    output_file = "../scraper/words_test.csv"  # Cambia esto al nombre de tu archivo de salida
-    
-    limpiar_csv(input_file, output_file)
+    # Valores por defecto si no se pasan por terminal
+    default_input = "../scrap_list_words/output/result-words-length5-20250502-133904.csv"
+    default_output = "../scraper/words_test.csv"
+
+    parser = argparse.ArgumentParser(description="Limpia palabras de un CSV y genera archivo limpio.")
+    parser.add_argument("--input", help="Ruta al archivo CSV de entrada", default=default_input)
+    parser.add_argument("--output", help="Ruta al archivo CSV de salida", default=default_output)
+
+    args = parser.parse_args()
+
+    limpiar_csv(args.input, args.output)
