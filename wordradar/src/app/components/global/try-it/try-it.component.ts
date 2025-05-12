@@ -11,7 +11,7 @@ import { ApiTryItService } from '../../../service/api-try-it.service';
 })
 export class TryItComponent {
   endpoint = 'http://localhost:8080/api/v1/'; // Endpoint base
-  param = 'search/emperador'; // Input del usuario
+  param = 'words/emperador'; // Input del usuario
   responseData: any = null; // Respuesta de la API
   loading = false; // Indicador de carga
   error = ''; // Manejo de errores
