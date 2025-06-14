@@ -1,19 +1,34 @@
 <div class="bg-primary sticky top-0 z-50">
-    <div class="w-[90%] py-3 md:w-[80%] max-w-[1200px] m-auto text-white">
-        <div class="flex items-center justify-between">
-            <!-- Logotipo -->
-            <span class="font-bold text-4xl">WordRadar</span>
-            <!-- Menú de hamburguesa (solo visible en móviles) -->
-            <button (click)="toggleMenu()" class="flex justify-center items-center w-[40px] h-[40px] md:hidden">
-              <mat-icon>menu</mat-icon>
-            </button>
-            <!-- Enlaces (visibles en escritorio) -->
-            <div class="links flex gap-4 top-[64px] md:top-0" [ngClass]="{'hidden': !menuOpen && isMobile, 'md:block': true}">
-              <a mat-button routerLink="/">Inicio</a>
-              <a mat-button routerLink="/servicios">Servicios</a>
-              <a mat-button routerLink="/acerca-de">Acerca de</a>
-              <a mat-button routerLink="/contacto">Contacto</a>
-            </div>
-        </div>
-      </div>
+  <div class="w-[90%] max-w-[1200px] py-3 md:w-[80%] mx-auto text-white">
+    <div class="flex items-center justify-between">
+      
+      <!-- Logotipo -->
+      <span class="font-bold text-4xl">WordRadar</span>
+
+      <!-- Botón de menú (solo en móviles) -->
+      <button
+        (click)="toggleMenu()"
+        class="flex justify-center items-center w-10 h-10 md:hidden"
+        aria-label="Abrir menú"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <!-- Menú de enlaces -->
+      <ul
+        class="absolute md:static right-0 top-full md:mt-0 w-full md:w-auto shadow md:shadow-none bg-white text-primary md:text-white md:bg-transparent flex-col md:flex-row items-center md:items-center gap-4 px-4 py-4 md:p-0 flex transition-all duration-300"
+        [ngClass]="{
+          'hidden': !menuOpen && isMobile,
+          'flex': menuOpen || !isMobile
+        }"
+      >
+        <li><a mat-button routerLink="/">Inicio</a></li>
+        <hr class="w-full border-t border-gray-200 md:hidden" />
+        <li><a mat-button href="http://localhost:8080/documentation" target="_blank">Documentación</a></li>
+        <hr class="w-full border-t border-gray-200 md:hidden" />
+        <li><a mat-button routerLink="/contacto">Contacto</a></li>
+      </ul>
+      
+    </div>
+  </div>
 </div>
